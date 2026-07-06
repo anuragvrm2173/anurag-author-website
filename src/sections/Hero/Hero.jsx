@@ -1,4 +1,5 @@
 import "./Hero.css";
+import Button from "../../components/ui/Button/Button";
 
 function Hero() {
   return (
@@ -19,9 +20,13 @@ function Hero() {
         </p>
 
         <div className="hero__actions">
-          <button>Explore My Books</button>
+          <Button>
+            Explore My Books
+          </Button>
 
-          <button>About Me</button>
+          <Button variant="outline">
+            About Me
+          </Button>
         </div>
       </div>
     </section>
