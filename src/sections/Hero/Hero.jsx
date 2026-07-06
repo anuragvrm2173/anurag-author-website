@@ -1,10 +1,11 @@
 import "./Hero.css";
 import Button from "../../components/ui/Button/Button";
+import Container from "../../components/ui/Container/Container";
 
 function Hero() {
   return (
     <section className="hero">
-      <div className="hero__container">
+      <Container>
         <p className="hero__eyebrow">
           Author • Storyteller • Memoir Writer
         </p>
@@ -28,7 +29,7 @@ function Hero() {
             About Me
           </Button>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }
