@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom";
+import navigation from "../../data/navigation";
+
 import "./Navbar.css";
 
 function Navbar() {
@@ -10,11 +12,17 @@ function Navbar() {
         </NavLink>
 
         <nav className="navbar__menu">
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="/about">About</NavLink>
-          <NavLink to="/library">Library</NavLink>
-          <NavLink to="/blog">Blog</NavLink>
-          <NavLink to="/contact">Contact</NavLink>
+          {navigation.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                isActive ? "active" : ""
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
       </div>
     </header>

@@ -1,0 +1,21 @@
+.hero {
+  padding: 4rem 2rem;
+  text-align: center;
+  background: var(--color-background);
+}
+
+.hero__content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.hero__content h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+.hero__content p {
+  font-size: 1.125rem;
+  color: var(--color-text-secondary);
+}

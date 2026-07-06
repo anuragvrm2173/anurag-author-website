@@ -1,4 +1,43 @@
-.navbar__menu a.active {
+.navbar {
+  background-color: var(--color-background);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+.navbar__container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 1.25rem 2rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar__logo {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.navbar__menu {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navbar__menu a {
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar__menu a:hover {
+  color: var(--color-accent);
+}
+
+.navbar__menu .active {
   color: var(--color-accent);
   font-weight: 600;
 }
