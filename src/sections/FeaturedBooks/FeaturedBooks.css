@@ -1,0 +1,17 @@
+.featured-books {
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.featured-books__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+.featured-books__subtitle {
+  font-size: 1.125rem;
+  color: var(--color-text-secondary);
+  max-width: 680px;
+  margin: 0 auto;
+}

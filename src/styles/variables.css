@@ -1,1 +1,32 @@
-/* CSS variables */
+:root {
+
+  /* Colors */
+  --color-background: #F8F6F1;
+  --color-primary: #111111;
+  --color-text: #2B2B2B;
+  --color-accent: #C9A34E;
+  --color-white: #ffffff;
+
+  /* Typography */
+  --font-heading: "Cormorant Garamond", serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Layout */
+  --container-width: 1200px;
+
+  /* Spacing */
+  --space-xs: .5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 6rem;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Shadow */
+  --shadow-sm: 0 8px 20px rgba(0,0,0,.08);
+
+}
