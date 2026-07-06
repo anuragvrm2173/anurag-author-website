@@ -1,0 +1,4 @@
+.navbar__menu a.active {
+  color: var(--color-accent);
+  font-weight: 600;
+}
