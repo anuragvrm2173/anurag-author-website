@@ -1,92 +1,231 @@
-const PURCHASE_LABELS = {
-  paperback: "Buy Paperback",
-  kindle: "Buy Kindle",
-  amazon: "Amazon",
-  pothi: "Pothi",
-  notionPress: "Notion Press",
-};
+const FORMAT_KEYS = new Set(["paperback", "kindle", "ebook", "hardcover", "audiobook"]);
+const FORMAT_PRIORITY = ["paperback", "hardcover", "kindle", "ebook", "audiobook"];
+const RETAILER_PRIORITY = ["pothi", "amazon", "notionPress", "flipkart", "kindle"];
 
-const PURCHASE_LABELS_HI = {
-  paperback: "पेपरबैक खरीदें",
-  kindle: "किंडल खरीदें",
-  amazon: "अमेज़न",
-  pothi: "पोथी",
-  notionPress: "नोटियन प्रेस",
-};
+function toTitleCase(value = "") {
+  if (!value) {
+    return "";
+  }
 
-function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen, isHindi = false }) {
-  const labels = isHindi ? PURCHASE_LABELS_HI : PURCHASE_LABELS;
-  const purchaseLinks = Object.entries(activeEdition.purchaseLinks || {}).filter(([, value]) => value);
-  const primaryLinks = purchaseLinks.filter(([key]) => key === "paperback" || key === "kindle");
-  const retailerLinks = purchaseLinks.filter(([key]) => key !== "paperback" && key !== "kindle");
+  return value
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
+function getPrimaryFormat(formats = {}) {
+  const availableEntries = Object.entries(formats).filter(([, isAvailable]) => Boolean(isAvailable));
+  if (availableEntries.length === 0) {
+    return null;
+  }
+
+  const byPriority = FORMAT_PRIORITY.find((key) => formats[key]);
+  if (byPriority) {
+    return byPriority;
+  }
+
+  return availableEntries[0][0];
+}
+
+function normalizeRetailers(activeEdition) {
+  const fromStructured = Object.entries(activeEdition.retailers || {}).map(([key, value]) => {
+    if (typeof value === "string") {
+      return {
+        key,
+        name: toTitleCase(key),
+        available: true,
+        url: value,
+        actionLabel: `Buy from ${toTitleCase(key)}`,
+        statusLabel: null,
+      };
+    }
+
+    return {
+      key,
+      name: value?.name || toTitleCase(key),
+      available: value?.available !== false,
+      url: value?.url || value?.href || null,
+      actionLabel: value?.actionLabel || value?.label || `Buy from ${value?.name || toTitleCase(key)}`,
+      statusLabel: value?.statusLabel || value?.label || "Coming Soon",
+    };
+  });
+
+  if (fromStructured.length > 0) {
+    return fromStructured;
+  }
+
+  return Object.entries(activeEdition.purchaseLinks || {})
+    .filter(([key, value]) => !FORMAT_KEYS.has(key) && Boolean(value))
+    .map(([key, value]) => ({
+      key,
+      name: toTitleCase(key),
+      available: true,
+      url: value,
+      actionLabel: `Buy from ${toTitleCase(key)}`,
+      statusLabel: null,
+    }));
+}
+
+function formatDisplayDate(dateValue, locale) {
+  if (!dateValue) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(dateValue));
+}
+
+function formatCurrencyPrice(pricing) {
+  if (!pricing || typeof pricing.amount !== "number") {
+    return null;
+  }
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: pricing.currency || "INR",
+    maximumFractionDigits: 0,
+  }).format(pricing.amount);
+}
+
+function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi = false }) {
+  const locale = isHindi ? "hi-IN" : "en-IN";
+  const retailers = normalizeRetailers(activeEdition);
+  const orderedRetailers = [...retailers].sort((left, right) => {
+    const leftIndex = RETAILER_PRIORITY.indexOf(left.key);
+    const rightIndex = RETAILER_PRIORITY.indexOf(right.key);
+    const leftRank = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+    const rightRank = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
+    return leftRank - rightRank;
+  });
+  const availableRetailers = orderedRetailers.filter((item) => item.available && item.url);
+  const unavailableRetailers = orderedRetailers.filter((item) => !item.available || !item.url);
   const hasSample = Boolean(activeEdition.sampleId);
-  const formatNames = Object.entries(activeEdition.formats || {})
-    .filter(([, isAvailable]) => Boolean(isAvailable))
-    .map(([name]) => name.toUpperCase());
+  const primaryFormatKey = getPrimaryFormat(activeEdition.formats || {});
+  const displayFormat = primaryFormatKey ? toTitleCase(primaryFormatKey) : (activeEdition.formatLabel || (isHindi ? "संस्करण" : "Edition"));
+  const isPublished = bookStatus === "Published";
+
+  const directPricing = activeEdition.pricing && typeof activeEdition.pricing.amount === "number" ? activeEdition.pricing : null;
+  const formatPricing = primaryFormatKey ? activeEdition.pricing?.[primaryFormatKey] : null;
+  const displayPricing = formatPricing || directPricing || (activeEdition.priceInr
+    ? { currency: "INR", amount: activeEdition.priceInr }
+    : null);
+  const displayPrice = formatCurrencyPrice(displayPricing);
+  const publicationDate = activeEdition.publicationDate || book?.publicationDate;
+  const publicationLabel = formatDisplayDate(publicationDate, locale);
+  const expectedLabel = publicationDate
+    ? new Intl.DateTimeFormat(locale, {
+      month: "long",
+      year: "numeric",
+    }).format(new Date(publicationDate))
+    : null;
+  const availabilityLabel = isPublished
+    ? (isHindi ? "उपलब्ध अब" : "Available Now")
+    : expectedLabel
+      ? (isHindi ? `अपेक्षित ${expectedLabel}` : `Expected ${expectedLabel}`)
+      : (isHindi ? "शीघ्र" : "Coming Soon");
+
+  const metadata = activeEdition.metadata || {};
+  const metadataRows = [
+    { key: "publisher", label: "Publisher", value: metadata.publisher || activeEdition.publisher || book?.publisher },
+    { key: "publicationDate", label: "Publication Date", value: formatDisplayDate(metadata.publicationDate || publicationDate, locale) },
+    { key: "language", label: "Language", value: metadata.language || activeEdition.language || activeEdition.label || book?.language },
+    { key: "pages", label: "Pages", value: metadata.pages || activeEdition.pages || book?.pages },
+    { key: "isbn13", label: "ISBN-13", value: metadata.isbn13 || activeEdition.isbn13 || activeEdition.isbn || book?.isbn },
+    { key: "asin", label: "ASIN", value: metadata.asin || activeEdition.asin },
+    { key: "weight", label: "Weight", value: metadata.weight || activeEdition.weight },
+    { key: "dimensions", label: "Dimensions", value: metadata.dimensions || activeEdition.dimensions },
+    { key: "country", label: "Country", value: metadata.country || activeEdition.country },
+  ].filter((item) => Boolean(item.value));
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    const shareTitle = book?.title || "Book";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, url: shareUrl });
+        return;
+      } catch {
+        return;
+      }
+    }
+
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareUrl);
+    }
+  };
 
   return (
     <aside className="purchase-panel">
       <div className="purchase-panel__header">
         <h2 className="purchase-panel__title">{isHindi ? "पुस्तक प्राप्त करें" : "Get the Book"}</h2>
-        <p className="purchase-panel__status">{isHindi && bookStatus === "Published" ? "प्रकाशित" : bookStatus}</p>
+        <p className="purchase-panel__status">{availabilityLabel}</p>
       </div>
 
-      <p className="purchase-panel__note">
-        {activeEdition.publicationDate
-          ? `${isHindi ? "प्रकाशन" : "Publication"}: ${new Date(activeEdition.publicationDate).toLocaleDateString("en-IN")}`
-          : isHindi
-            ? "प्रकाशन तिथि शीघ्र घोषित होगी।"
-            : "Publication date to be announced."}
-      </p>
-      <p className="purchase-panel__note">
-        {isHindi ? "फॉर्मेट" : "Formats"}: {formatNames.length > 0 ? formatNames.join(", ") : (isHindi ? "शीघ्र" : "Coming Soon")}
-      </p>
+      <div className="purchase-panel__price-block" aria-label={isHindi ? "संस्करण मूल्य" : "Edition pricing"}>
+        <p className="purchase-panel__price-format">{displayFormat}</p>
+        {displayPrice ? (
+          <p className="purchase-panel__price">{displayPrice}</p>
+        ) : (
+          <p className="purchase-panel__note">{isHindi ? "मूल्य शीघ्र घोषित होगा" : "Price to be announced"}</p>
+        )}
+        {availableRetailers.length > 0 ? (
+          <p className="purchase-panel__note">{isHindi ? "उपलब्ध" : "Available at"}</p>
+        ) : null}
+      </div>
 
-      {primaryLinks.length > 0 ? (
-        <div className="purchase-panel__actions">
-          {primaryLinks.map(([key, value]) => (
-            <a
-              key={key}
-              href={value}
-              className="purchase-panel__button purchase-panel__button--primary"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {labels[key]}
-            </a>
-          ))}
-        </div>
-      ) : (
-        <p className="purchase-panel__note">{isHindi ? "अभी खरीद लिंक उपलब्ध नहीं हैं।" : "Purchase links are not available for this edition yet."}</p>
-      )}
-
-      {retailerLinks.length > 0 ? (
+      {availableRetailers.length > 0 ? (
         <div className="purchase-panel__retailers">
-          {retailerLinks.map(([key, value]) => (
+          {availableRetailers.map((retailer) => (
             <a
-              key={key}
-              href={value}
+              key={retailer.key}
+              href={retailer.url}
               className="purchase-panel__button purchase-panel__button--secondary"
               target="_blank"
               rel="noreferrer"
+              aria-label={retailer.actionLabel}
             >
-              {labels[key]}
+              {retailer.name}
             </a>
           ))}
         </div>
       ) : null}
 
-      {purchaseLinks.length === 0 ? (
-        <button type="button" className="purchase-panel__button purchase-panel__button--secondary" disabled>
-          {isHindi ? "सूचित करें" : "Notify Me"}
-        </button>
+      {unavailableRetailers.length > 0 ? (
+        <div className="purchase-panel__retailers-unavailable" aria-label={isHindi ? "अनुपलब्ध विक्रेता" : "Unavailable retailers"}>
+          {unavailableRetailers.map((retailer) => (
+            <div key={retailer.key} className="purchase-panel__retailer-unavailable-item">
+              <p className="purchase-panel__retailer-name">{retailer.name}</p>
+              <p className="purchase-panel__retailer-status">{retailer.statusLabel}</p>
+            </div>
+          ))}
+        </div>
       ) : null}
 
-      {hasSample ? (
-        <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={onPreviewOpen}>
-          {isHindi ? "अंश पढ़ें" : "Look Inside"}
+      <div className="purchase-panel__secondary-actions">
+        {hasSample ? (
+          <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={onPreviewOpen}>
+            {isHindi ? "अंश पढ़ें" : "Read Sample"}
+          </button>
+        ) : null}
+
+        <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={handleShare}>
+          {isHindi ? "पुस्तक साझा करें" : "Share Book"}
         </button>
-      ) : null}
+      </div>
+
+      <dl className="purchase-panel__metadata" aria-label={isHindi ? "पुस्तक मेटाडेटा" : "Book metadata"}>
+        {metadataRows.map((item) => (
+          <div key={item.key} className="purchase-panel__metadata-item">
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+          </div>
+        ))}
+      </dl>
     </aside>
   );
 }

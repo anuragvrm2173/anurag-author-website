@@ -200,8 +200,70 @@
   line-height: 1.7;
 }
 
-.purchase-panel__actions,
+.purchase-panel__status {
+  font-weight: 600;
+  color: #1d7a3f;
+}
+
+.purchase-panel__price-block {
+  display: grid;
+  gap: 0.2rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(17, 17, 17, 0.04);
+}
+
+.purchase-panel__price-format {
+  margin: 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  color: rgba(43, 43, 43, 0.7);
+}
+
+.purchase-panel__price {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 4vw, 2.1rem);
+  line-height: 1.1;
+  color: var(--color-primary);
+}
+
 .purchase-panel__retailers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.purchase-panel__retailers-unavailable {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.purchase-panel__retailer-unavailable-item {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  background: rgba(17, 17, 17, 0.04);
+}
+
+.purchase-panel__retailer-name,
+.purchase-panel__retailer-status {
+  margin: 0;
+}
+
+.purchase-panel__retailer-name {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.purchase-panel__retailer-status {
+  color: rgba(43, 43, 43, 0.72);
+  font-size: 0.92rem;
+}
+
+.purchase-panel__secondary-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -223,7 +285,10 @@
   transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, color 180ms ease;
 }
 
-.purchase-panel__button--primary,
+.purchase-panel__button {
+  flex: 0 1 auto;
+}
+
 .related-books__link,
 .book-details__back-link {
   background: var(--color-primary);
@@ -239,6 +304,39 @@
   border-color: rgba(17, 17, 17, 0.12);
   background: transparent;
   color: var(--color-primary);
+}
+
+.purchase-panel__metadata {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1.1rem;
+}
+
+.purchase-panel__metadata-item {
+  display: grid;
+  gap: 0.2rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+.purchase-panel__metadata-item dt,
+.purchase-panel__metadata-item dd {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.purchase-panel__metadata-item dt {
+  color: rgba(43, 43, 43, 0.68);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+}
+
+.purchase-panel__metadata-item dd {
+  color: var(--color-primary);
+  font-weight: 500;
 }
 
 .purchase-panel__button:hover,
@@ -428,6 +526,10 @@
   .purchase-panel__header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .purchase-panel__metadata {
+    grid-template-columns: 1fr;
   }
 
   .edition-selector__list {

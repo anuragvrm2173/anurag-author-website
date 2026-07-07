@@ -17,6 +17,34 @@ import books, { getBookById, getRelatedBooks } from "../../data/books";
 
 import "./BookDetails.css";
 
+const RETAILER_PRIORITY = ["pothi", "amazon", "notionPress", "flipkart", "kindle"];
+
+function getPrimaryBuyLink(edition) {
+  const retailers = Object.entries(edition?.retailers || {})
+    .map(([key, value]) => ({
+      key,
+      available: value?.available !== false,
+      url: value?.url || value?.href || null,
+    }))
+    .filter((item) => item.available && item.url)
+    .sort((left, right) => {
+      const leftIndex = RETAILER_PRIORITY.indexOf(left.key);
+      const rightIndex = RETAILER_PRIORITY.indexOf(right.key);
+      const leftRank = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+      const rightRank = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
+      return leftRank - rightRank;
+    });
+
+  if (retailers[0]?.url) {
+    return retailers[0].url;
+  }
+
+  return edition?.purchaseLinks?.paperback
+    || edition?.purchaseLinks?.kindle
+    || edition?.purchaseLinks?.amazon
+    || null;
+}
+
 function BookDetails() {
   const { bookId } = useParams();
   const location = useLocation();
@@ -268,6 +296,7 @@ function BookDetails() {
 
             <PurchasePanel
               bookStatus={book.status}
+              book={book}
               activeEdition={activeEdition}
               onPreviewOpen={() => setIsReaderOpen(true)}
               isHindi={isHindi}
@@ -385,12 +414,7 @@ function BookDetails() {
         <BookReader
           sample={activeSample}
           onClose={() => setIsReaderOpen(false)}
-          buyLink={
-            activeEdition?.purchaseLinks?.paperback ||
-            activeEdition?.purchaseLinks?.kindle ||
-            activeEdition?.purchaseLinks?.amazon ||
-            null
-          }
+          buyLink={getPrimaryBuyLink(activeEdition)}
         />
       </ReaderModal>
     </HelmetProvider>

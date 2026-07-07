@@ -10,7 +10,17 @@ function BookHero({
   displaySubtitle,
   displayDescription,
 }) {
-  const publishedLabel = isHindi ? "प्रकाशित" : "Published";
+  const expectedLabel = activeEdition.publicationDate
+    ? new Intl.DateTimeFormat(isHindi ? "hi-IN" : "en-IN", {
+      month: "long",
+      year: "numeric",
+    }).format(new Date(activeEdition.publicationDate))
+    : null;
+  const availabilityLabel = book.status === "Published"
+    ? (isHindi ? "उपलब्ध अब" : "Available Now")
+    : expectedLabel
+      ? (isHindi ? `अपेक्षित ${expectedLabel}` : `Expected ${expectedLabel}`)
+      : (isHindi ? "शीघ्र" : "Coming Soon");
   const t = {
     pages: labels.pages || (isHindi ? "पृष्ठ" : "Pages"),
     isbn: labels.isbn || "ISBN",
@@ -42,7 +52,7 @@ function BookHero({
       </div>
 
       <div className="book-hero__content">
-        <p className="book-hero__status">{book.status === "Published" ? publishedLabel : book.status}</p>
+        <p className="book-hero__status">{availabilityLabel}</p>
         <h1 className="book-hero__title">{book.title}</h1>
         <p className="book-hero__subtitle">{displaySubtitle || book.subtitle}</p>
         <p className="book-hero__description">{displayDescription || book.shortDescription || book.description}</p>
