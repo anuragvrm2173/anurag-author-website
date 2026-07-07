@@ -1,5 +1,7 @@
 import "./Reviews.css";
 
+import { Link } from "react-router-dom";
+
 import ReviewCard from "../../components/reviews/ReviewCard/ReviewCard";
 import Container from "../../components/ui/Container/Container";
 import { getFeaturedReviews } from "../../data/reviews";
@@ -8,10 +10,10 @@ import useApprovedReviews from "../../hooks/useApprovedReviews";
 function Reviews() {
   const { reviews } = useApprovedReviews();
   const testimonials = getFeaturedReviews(3, reviews);
-  const reviewCount = reviews.length || 32;
+  const reviewCount = reviews.length;
   const averageRating = reviews.length
     ? (reviews.reduce((sum, item) => sum + (item.rating || 0), 0) / reviews.length).toFixed(1)
-    : "5.0";
+    : null;
 
   return (
     <section className="reviews-preview" aria-labelledby="reviews-preview-title">
@@ -21,10 +23,12 @@ function Reviews() {
           <h2 id="reviews-preview-title" className="reviews-preview__title">
             Words readers return to again and again.
           </h2>
-          <div className="reviews-preview__stats" aria-label="Rating summary">
-            <p className="reviews-preview__avg">Average Rating {averageRating} ★★★★★</p>
-            <p className="reviews-preview__count">{reviewCount} Reader Reviews</p>
-          </div>
+          {reviewCount > 0 ? (
+            <div className="reviews-preview__stats" aria-label="Rating summary">
+              {averageRating ? <p className="reviews-preview__avg">Average Rating {averageRating} ★★★★★</p> : null}
+              <p className="reviews-preview__count">{reviewCount} Reader Reviews</p>
+            </div>
+          ) : null}
         </div>
 
         <div className="reviews-preview__grid">
@@ -33,11 +37,17 @@ function Reviews() {
           ) : (
             <article className="review-card" aria-live="polite">
               <p className="review-card__quote">
-                Reader reviews will appear here after publication.
+                No reader reviews yet.
               </p>
               <p className="review-card__author">Be the first to share your thoughts.</p>
             </article>
           )}
+        </div>
+
+        <div className="reviews-preview__actions">
+          <Link to="/reviews#reviews-submit-title" className="reviews-preview__cta">
+            Give Review
+          </Link>
         </div>
       </Container>
     </section>

@@ -46,6 +46,29 @@
   gap: 1.5rem;
 }
 
+.reviews-preview__actions {
+  margin-top: 1.3rem;
+}
+
+.reviews-preview__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.05rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: var(--color-white);
+  transition: transform 180ms ease;
+}
+
+.reviews-preview__cta:hover {
+  transform: translateY(-1px);
+}
+
 @media (min-width: 768px) {
   .reviews-preview__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
