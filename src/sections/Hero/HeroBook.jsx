@@ -19,7 +19,7 @@ function HeroBook() {
         </p>
 
         <div className="hero__spotlight-author" aria-label="Author summary">
-          <img src={authorImage} alt="Anurag Verma" className="hero__spotlight-author-image" loading="lazy" />
+          <img src={authorImage} alt="Anurag Verma" className="hero__spotlight-author-image" loading="lazy" width="320" height="320" />
           <div>
             <p className="hero__spotlight-author-name">Anurag Verma</p>
             <p className="hero__spotlight-author-role">Indian Author</p>
@@ -34,6 +34,8 @@ function HeroBook() {
                 alt={`${featuredBook.title} ${edition.label} cover`}
                 className="hero__spotlight-edition-cover"
                 loading="lazy"
+                width="800"
+                height="1200"
               />
               <div className="hero__spotlight-edition-meta">
                 <p className="hero__spotlight-edition-label">{edition.formatLabel}</p>

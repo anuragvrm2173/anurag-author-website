@@ -56,7 +56,7 @@ function Contact() {
 
               <aside className="contact-page__aside" aria-labelledby="contact-channels-title">
                 <div className="contact-page__author">
-                  <img src={authorImage} alt="Anurag Verma portrait" loading="lazy" />
+                  <img src={authorImage} alt="Anurag Verma portrait" loading="lazy" width="320" height="320" />
                   <p>Anurag Verma</p>
                 </div>
 

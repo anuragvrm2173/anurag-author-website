@@ -156,6 +156,31 @@ function BookDetails() {
     bookFormat: activeEdition?.formatLabel,
   };
 
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteConfig.url,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Library",
+        item: `${siteConfig.url}/library`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: book.title,
+        item: `${siteConfig.url}/library/${book.id}`,
+      },
+    ],
+  };
+
   if (isPublished) {
     if (activeEdition?.isbn || book.isbn) {
       structuredData.isbn = activeEdition?.isbn || book.isbn;
@@ -287,6 +312,7 @@ function BookDetails() {
         <meta name="twitter:title" content={metaTitle} />
         <meta name="twitter:description" content={metaDescription} />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbStructuredData)}</script>
       </Helmet>
 
       <section className="book-details">

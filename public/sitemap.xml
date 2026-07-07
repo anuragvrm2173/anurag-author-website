@@ -3,4 +3,37 @@
   <url>
     <loc>https://example.com/</loc>
   </url>
+  <url>
+    <loc>https://example.com/about</loc>
+  </url>
+  <url>
+    <loc>https://example.com/library</loc>
+  </url>
+  <url>
+    <loc>https://example.com/library/the-last-goodbye</loc>
+  </url>
+  <url>
+    <loc>https://example.com/library/the-untold-stories</loc>
+  </url>
+  <url>
+    <loc>https://example.com/library/lessons-of-the-heart</loc>
+  </url>
+  <url>
+    <loc>https://example.com/reviews</loc>
+  </url>
+  <url>
+    <loc>https://example.com/blog</loc>
+  </url>
+  <url>
+    <loc>https://example.com/contact</loc>
+  </url>
+  <url>
+    <loc>https://example.com/search</loc>
+  </url>
+  <url>
+    <loc>https://example.com/privacy</loc>
+  </url>
+  <url>
+    <loc>https://example.com/terms</loc>
+  </url>
 </urlset>

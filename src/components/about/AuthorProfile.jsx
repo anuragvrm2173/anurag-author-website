@@ -12,7 +12,7 @@ function AuthorProfile({ name, occupation, shortBio, longBio, basedIn, authorIma
           <div className="author-profile__layout">
             {authorImage ? (
               <figure className="author-profile__portrait-wrap">
-                <img src={authorImage} alt={`${name} portrait`} className="author-profile__portrait" loading="lazy" />
+                <img src={authorImage} alt={`${name} portrait`} className="author-profile__portrait" loading="lazy" width="640" height="640" />
               </figure>
             ) : null}
 
