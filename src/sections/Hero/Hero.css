@@ -78,6 +78,13 @@
   animation: heroFloat 8s ease-in-out infinite;
 }
 
+.hero__spotlight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .hero__spotlight-label {
   margin: 0;
   font-size: 0.82rem;
@@ -85,6 +92,20 @@
   letter-spacing: 0.18rem;
   text-transform: uppercase;
   color: var(--color-accent);
+}
+
+.hero__spotlight-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
 }
 
 .hero__spotlight-title {
@@ -100,35 +121,8 @@
   color: var(--color-text);
 }
 
-.hero__spotlight-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
-}
-
-.hero__spotlight-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.9rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.52);
-  border: 1px solid rgba(17, 17, 17, 0.06);
-}
-
-.hero__spotlight-value {
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.hero__spotlight-key {
-  font-size: 0.86rem;
-  line-height: 1.5;
-  color: var(--color-text);
-}
-
 .hero__spotlight-note {
+  margin-top: auto;
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
@@ -187,10 +181,6 @@
   .hero__spotlight {
     min-height: auto;
     padding: 1.5rem;
-  }
-
-  .hero__spotlight-stats {
-    grid-template-columns: 1fr;
   }
 }
 
