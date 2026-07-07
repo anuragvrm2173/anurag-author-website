@@ -35,7 +35,7 @@ const socialLinks = [
     id: "email",
     name: "Email",
     icon: "email",
-    url: "mailto:anuragverma2173@gmail.com",
+    url: "mailto:vanuragverma2173@gmail.com",
     external: false,
     active: true,
   },

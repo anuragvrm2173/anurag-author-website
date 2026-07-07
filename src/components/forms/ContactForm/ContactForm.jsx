@@ -3,7 +3,7 @@ import { useState } from "react";
 import Button from "../../ui/Button/Button";
 import "./ContactForm.css";
 
-const CONTACT_ENDPOINT = "https://formsubmit.co/ajax/anuragverma2173@gmail.com";
+const CONTACT_ENDPOINT = "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
 
 function ContactForm() {
   const [status, setStatus] = useState("idle");
