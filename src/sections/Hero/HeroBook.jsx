@@ -59,7 +59,7 @@ function HeroBook() {
                   alt={`${featuredBook.title} ${edition.label} cover`}
                   className="hero__spotlight-edition-cover"
                   loading="eager"
-                  fetchpriority="high"
+                  fetchPriority="high"
                   width="800"
                   height="1200"
                 />
