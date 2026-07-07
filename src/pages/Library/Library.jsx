@@ -76,7 +76,7 @@ function Library() {
                             <p className="library-page__edition-language">{edition.label}</p>
                             <span className="library-page__edition-status library-page__edition-status--published">Published</span>
                             <Link to={`/library/${book.id}?edition=${editionKey}`} className="library-page__edition-link">
-                              View Details
+                              Explore Book
                             </Link>
                           </div>
                         </article>

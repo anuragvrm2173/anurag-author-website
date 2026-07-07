@@ -193,10 +193,20 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     }
   };
 
+  const getRetailerDescriptor = (retailer) => {
+    if (retailer.key === "amazon") {
+      return "★★★★★";
+    }
+    if (retailer.key === "notionPress") {
+      return "Official Store";
+    }
+    return retailer.actionLabel || (isHindi ? "उपलब्ध" : "Available");
+  };
+
   return (
     <aside className="purchase-panel">
       <div className="purchase-panel__header">
-        <h2 className="purchase-panel__title">{isHindi ? "पुस्तक प्राप्त करें" : "Get the Book"}</h2>
+        <h2 className="purchase-panel__title">{isHindi ? "यहां उपलब्ध" : "Available At"}</h2>
         <p className="purchase-panel__status">{availabilityLabel}</p>
       </div>
 
@@ -223,8 +233,11 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
               rel="noreferrer"
               aria-label={retailer.actionLabel}
             >
-              <RetailerMark retailerKey={retailer.key} />
-              <span>[ {retailer.name} ]</span>
+              <span className="purchase-panel__retailer-top-row">
+                <RetailerMark retailerKey={retailer.key} />
+                <span>[ {retailer.name} ]</span>
+              </span>
+              <span className="purchase-panel__retailer-subtext">{getRetailerDescriptor(retailer)}</span>
             </a>
           ))}
         </div>

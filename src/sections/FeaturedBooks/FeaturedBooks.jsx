@@ -2,7 +2,6 @@ import "./FeaturedBooks.css";
 
 import { Link } from "react-router-dom";
 
-import BookCoverArt from "../../components/books/BookCoverArt";
 import Container from "../../components/ui/Container/Container";
 import books from "../../data/books";
 
@@ -46,9 +45,8 @@ function FeaturedBooks() {
           subtitle: untoldBook.subtitle,
           language: "English & हिन्दी",
           status: "Coming Soon",
-          cover: untoldBook.editions?.english?.cover,
-          ctaLabel: "Notify Me",
-          ctaTo: "/contact",
+          ctaLabel: "Learn More",
+          ctaTo: `/library/${untoldBook.id}`,
         }
       : null,
     lessonsBook
@@ -59,12 +57,18 @@ function FeaturedBooks() {
           subtitle: lessonsBook.subtitle,
           language: "English & हिन्दी",
           status: "Coming Soon",
-          cover: lessonsBook.editions?.english?.cover,
-          ctaLabel: "Notify Me",
-          ctaTo: "/contact",
+          ctaLabel: "Learn More",
+          ctaTo: `/library/${lessonsBook.id}`,
         }
       : null,
   ].filter(Boolean);
+
+  const shelfColorByKey = {
+    "last-goodbye-english": "featured-books__tile-icon--red",
+    "last-goodbye-hindi": "featured-books__tile-icon--green",
+    "untold-upcoming": "featured-books__tile-icon--blue",
+    "lessons-upcoming": "featured-books__tile-icon--amber",
+  };
 
   return (
     <section className="featured-books" aria-labelledby="featured-books-title">
@@ -76,37 +80,29 @@ function FeaturedBooks() {
           </h2>
         </div>
 
-        <div className="featured-books__cards" role="list" aria-label="Homepage book collection">
+        <div className="featured-books__shelf" role="list" aria-label="Homepage book collection">
           {homepageTiles.map((tile) => (
-            <article key={tile.key} role="listitem" className="featured-books__card">
-              <BookCoverArt
-                title={tile.title}
-                subtitle={tile.subtitle}
-                author={tile.cover?.author || "Anurag Verma"}
-                badge={tile.status}
-                cover={tile.cover}
-                variant="front"
-                alt={`${tile.title} ${tile.language} cover`}
-                className="featured-books__cover"
-                imageClassName="featured-books__cover-image"
-                loading="lazy"
-              />
+            <article key={tile.key} role="listitem" className="featured-books__tile">
+              <div className="featured-books__tile-language-row">
+                <span className={`featured-books__tile-icon ${shelfColorByKey[tile.key] || ""}`} aria-hidden="true" />
+                <p className="featured-books__tile-language">{tile.language}</p>
+              </div>
 
-              <div className="featured-books__card-head">
-                <h3 className="featured-books__card-title">{tile.title}</h3>
-                <p className="featured-books__language">{tile.language}</p>
+              <div className="featured-books__tile-head">
+                <h3 className="featured-books__tile-title">{tile.title}</h3>
                 <span
-                  className={`featured-books__status featured-books__status--${tile.status.toLowerCase().replace(/\s+/g, "-")}`}
+                  className={`featured-books__tile-status featured-books__tile-status--${tile.status.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   {tile.status}
                 </span>
               </div>
 
-              <Link to={tile.ctaTo} className="featured-books__view-link">
+              <Link to={tile.ctaTo} className="featured-books__tile-link">
                 {tile.ctaLabel}
               </Link>
             </article>
           ))}
+          <span className="featured-books__shelf-plank" aria-hidden="true" />
         </div>
       </Container>
     </section>

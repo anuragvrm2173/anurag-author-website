@@ -19,6 +19,11 @@
   padding: 4.5rem 0;
 }
 
+.about-philosophy,
+.about-stats {
+  padding: 3.8rem 0;
+}
+
 .about-story__inner,
 .about-writing-focus__inner,
 .about-reader-connection__inner,
@@ -64,9 +69,55 @@
   margin: 0 auto;
   max-width: 52rem;
   font-family: var(--font-heading);
-  font-size: clamp(2rem, 5.8vw, 4rem);
-  line-height: 1.18;
+  font-size: clamp(2.1rem, 5.8vw, 4.25rem);
+  line-height: 1.2;
   text-align: center;
+  color: var(--color-primary);
+}
+
+.about-philosophy__content {
+  max-width: 44rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.about-philosophy__content p {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  line-height: 1.55;
+  color: var(--color-primary);
+}
+
+.about-stats__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.about-stats__card {
+  padding: 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(247, 241, 228, 0.84));
+}
+
+.about-stats__label,
+.about-stats__value {
+  margin: 0;
+}
+
+.about-stats__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+  color: rgba(43, 43, 43, 0.72);
+}
+
+.about-stats__value {
+  margin-top: 0.45rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 2.6vw, 1.8rem);
   color: var(--color-primary);
 }
 
@@ -253,6 +304,10 @@
 }
 
 @media (max-width: 640px) {
+  .about-stats__grid {
+    grid-template-columns: 1fr;
+  }
+
   .about-social-links__anchor {
     width: 100%;
     justify-content: center;

@@ -290,6 +290,8 @@ function BookDetails() {
   const displayLongDescription = localized?.longDescription || book.longDescription;
   const displaySynopsis = localized?.synopsis || book.synopsis;
   const displayWhoFor = book.whoThisBookIsFor || [];
+  const displayReadingTime = activeEdition?.readingTime || book.readingTime || "6-7 hours";
+  const displayFavoriteQuotes = activeEdition?.favoriteQuotes || book.favoriteQuotes || [];
   const displayGenres = isHindi ? book.genres.map((item) => genreMapHi[item] || item) : book.genres;
   const displayThemes = isHindi ? book.themes.map((item) => themeMapHi[item] || item) : book.themes;
   const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
@@ -398,6 +400,8 @@ function BookDetails() {
             synopsis={displaySynopsis}
             themes={displayThemes}
             whoThisBookIsFor={displayWhoFor}
+            readingTime={displayReadingTime}
+            favoriteQuotes={displayFavoriteQuotes}
             isHindi={isHindi}
           />
 

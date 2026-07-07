@@ -23,6 +23,24 @@
   color: var(--color-primary);
 }
 
+.reviews-preview__stats {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.3rem;
+}
+
+.reviews-preview__avg,
+.reviews-preview__count {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.reviews-preview__avg {
+  color: #a26f1e;
+}
+
 .reviews-preview__grid {
   display: grid;
   gap: 1.5rem;

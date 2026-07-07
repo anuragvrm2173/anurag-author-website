@@ -15,6 +15,46 @@
   color: var(--color-primary);
 }
 
+.reviews-page__stats-row {
+  margin-bottom: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.reviews-page__avg,
+.reviews-page__count {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.reviews-page__avg {
+  color: #9a6a1d;
+  font-weight: 700;
+}
+
+.reviews-page__count {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.reviews-page__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.reviews-page__sort select {
+  min-height: 2.4rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 255, 255, 0.82);
+}
+
 .reviews-page__grid {
   display: grid;
   gap: 1.2rem;

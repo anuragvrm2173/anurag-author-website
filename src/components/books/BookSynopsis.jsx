@@ -1,7 +1,17 @@
-function BookSynopsis({ longDescription, synopsis, themes, whoThisBookIsFor = [], isHindi = false }) {
+function BookSynopsis({
+  longDescription,
+  synopsis,
+  themes,
+  whoThisBookIsFor = [],
+  favoriteQuotes = [],
+  readingTime = null,
+  isHindi = false,
+}) {
   const aboutLabel = isHindi ? "पुस्तक परिचय" : "About the Book";
   const themesLabel = isHindi ? "विषय" : "Themes";
   const whoForLabel = isHindi ? "यह पुस्तक किनके लिए है" : "Who This Book Is For";
+  const readingTimeLabel = isHindi ? "अनुमानित पढ़ने का समय" : "Approx Reading Time";
+  const favoriteQuotesLabel = isHindi ? "पसंदीदा उद्धरण" : "Favorite Quotes";
 
   return (
     <section className="book-synopsis">
@@ -34,6 +44,26 @@ function BookSynopsis({ longDescription, synopsis, themes, whoThisBookIsFor = []
               {whoThisBookIsFor.map((item) => (
                 <li key={item} className="book-synopsis__list-item">
                   {item}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
+
+        {readingTime ? (
+          <>
+            <p className="book-synopsis__eyebrow book-synopsis__eyebrow--nested">{readingTimeLabel}</p>
+            <p className="book-synopsis__paragraph">{readingTime}</p>
+          </>
+        ) : null}
+
+        {favoriteQuotes.length > 0 ? (
+          <>
+            <p className="book-synopsis__eyebrow book-synopsis__eyebrow--nested">{favoriteQuotesLabel}</p>
+            <ul className="book-synopsis__list">
+              {favoriteQuotes.map((item) => (
+                <li key={item} className="book-synopsis__list-item">
+                  "{item}"
                 </li>
               ))}
             </ul>

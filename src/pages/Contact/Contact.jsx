@@ -12,6 +12,7 @@ import socialLinks from "../../data/socialLinks";
 
 function Contact() {
   const contactChannels = socialLinks.filter((link) => link.active !== false);
+  const inquiries = ["Media", "Collaborations", "Speaking", "General Questions"];
 
   return (
     <HelmetProvider>
@@ -48,6 +49,11 @@ function Contact() {
                 <h2 id="contact-form-title" className="contact-page__section-title">
                   Send a Message
                 </h2>
+                <div className="contact-page__inquiries" aria-label="Inquiry categories">
+                  {inquiries.map((item) => (
+                    <span key={item} className="contact-page__inquiry-pill">{item}</span>
+                  ))}
+                </div>
                 <p className="contact-page__note">
                   I read every message with care. Thank you for writing with sincerity.
                 </p>

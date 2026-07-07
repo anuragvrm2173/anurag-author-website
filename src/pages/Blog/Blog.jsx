@@ -10,6 +10,15 @@ import { blogPosts } from "../../data/blog";
 import siteConfig from "../../data/siteConfig";
 
 function Blog() {
+  const [featuredArticle, ...latestArticles] = blogPosts;
+  const categoryMap = blogPosts.reduce((acc, post) => {
+    if (!acc[post.category]) {
+      acc[post.category] = [];
+    }
+    acc[post.category].push(post);
+    return acc;
+  }, {});
+
   return (
     <HelmetProvider>
       <SEO
@@ -38,9 +47,31 @@ function Blog() {
           </Container>
         </section>
 
-        <section className="blog-page__list">
+        <section className="blog-page__featured" aria-labelledby="blog-featured-title">
           <Container>
-            <BlogGrid posts={blogPosts} />
+            <h2 id="blog-featured-title" className="blog-page__section-title">Featured Article</h2>
+            {featuredArticle ? <BlogGrid posts={[featuredArticle]} compact /> : null}
+          </Container>
+        </section>
+
+        <section className="blog-page__list" aria-labelledby="blog-latest-title">
+          <Container>
+            <h2 id="blog-latest-title" className="blog-page__section-title">Latest Articles</h2>
+            <BlogGrid posts={latestArticles} />
+          </Container>
+        </section>
+
+        <section className="blog-page__categories" aria-labelledby="blog-categories-title">
+          <Container>
+            <h2 id="blog-categories-title" className="blog-page__section-title">Browse by Category</h2>
+            <div className="blog-page__category-grid" role="list" aria-label="Blog categories">
+              {Object.entries(categoryMap).map(([category, posts]) => (
+                <article key={category} className="blog-page__category-card" role="listitem">
+                  <h3>{category}</h3>
+                  <p>{posts.length} article{posts.length > 1 ? "s" : ""}</p>
+                </article>
+              ))}
+            </div>
           </Container>
         </section>
       </main>

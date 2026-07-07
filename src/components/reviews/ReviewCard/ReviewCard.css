@@ -11,6 +11,20 @@
   color: var(--color-text);
 }
 
+.review-card__verified {
+  margin: 0 0 0.5rem;
+  width: fit-content;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(78, 133, 88, 0.4);
+  background: rgba(78, 133, 88, 0.12);
+  color: #2f6040;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
 .review-card__rating {
   margin: 0 0 0.7rem;
   letter-spacing: 0.15rem;

@@ -33,6 +33,20 @@ const writingThemes = [
   "The quiet lessons hidden inside ordinary life",
 ];
 
+const writingPhilosophyParagraphs = [
+  "Some stories begin with imagination.",
+  "Mine began with memories.",
+  "I don't write to tell readers what to feel.",
+  "I write so they discover feelings they've carried for years.",
+];
+
+const readingStats = [
+  { label: "Books Published", value: "2" },
+  { label: "Languages", value: "2" },
+  { label: "Readers", value: "Growing Every Day" },
+  { label: "Current Project", value: "Lessons of the Heart" },
+];
+
 const readerConnectionParagraphs = [
   "People don't read my books because I have all the answers.",
   "They read because the stories feel honest.",
@@ -98,13 +112,39 @@ function About() {
 
         <StorySection title="The Story Behind the Words" paragraphs={storyParagraphs} />
 
+        <section className="about-philosophy" aria-labelledby="about-philosophy-title">
+          <Container>
+            <h2 id="about-philosophy-title" className="about-story__title">Why I Write</h2>
+            <div className="about-philosophy__content">
+              {writingPhilosophyParagraphs.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        <section className="about-stats" aria-labelledby="about-stats-title">
+          <Container>
+            <h2 id="about-stats-title" className="about-story__title">Reading Statistics</h2>
+            <div className="about-stats__grid" role="list" aria-label="Author reading statistics">
+              {readingStats.map((item) => (
+                <article key={item.label} className="about-stats__card" role="listitem">
+                  <p className="about-stats__label">{item.label}</p>
+                  <p className="about-stats__value">{item.value}</p>
+                </article>
+              ))}
+            </div>
+          </Container>
+        </section>
+
         <section className="about-quote" aria-label="Author quote">
           <Container>
             <blockquote className="about-quote__text">
-              I don't write because I have all the answers.
+              "I write so a reader can meet an old feeling,
               <br />
+              forgive it,
               <br />
-              I write because stories have always helped me understand the questions.
+              and leave lighter than they arrived."
             </blockquote>
           </Container>
         </section>

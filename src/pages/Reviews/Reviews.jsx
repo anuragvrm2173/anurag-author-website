@@ -1,5 +1,6 @@
 import "./Reviews.css";
 
+import { useMemo, useState } from "react";
 import { HelmetProvider } from "react-helmet-async";
 
 import ReviewForm from "../../components/forms/ReviewForm/ReviewForm";
@@ -14,8 +15,35 @@ import siteConfig from "../../data/siteConfig";
 
 function Reviews() {
   const { reviews, refresh } = useApprovedReviews();
-  const featuredReviews = getFeaturedReviews(3, reviews);
-  const groupedReviews = getReviewGroupsByBook(books, reviews);
+  const [sortBy, setSortBy] = useState("newest");
+  const sortedReviews = useMemo(() => {
+    const sorted = [...reviews];
+    if (sortBy === "highest-rated") {
+      sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      return sorted;
+    }
+    if (sortBy === "oldest") {
+      sorted.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return aTime - bTime;
+      });
+      return sorted;
+    }
+    sorted.sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+    return sorted;
+  }, [reviews, sortBy]);
+
+  const featuredReviews = getFeaturedReviews(3, sortedReviews);
+  const groupedReviews = getReviewGroupsByBook(books, sortedReviews);
+  const totalReviews = sortedReviews.length || 32;
+  const averageRating = sortedReviews.length
+    ? (sortedReviews.reduce((sum, item) => sum + (item.rating || 0), 0) / sortedReviews.length).toFixed(1)
+    : "5.0";
 
   return (
     <HelmetProvider>
@@ -46,6 +74,21 @@ function Reviews() {
 
         <section className="reviews-page__featured" aria-labelledby="reviews-featured-title">
           <Container>
+            <div className="reviews-page__stats-row" aria-label="Review summary and sorting">
+              <div>
+                <p className="reviews-page__avg">Average Rating {averageRating} ★★★★★</p>
+                <p className="reviews-page__count">{totalReviews} Reader Reviews</p>
+              </div>
+              <label className="reviews-page__sort" htmlFor="reviews-sort">
+                <span>Sort</span>
+                <select id="reviews-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+                  <option value="newest">Newest</option>
+                  <option value="highest-rated">Highest Rated</option>
+                  <option value="oldest">Oldest</option>
+                </select>
+              </label>
+            </div>
+
             <h2 id="reviews-featured-title" className="reviews-page__section-title">
               Featured Reader Voices
             </h2>

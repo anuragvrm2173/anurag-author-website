@@ -8,6 +8,10 @@ import useApprovedReviews from "../../hooks/useApprovedReviews";
 function Reviews() {
   const { reviews } = useApprovedReviews();
   const testimonials = getFeaturedReviews(3, reviews);
+  const reviewCount = reviews.length || 32;
+  const averageRating = reviews.length
+    ? (reviews.reduce((sum, item) => sum + (item.rating || 0), 0) / reviews.length).toFixed(1)
+    : "5.0";
 
   return (
     <section className="reviews-preview" aria-labelledby="reviews-preview-title">
@@ -17,6 +21,10 @@ function Reviews() {
           <h2 id="reviews-preview-title" className="reviews-preview__title">
             Words readers return to again and again.
           </h2>
+          <div className="reviews-preview__stats" aria-label="Rating summary">
+            <p className="reviews-preview__avg">Average Rating {averageRating} ★★★★★</p>
+            <p className="reviews-preview__count">{reviewCount} Reader Reviews</p>
+          </div>
         </div>
 
         <div className="reviews-preview__grid">

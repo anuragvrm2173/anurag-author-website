@@ -63,6 +63,12 @@ const books = [
       "Anyone navigating grief, heartbreak, or unfinished emotional conversations.",
       "Readers looking for emotionally honest stories about healing and resilience.",
     ],
+    readingTime: "6-7 hours",
+    favoriteQuotes: [
+      "Some goodbyes never happen in words, only in silence.",
+      "Love does not end when a chapter closes.",
+      "We heal when we stop running from memory.",
+    ],
     editions: {
       english: {
         label: "English",
@@ -91,6 +97,12 @@ const books = [
           fullCover: lastGoodbyeEnFullCover,
         },
         sampleId: "lastGoodbye-en",
+        readingTime: "6-7 hours",
+        favoriteQuotes: [
+          "Some goodbyes never happen in words, only in silence.",
+          "Love does not end when a chapter closes.",
+          "We heal when we stop running from memory.",
+        ],
         purchaseLinks: {
           paperback: "https://amazon.in/stores/Anurag-Verma/author/B0H7PH8QW4",
           kindle: "https://amazon.in/stores/Anurag-Verma/author/B0H7PH8QW4",
@@ -128,6 +140,12 @@ const books = [
           fullCover: lastGoodbyeHiFullCover,
         },
         sampleId: "lastGoodbye-hi",
+        readingTime: "6-7 hours",
+        favoriteQuotes: [
+          "कुछ अलविदा शब्दों में नहीं, खामोशी में होते हैं।",
+          "प्रेम अध्याय खत्म होने से खत्म नहीं होता।",
+          "यादों से भागना छोड़ दें तो उपचार शुरू होता है।",
+        ],
         retailers: {
           amazon: {
             name: "Amazon",
@@ -218,6 +236,12 @@ const books = [
       "Anyone curious about untold chapters, emotional backstory, and reflection.",
       "Readers who appreciate intimate nonfiction and companion memoirs.",
     ],
+    readingTime: "5-6 hours",
+    favoriteQuotes: [
+      "Untold stories are often the ones that changed us most.",
+      "Memory edits nothing; it reveals what mattered.",
+      "What we could not publish still shaped every page.",
+    ],
     editions: {
       english: {
         label: "English",
@@ -245,6 +269,12 @@ const books = [
           fullCover: null,
         },
         sampleId: "untold-en",
+        readingTime: "5-6 hours",
+        favoriteQuotes: [
+          "Untold stories are often the ones that changed us most.",
+          "Memory edits nothing; it reveals what mattered.",
+          "What we could not publish still shaped every page.",
+        ],
         metadata: {
           publisher: null,
           publicationDate: null,
@@ -286,6 +316,12 @@ const books = [
           fullCover: null,
         },
         sampleId: "untold-hi",
+        readingTime: "5-6 hours",
+        favoriteQuotes: [
+          "अनकही कहानियां अक्सर वही होती हैं जो हमें बदल देती हैं।",
+          "स्मृति कुछ नहीं छिपाती, वही दिखाती है जो महत्वपूर्ण था।",
+          "जो छपा नहीं, उसने भी पूरी किताब को आकार दिया।",
+        ],
         metadata: {
           publisher: null,
           publicationDate: null,
@@ -348,6 +384,12 @@ const books = [
       "Anyone working through healing, purpose, and personal growth.",
       "Readers who enjoy reflective nonfiction and life lessons they can apply daily.",
     ],
+    readingTime: "4-5 hours",
+    favoriteQuotes: [
+      "A broken heart can still become a wise one.",
+      "Healing is not forgetting; it is understanding.",
+      "Hope is a daily practice, not a single moment.",
+    ],
     editions: {
       english: {
         label: "English",
@@ -375,6 +417,12 @@ const books = [
           fullCover: null,
         },
         sampleId: "lessons-en",
+        readingTime: "4-5 hours",
+        favoriteQuotes: [
+          "A broken heart can still become a wise one.",
+          "Healing is not forgetting; it is understanding.",
+          "Hope is a daily practice, not a single moment.",
+        ],
         metadata: {
           publisher: null,
           publicationDate: null,
@@ -416,6 +464,12 @@ const books = [
           fullCover: null,
         },
         sampleId: "lessons-hi",
+        readingTime: "4-5 hours",
+        favoriteQuotes: [
+          "टूटा हुआ दिल भी समझदार बन सकता है।",
+          "उपचार भूलना नहीं, समझना है।",
+          "आशा एक अभ्यास है, एक पल नहीं।",
+        ],
         metadata: {
           publisher: null,
           publicationDate: null,

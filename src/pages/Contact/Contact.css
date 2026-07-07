@@ -25,6 +25,25 @@
   color: var(--color-text);
 }
 
+.contact-page__inquiries {
+  margin-bottom: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.contact-page__inquiry-pill {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
 .contact-page__aside {
   padding: 1.4rem;
   border: 1px solid rgba(17, 17, 17, 0.1);

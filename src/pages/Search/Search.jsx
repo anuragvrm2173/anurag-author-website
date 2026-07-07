@@ -102,6 +102,10 @@ function Search() {
     });
   }, [normalizedQuery]);
 
+  const recentBooks = books.slice(0, 3);
+  const recentBlogs = blogPosts.slice(0, 3);
+  const hasNoResults = normalizedQuery && filteredBooks.length === 0 && filteredPosts.length === 0;
+
   return (
     <HelmetProvider>
       <SEO
@@ -207,6 +211,54 @@ function Search() {
             </div>
           </Container>
         </section>
+
+        {!normalizedQuery ? (
+          <section className="search-page__results" aria-labelledby="search-recent-books-title">
+            <Container>
+              <h2 id="search-recent-books-title" className="search-page__section-title">Recent Books</h2>
+              <div className="search-page__grid" role="list" aria-label="Recent books">
+                {recentBooks.map((book) => (
+                  <article key={book.id} className="search-page__card" role="listitem">
+                    <p className="search-page__meta">{book.status}</p>
+                    <h3>{book.title}</h3>
+                    <p>{book.shortDescription}</p>
+                    <Link to={`/library/${book.id}`} className="search-page__link">Open Book</Link>
+                  </article>
+                ))}
+              </div>
+            </Container>
+          </section>
+        ) : null}
+
+        {!normalizedQuery ? (
+          <section className="search-page__results" aria-labelledby="search-recent-blog-title">
+            <Container>
+              <h2 id="search-recent-blog-title" className="search-page__section-title">Recent Blogs</h2>
+              <div className="search-page__grid" role="list" aria-label="Recent blogs">
+                {recentBlogs.map((post) => (
+                  <article key={post.id} className="search-page__card" role="listitem">
+                    <p className="search-page__meta">{post.category}</p>
+                    <h3>{post.title}</h3>
+                    <p>{post.excerpt}</p>
+                    <Link to="/blog" className="search-page__link">Read in Blog</Link>
+                  </article>
+                ))}
+              </div>
+            </Container>
+          </section>
+        ) : null}
+
+        {hasNoResults ? (
+          <section className="search-page__results" aria-labelledby="search-empty-title">
+            <Container>
+              <div className="search-page__illustration" role="img" aria-label="No results illustration">
+                <span className="search-page__illustration-icon" aria-hidden="true">📚</span>
+                <h2 id="search-empty-title" className="search-page__section-title">No Results Found</h2>
+                <p className="search-page__empty">Try broader keywords or browse recent books and blog posts.</p>
+              </div>
+            </Container>
+          </section>
+        ) : null}
       </main>
     </HelmetProvider>
   );

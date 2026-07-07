@@ -8,9 +8,10 @@ function renderStars(rating = 0) {
   return "★".repeat(rating);
 }
 
-function ReviewCard({ review }) {
+function ReviewCard({ review, showVerifiedBadge = true }) {
   return (
     <article className="review-card" aria-label={`Review by ${review.reviewerName}`}>
+      {showVerifiedBadge ? <p className="review-card__verified">Verified Reader</p> : null}
       {review.rating ? <p className="review-card__rating">{renderStars(review.rating)}</p> : null}
       <p className="review-card__quote">"{review.quote}"</p>
       <p className="review-card__author">

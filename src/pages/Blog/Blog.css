@@ -2,6 +2,50 @@
   padding: 5.5rem 0 2.5rem;
 }
 
+.blog-page__section-title {
+  margin: 0 0 1.1rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  color: var(--color-primary);
+}
+
+.blog-page__featured {
+  padding: 1rem 0 1.4rem;
+}
+
 .blog-page__list {
-  padding: 1rem 0 5rem;
+  padding: 0.5rem 0 2.5rem;
+}
+
+.blog-page__categories {
+  padding: 0.5rem 0 5rem;
+}
+
+.blog-page__category-grid {
+  display: grid;
+  gap: 0.95rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.blog-page__category-card {
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.blog-page__category-card h3,
+.blog-page__category-card p {
+  margin: 0;
+}
+
+.blog-page__category-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.blog-page__category-card p {
+  margin-top: 0.4rem;
+  color: rgba(43, 43, 43, 0.72);
 }

@@ -15,10 +15,11 @@ function Timeline() {
         </div>
 
         <div className="timeline__list" role="list">
-          {timeline.map((item) => (
+          {timeline.map((item, index) => (
             <article className="timeline__item" key={`${item.year}-${item.title}`} role="listitem">
+              <div className="timeline__marker" aria-hidden="true">✦</div>
               <div className="timeline__year">{item.year}</div>
-              <div className="timeline__content">
+              <div className="timeline__content" style={{ animationDelay: `${index * 120}ms` }}>
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
               </div>

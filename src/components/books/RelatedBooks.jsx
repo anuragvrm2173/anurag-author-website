@@ -9,9 +9,9 @@ function RelatedBooks({ books }) {
   return (
     <section className="related-books" aria-labelledby="related-books-title">
       <div className="related-books__header">
-        <p className="related-books__eyebrow">More Books</p>
+        <p className="related-books__eyebrow">Continue Reading</p>
         <h2 id="related-books-title" className="related-books__title">
-          Continue through the library.
+          Continue Reading
         </h2>
       </div>
 
