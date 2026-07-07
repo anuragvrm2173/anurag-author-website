@@ -59,19 +59,94 @@
   align-items: center;
 }
 
-.hero__portrait {
+.hero__spotlight {
   width: min(100%, 27rem);
-  aspect-ratio: 4 / 5;
-  display: grid;
-  place-items: center;
+  min-height: 31rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem;
   border-radius: 1.5rem;
-  background: linear-gradient(135deg, rgba(201, 163, 78, 0.22), rgba(17, 17, 17, 0.04));
+  background:
+    radial-gradient(circle at top, rgba(201, 163, 78, 0.18), transparent 40%),
+    linear-gradient(145deg, #f4ecdd 0%, #eee1c3 100%);
   color: var(--color-primary);
-  font-weight: 700;
   border: 1px solid rgba(17, 17, 17, 0.08);
   box-shadow: 0 24px 70px rgba(17, 17, 17, 0.08);
   transform: translateY(-4px);
   animation: heroFloat 8s ease-in-out infinite;
+}
+
+.hero__spotlight-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18rem;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.hero__spotlight-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 0.98;
+}
+
+.hero__spotlight-copy {
+  margin: 0;
+  line-height: 1.8;
+  color: var(--color-text);
+}
+
+.hero__spotlight-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.hero__spotlight-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(17, 17, 17, 0.06);
+}
+
+.hero__spotlight-value {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.hero__spotlight-key {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.hero__spotlight-note {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+.hero__spotlight-note-mark {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.hero__spotlight-note p {
+  margin: 0;
+  line-height: 1.7;
+  color: rgba(43, 43, 43, 0.84);
 }
 
 @keyframes heroFloat {
@@ -107,6 +182,15 @@
   .hero__buttons {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .hero__spotlight {
+    min-height: auto;
+    padding: 1.5rem;
+  }
+
+  .hero__spotlight-stats {
+    grid-template-columns: 1fr;
   }
 }
 
