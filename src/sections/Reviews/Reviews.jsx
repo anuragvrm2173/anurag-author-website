@@ -3,9 +3,11 @@ import "./Reviews.css";
 import ReviewCard from "../../components/reviews/ReviewCard/ReviewCard";
 import Container from "../../components/ui/Container/Container";
 import { getFeaturedReviews } from "../../data/reviews";
+import useApprovedReviews from "../../hooks/useApprovedReviews";
 
 function Reviews() {
-  const testimonials = getFeaturedReviews(3);
+  const { reviews } = useApprovedReviews();
+  const testimonials = getFeaturedReviews(3, reviews);
 
   return (
     <section className="reviews-preview" aria-labelledby="reviews-preview-title">

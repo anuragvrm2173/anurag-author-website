@@ -17,7 +17,7 @@ function Home() {
       <AboutPreview />
       <Timeline />
       <Reviews />
-      <Newsletter />
+      <Newsletter source="Homepage" />
     </main>
   );
 }

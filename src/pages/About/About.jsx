@@ -143,7 +143,7 @@ function About() {
 
         <SocialLinks links={socialLinks} />
 
-        <Newsletter />
+        <Newsletter source="About" />
       </main>
     </HelmetProvider>
   );

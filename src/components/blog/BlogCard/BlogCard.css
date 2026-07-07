@@ -27,3 +27,15 @@
   line-height: 1.85;
   color: var(--color-text);
 }
+
+.blog-card__content {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.blog-card__content p {
+  margin: 0;
+  line-height: 1.8;
+  color: var(--color-text);
+}

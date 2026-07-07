@@ -67,6 +67,10 @@
   color: var(--color-accent);
 }
 
+.book-synopsis__eyebrow--nested {
+  margin-top: 1.3rem;
+}
+
 .book-hero__title,
 .related-books__title,
 .book-reviews__title {
@@ -128,6 +132,32 @@
   background: rgba(17, 17, 17, 0.06);
   color: var(--color-primary);
   font-size: 0.92rem;
+}
+
+.book-details__share {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.book-details__share-label {
+  color: rgba(43, 43, 43, 0.72);
+  font-size: 0.92rem;
+}
+
+.book-details__share-link {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .edition-selector {

@@ -54,6 +54,19 @@
   color: rgba(255,255,255,0.7);
 }
 
+.newsletter__status {
+  margin: 0.25rem 0 0;
+  line-height: 1.6;
+}
+
+.newsletter__status--success {
+  color: #9de6c0;
+}
+
+.newsletter__status--error {
+  color: #ffd2d2;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

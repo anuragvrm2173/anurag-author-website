@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { FaFacebookF, FaLink, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 
 import BookHero from "../../components/books/BookHero";
 import BookSynopsis from "../../components/books/BookSynopsis";
 import EditionSelector from "../../components/books/EditionSelector";
 import PurchasePanel from "../../components/books/PurchasePanel";
 import RelatedBooks from "../../components/books/RelatedBooks";
+import ReviewForm from "../../components/forms/ReviewForm/ReviewForm";
 import BookReader from "../../components/reader/BookReader";
 import ReaderModal from "../../components/reader/ReaderModal";
 import Container from "../../components/ui/Container/Container";
 import { sampleMap } from "../../data/samples";
+import booksData, { getBookById, getRelatedBooks } from "../../data/books";
 import { getReviewsByBookId } from "../../data/reviews";
+import useApprovedReviews from "../../hooks/useApprovedReviews";
 import siteConfig from "../../data/siteConfig";
-import books, { getBookById, getRelatedBooks } from "../../data/books";
 
 import "./BookDetails.css";
 
@@ -55,7 +58,7 @@ function BookDetails() {
   const closeButtonRef = useRef(null);
 
   const book = getBookById(bookId);
-  const relatedBooks = book ? getRelatedBooks(book.id) : books.slice(0, 2);
+  const relatedBooks = book ? getRelatedBooks(book.id) : booksData.slice(0, 2);
   const editionEntries = useMemo(() => Object.entries(book?.editions || {}), [book]);
   const requestedEditionKey = useMemo(() => {
     const requested = new URLSearchParams(location.search).get("edition");
@@ -136,7 +139,8 @@ function BookDetails() {
   const isHindi = activeEdition?.languageCode === "hi";
   const isPublished = book.status === "Published";
   const activeSample = activeEdition?.sampleId ? sampleMap[activeEdition.sampleId] : null;
-  const bookReviews = getReviewsByBookId(book.id);
+  const { reviews, refresh } = useApprovedReviews();
+  const bookReviews = getReviewsByBookId(book.id, reviews);
   const metaTitle = book.seo?.title || `${book.title} | Anurag Verma`;
   const metaDescription = book.seo?.description || book.shortDescription || book.description;
   const structuredData = {
@@ -260,10 +264,13 @@ function BookDetails() {
   const displayDescription = localized?.shortDescription || book.shortDescription || book.description;
   const displayLongDescription = localized?.longDescription || book.longDescription;
   const displaySynopsis = localized?.synopsis || book.synopsis;
+  const displayWhoFor = book.whoThisBookIsFor || [];
   const displayGenres = isHindi ? book.genres.map((item) => genreMapHi[item] || item) : book.genres;
   const displayThemes = isHindi ? book.themes.map((item) => themeMapHi[item] || item) : book.themes;
   const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
   const availabilityLabel = isHindi ? "शीघ्र" : "Coming Soon";
+  const pageUrl = `${siteConfig.url}/library/${book.id}${selectedEditionKey ? `?edition=${selectedEditionKey}` : ""}`;
+  const shareText = `${book.title} by Anurag Verma`;
 
   return (
     <HelmetProvider>
@@ -315,12 +322,56 @@ function BookDetails() {
               onPreviewOpen={() => setIsReaderOpen(true)}
               isHindi={isHindi}
             />
+
+            <div className="book-details__share" aria-label="Share this book">
+              <span className="book-details__share-label">Share</span>
+              <a
+                className="book-details__share-link"
+                href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${pageUrl}`)}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Share on WhatsApp"
+              >
+                <FaWhatsapp />
+              </a>
+              <a
+                className="book-details__share-link"
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Share on X"
+              >
+                <FaXTwitter />
+              </a>
+              <a
+                className="book-details__share-link"
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Share on Facebook"
+              >
+                <FaFacebookF />
+              </a>
+              <button
+                type="button"
+                className="book-details__share-link"
+                aria-label="Copy link"
+                onClick={async () => {
+                  if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(pageUrl);
+                  }
+                }}
+              >
+                <FaLink />
+              </button>
+            </div>
           </BookHero>
 
           <BookSynopsis
             longDescription={displayLongDescription}
             synopsis={displaySynopsis}
             themes={displayThemes}
+            whoThisBookIsFor={displayWhoFor}
             isHindi={isHindi}
           />
 
@@ -383,6 +434,8 @@ function BookDetails() {
               <Link to="/contact" className="book-reviews__cta">
                 {isHindi ? "अपनी समीक्षा साझा करें" : "Share Your Review"}
               </Link>
+
+              <ReviewForm books={booksData} defaultBookId={book.id} source="book-page" onSubmitted={refresh} />
             </section>
           ) : (
             <section className="book-reviews" aria-labelledby="book-reviews-title">
@@ -394,6 +447,8 @@ function BookDetails() {
               <Link to="/contact" className="book-reviews__cta">
                 {isHindi ? "पहली समीक्षा लिखें" : "Write the First Review"}
               </Link>
+
+              <ReviewForm books={booksData} defaultBookId={book.id} source="book-page" onSubmitted={refresh} />
             </section>
           )}
 

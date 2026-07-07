@@ -2,17 +2,20 @@ import "./Reviews.css";
 
 import { HelmetProvider } from "react-helmet-async";
 
+import ReviewForm from "../../components/forms/ReviewForm/ReviewForm";
 import ReviewCard from "../../components/reviews/ReviewCard/ReviewCard";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
 import books from "../../data/books";
 import { getFeaturedReviews, getReviewGroupsByBook } from "../../data/reviews";
+import useApprovedReviews from "../../hooks/useApprovedReviews";
 import siteConfig from "../../data/siteConfig";
 
 function Reviews() {
-  const featuredReviews = getFeaturedReviews(3);
-  const groupedReviews = getReviewGroupsByBook(books);
+  const { reviews, refresh } = useApprovedReviews();
+  const featuredReviews = getFeaturedReviews(3, reviews);
+  const groupedReviews = getReviewGroupsByBook(books, reviews);
 
   return (
     <HelmetProvider>
@@ -95,6 +98,18 @@ function Reviews() {
             </Container>
           </section>
         )}
+
+        <section className="reviews-page__book-section" aria-labelledby="reviews-submit-title">
+          <Container>
+            <h2 id="reviews-submit-title" className="reviews-page__section-title">
+              Write a Review
+            </h2>
+            <p className="reviews-page__empty">
+              Reviews are submitted as pending and appear after admin approval.
+            </p>
+            <ReviewForm books={books} source="reviews-page" onSubmitted={refresh} />
+          </Container>
+        </section>
       </main>
     </HelmetProvider>
   );

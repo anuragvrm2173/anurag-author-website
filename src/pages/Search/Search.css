@@ -24,6 +24,36 @@
   outline-offset: 2px;
 }
 
+.search-page__recent {
+  margin-top: 0.9rem;
+}
+
+.search-page__recent-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  color: rgba(43, 43, 43, 0.75);
+}
+
+.search-page__recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.search-page__recent-item {
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--color-primary);
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.search-page__card mark {
+  background: rgba(201, 163, 78, 0.28);
+  color: inherit;
+}
+
 .search-page__results {
   padding: 1.5rem 0 2.5rem;
 }

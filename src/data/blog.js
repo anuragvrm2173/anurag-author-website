@@ -1,110 +1,162 @@
 export const blogPosts = [
 	{
-		id: "grief-and-gentleness",
-		title: "When Grief Asks For Gentleness",
+		id: "why-i-wrote-the-last-goodbye",
+		title: "Why I Wrote The Last Goodbye I Never Got",
 		excerpt:
-			"Some wounds do not ask to be fixed. They ask to be held with patience, silence, and love.",
-		readingTime: "5 min read",
+			"Some memories refuse to stay silent. Writing became the only way to preserve moments that shaped me before time softened their edges.",
+		readingTime: "7 min read",
 		publishedAt: "July 2026",
-		category: "Reflection",
+		category: "Behind the Book",
+		content: [
+			"People often ask why I decided to write such a personal story. The answer is simple: some memories refuse to stay silent.",
+			"For years, I carried moments I could not fully explain: love that changed me, loss that stayed with me, and conversations I replayed in my mind long after they were over.",
+			"Writing became the only way to preserve those experiences before time softened their edges.",
+			"I did not write this book because I had all the answers. I wrote it because I was still searching for them.",
+			"If someone finds a piece of their own story inside mine, then every page was worth writing."
+		],
 	},
 	{
-		id: "writing-after-loss",
-		title: "Writing After Loss",
+		id: "how-personal-loss-changed-my-writing",
+		title: "How Personal Loss Changed My Writing",
 		excerpt:
-			"I did not begin writing to explain pain. I began writing so pain would not be the only voice left in the room.",
+			"Loss changed what I notice and what I choose to write. The smallest moments began to carry the deepest meaning.",
 		readingTime: "6 min read",
 		publishedAt: "June 2026",
 		category: "Writing",
+		content: [
+			"Loss changes more than our lives. It changes the way we see people, the way we remember moments, and the way we tell stories.",
+			"Before loss, I focused on events. After loss, I began noticing emotions hidden inside ordinary moments.",
+			"A conversation with my father. A quiet sacrifice by my mother. A message from someone I loved.",
+			"Those experiences taught me that the smallest moments often become the ones we carry forever.",
+			"That realization changed not only what I write, but why I write."
+		],
 	},
 	{
-		id: "how-stories-heal",
-		title: "How Stories Help Us Begin Again",
+		id: "why-stories-matter-more-than-advice",
+		title: "Why Stories Matter More Than Advice",
 		excerpt:
-			"A story cannot undo what happened, but it can return us to ourselves, one honest sentence at a time.",
-		readingTime: "4 min read",
+			"Advice tells people what to do. Stories allow people to discover meaning in their own way.",
+		readingTime: "5 min read",
 		publishedAt: "May 2026",
-		category: "Healing",
+		category: "Storytelling",
+		content: [
+			"Advice tells people what to do. Stories allow people to discover it for themselves.",
+			"A lesson can be forgotten, but a story has a way of staying with us.",
+			"Long after we finish a book, we remember a character, a conversation, or a single moment that changes how we see our own lives.",
+			"That is why I choose stories over instructions.",
+			"I do not want to tell readers what to think. I want to share honestly and let them find the meaning that speaks to them."
+		],
 	},
 	{
-		id: "unfinished-goodbyes",
-		title: "The Weight of Unfinished Goodbyes",
+		id: "difference-between-healing-and-moving-on",
+		title: "The Difference Between Healing and Moving On",
 		excerpt:
-			"Not every goodbye arrives in words. Some remain open, and still teach us how to live.",
+			"Moving on and healing are not the same. Healing is learning to carry memory without letting it define your life.",
 		readingTime: "5 min read",
 		publishedAt: "April 2026",
-		category: "Loss",
+		category: "Healing",
+		content: [
+			"People often use healing and moving on as if they mean the same thing. I do not believe they do.",
+			"Moving on suggests leaving something behind. Healing is learning how to carry it without letting it define every part of your life.",
+			"Some people will always remain part of your story. Some losses never disappear completely.",
+			"Healing does not erase memories. It changes the relationship you have with them.",
+			"For me, writing has never been about forgetting. It has always been about understanding."
+		],
 	},
 	{
-		id: "friendship-and-recovery",
-		title: "Friendship During Recovery",
+		id: "behind-the-book-untold-stories",
+		title: "Behind the Book: The Untold Stories",
 		excerpt:
-			"In the hardest seasons, the right friend does not rush your healing. They sit beside it.",
-		readingTime: "4 min read",
+			"Every book leaves something behind. This companion work explores the moments that lived between published chapters.",
+		readingTime: "6 min read",
 		publishedAt: "March 2026",
-		category: "Relationships",
+		category: "Behind the Book",
+		content: [
+			"Every book leaves something behind. Not because those moments are unimportant, but because not every memory belongs in the main story.",
+			"The Untold Stories grew from pages that did not make it into the first book.",
+			"It is not a sequel. It is a deeper look at the people, moments, and emotions that shaped the journey.",
+			"It offers readers a chance to see the same story from another perspective.",
+			"Sometimes what remains untold is just as meaningful as what is written."
+		],
 	},
 	{
-		id: "writing-discipline",
-		title: "Building a Writing Discipline That Feels Human",
+		id: "what-readers-carry-from-stories",
+		title: "What Readers Carry from Stories",
 		excerpt:
-			"Discipline is not punishment. It is a quiet promise to return to your truth every day.",
+			"The best books do not just end. They continue quietly in how readers think, remember, and heal.",
 		readingTime: "6 min read",
 		publishedAt: "February 2026",
-		category: "Writing",
+		category: "Reflection",
+		content: [
+			"A story lives twice: once in writing and once in the reader who receives it.",
+			"Readers often remember one line, one chapter, one character that met them at the right time.",
+			"Those fragments become emotional tools they return to during difficult days.",
+			"That is the quiet power of literature. It does not always solve pain, but it gives shape to it.",
+			"When a reader says, 'I felt seen,' that is the deepest form of success for any writer."
+		],
 	},
 	{
-		id: "memory-and-meaning",
-		title: "How Memory Changes Meaning",
+		id: "writing-with-emotional-honesty",
+		title: "Writing with Emotional Honesty",
 		excerpt:
-			"The same memory can wound us in one chapter and guide us in another.",
+			"Emotional honesty is not dramatic writing. It is precise writing that stays truthful to lived experience.",
 		readingTime: "5 min read",
 		publishedAt: "January 2026",
-		category: "Reflection",
+		category: "Writing",
+		content: [
+			"Emotional honesty begins with attention. Noticing what was actually felt, not just what sounds poetic.",
+			"It asks a writer to resist exaggeration and stay near truth.",
+			"In personal writing, honesty does not mean sharing everything. It means sharing the right things clearly.",
+			"Readers can recognize sincerity quickly. They can also recognize performance.",
+			"When language is honest, it creates trust. Trust is what turns pages into connection."
+		],
 	},
 	{
-		id: "hope-after-heartbreak",
-		title: "Hope After Heartbreak",
+		id: "family-memory-and-language",
+		title: "Family, Memory, and the Language of Home",
 		excerpt:
-			"Hope does not erase heartbreak. It gives heartbreak a future.",
+			"The emotional vocabulary we inherit from family shapes how we remember, grieve, and heal.",
 		readingTime: "4 min read",
 		publishedAt: "December 2025",
-		category: "Hope",
+		category: "Personal",
+		content: [
+			"Before we learn literary language, we learn emotional language at home.",
+			"How families speak about love, conflict, sacrifice, and silence becomes part of our voice.",
+			"When I write about family, I am writing about the first place where I learned both tenderness and resilience.",
+			"Memory does not preserve facts alone. It preserves tone, pauses, and the emotional weather of a room.",
+			"Those details are often where the truest stories live."
+		],
 	},
 	{
-		id: "purpose-in-pain",
-		title: "Finding Purpose in Pain",
+		id: "from-draft-to-book",
+		title: "From Draft to Book: What Changes Most",
 		excerpt:
-			"Pain asks difficult questions, but it can also reveal what matters most.",
+			"The biggest change between draft and publication is usually clarity: what the story is truly trying to say.",
 		readingTime: "7 min read",
 		publishedAt: "November 2025",
-		category: "Growth",
+		category: "Process",
+		content: [
+			"Early drafts are full of urgency. Later drafts are full of decisions.",
+			"What to keep, what to cut, and what belongs in a different book entirely.",
+			"Revision is where a manuscript learns discipline. It is also where it discovers voice.",
+			"Publication is not the end of writing. It is the beginning of dialogue with readers.",
+			"A finished book is not perfect memory. It is the truest version we can offer at that time."
+		],
 	},
 	{
-		id: "quiet-courage",
-		title: "Quiet Courage",
+		id: "why-books-still-matter",
+		title: "Why Books Still Matter in a Fast World",
 		excerpt:
-			"Courage is often invisible. It looks like getting up, trying again, and speaking with kindness.",
-		readingTime: "3 min read",
-		publishedAt: "October 2025",
-		category: "Life Lessons",
-	},
-	{
-		id: "forgiveness-practice",
-		title: "Forgiveness as Daily Practice",
-		excerpt:
-			"Forgiveness is less an event and more a practice of choosing peace over repetition.",
+			"Books create the rarest modern experience: sustained attention to another human life.",
 		readingTime: "5 min read",
-		publishedAt: "September 2025",
-		category: "Healing",
-	},
-	{
-		id: "letters-to-younger-self",
-		title: "Letters to My Younger Self",
-		excerpt:
-			"If I could return to those early years, I would not offer certainty. I would offer patience.",
-		readingTime: "6 min read",
-		publishedAt: "August 2025",
-		category: "Personal",
+		publishedAt: "October 2025",
+		category: "Reflection",
+		content: [
+			"A fast world rewards quick answers. Books reward careful understanding.",
+			"Reading asks us to slow down long enough to encounter complexity.",
+			"That matters especially in emotional life, where simple answers often fail.",
+			"Books give language to feelings we struggle to name.",
+			"In that sense, reading is not escape. It is practice for being fully human."
+		],
 	},
 ];

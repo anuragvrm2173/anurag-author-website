@@ -12,6 +12,13 @@ function BlogCard({ post }) {
       </p>
       <h3 className="blog-card__title">{post.title}</h3>
       <p className="blog-card__excerpt">{post.excerpt}</p>
+      {post.content?.length ? (
+        <div className="blog-card__content">
+          {post.content.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+      ) : null}
     </article>
   );
 }

@@ -1,6 +1,6 @@
 import "./Search.css";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
@@ -11,10 +11,67 @@ import { blogPosts } from "../../data/blog";
 import books from "../../data/books";
 import siteConfig from "../../data/siteConfig";
 
+const RECENT_SEARCHES_KEY = "recent_searches";
+
+function highlightText(text, query) {
+  if (!query) {
+    return text;
+  }
+
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(${escaped})`, "ig");
+  const parts = String(text).split(regex);
+
+  return parts.map((part, index) => (
+    part.toLowerCase() === query.toLowerCase()
+      ? <mark key={`${part}-${index}`}>{part}</mark>
+      : <span key={`${part}-${index}`}>{part}</span>
+  ));
+}
+
 function Search() {
   const [query, setQuery] = useState("");
+  const [recentSearches, setRecentSearches] = useState(() => {
+    try {
+      return JSON.parse(window.localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
+    } catch {
+      return [];
+    }
+  });
+  const inputRef = useRef(null);
 
   const normalizedQuery = query.trim().toLowerCase();
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k";
+      const isSlash = event.key === "/";
+
+      if (isShortcut || isSlash) {
+        event.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (!normalizedQuery) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setRecentSearches((current) => {
+        const next = [normalizedQuery, ...current.filter((item) => item !== normalizedQuery)].slice(0, 8);
+        window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next));
+        return next;
+      });
+    }, 350);
+
+    return () => window.clearTimeout(timeout);
+  }, [normalizedQuery]);
 
   const filteredBooks = useMemo(() => {
     if (!normalizedQuery) {
@@ -75,12 +132,31 @@ function Search() {
             </label>
             <input
               id="search-input"
+              ref={inputRef}
               className="search-page__input"
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Try: healing, love, goodbye, memoir"
             />
+
+            {recentSearches.length > 0 ? (
+              <div className="search-page__recent" aria-label="Recent searches">
+                <p className="search-page__recent-label">Recent</p>
+                <div className="search-page__recent-list">
+                  {recentSearches.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      className="search-page__recent-item"
+                      onClick={() => setQuery(item)}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </Container>
         </section>
 
@@ -94,8 +170,8 @@ function Search() {
                 filteredBooks.map((book) => (
                   <article key={book.id} className="search-page__card" role="listitem">
                     <p className="search-page__meta">{book.status}</p>
-                    <h3>{book.title}</h3>
-                    <p>{book.shortDescription}</p>
+                    <h3>{highlightText(book.title, normalizedQuery)}</h3>
+                    <p>{highlightText(book.shortDescription, normalizedQuery)}</p>
                     <Link to={`/library/${book.id}`} className="search-page__link">
                       Open Book
                     </Link>
@@ -118,8 +194,8 @@ function Search() {
                 filteredPosts.map((post) => (
                   <article key={post.id} className="search-page__card" role="listitem">
                     <p className="search-page__meta">{post.category}</p>
-                    <h3>{post.title}</h3>
-                    <p>{post.excerpt}</p>
+                    <h3>{highlightText(post.title, normalizedQuery)}</h3>
+                    <p>{highlightText(post.excerpt, normalizedQuery)}</p>
                     <Link to="/blog" className="search-page__link">
                       Read in Blog
                     </Link>

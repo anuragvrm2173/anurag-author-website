@@ -58,6 +58,11 @@ const books = [
       "The emotional threads connecting love, family, friendship, and identity.",
       "Why healing often begins when we stop hiding from memory.",
     ],
+    whoThisBookIsFor: [
+      "Readers of deeply personal literary fiction and memoir-inspired storytelling.",
+      "Anyone navigating grief, heartbreak, or unfinished emotional conversations.",
+      "Readers looking for emotionally honest stories about healing and resilience.",
+    ],
     editions: {
       english: {
         label: "English",
@@ -208,6 +213,11 @@ const books = [
       "How memory reshapes the meaning of earlier chapters.",
       "Why untold stories can become the most transformative ones.",
     ],
+    whoThisBookIsFor: [
+      "Readers who loved The Last Goodbye I Never Got and want deeper context.",
+      "Anyone curious about untold chapters, emotional backstory, and reflection.",
+      "Readers who appreciate intimate nonfiction and companion memoirs.",
+    ],
     editions: {
       english: {
         label: "English",
@@ -332,6 +342,11 @@ const books = [
       "How difficult seasons can reveal purpose instead of only pain.",
       "Why forgiveness and self-compassion are forms of strength.",
       "How hope can be practiced in ordinary moments.",
+    ],
+    whoThisBookIsFor: [
+      "Readers seeking practical emotional wisdom from lived experience.",
+      "Anyone working through healing, purpose, and personal growth.",
+      "Readers who enjoy reflective nonfiction and life lessons they can apply daily.",
     ],
     editions: {
       english: {
