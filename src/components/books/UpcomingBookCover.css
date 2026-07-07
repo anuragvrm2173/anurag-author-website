@@ -57,6 +57,9 @@
   margin: 0 auto;
   padding: 0.3rem 0.7rem;
   width: fit-content;
+  height: auto;
+  align-self: center;
+  justify-self: center;
   border-radius: 0.2rem;
   border: 1px solid rgba(17, 17, 17, 0.18);
   font-size: 0.72rem;
