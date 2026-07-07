@@ -1,0 +1,5 @@
+.heading {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}

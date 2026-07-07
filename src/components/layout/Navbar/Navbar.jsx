@@ -1,66 +1,36 @@
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { HiOutlineBars3, HiOutlineXMark } from "react-icons/hi2";
-
-import navigation from "../../../data/navigation";
-
 import "./Navbar.css";
 
 function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  function closeMenu() {
-    setIsMenuOpen(false);
-  }
-
-  function toggleMenu() {
-    setIsMenuOpen((open) => !open);
-  }
+  const links = [
+    { to: "/", label: "Home" },
+    { to: "/about", label: "About" },
+    { to: "/library", label: "Library" },
+    { to: "/reviews", label: "Reviews" },
+    { to: "/blog", label: "Blog" },
+    { to: "/contact", label: "Contact" },
+  ];
 
   return (
     <header className="navbar">
       <div className="navbar__container">
-
-        <NavLink
-          to="/"
-          className="navbar__logo"
-          onClick={closeMenu}
-        >
+        <NavLink to="/" className="navbar__logo">
           Anurag Verma
         </NavLink>
 
-        <nav
-          className={`navbar__nav ${
-            isMenuOpen ? "navbar__nav--open" : ""
-          }`}
-        >
-          {navigation.map((item) => (
+        <nav className="navbar__nav" aria-label="Main navigation">
+          {links.map((link) => (
             <NavLink
-              key={item.id}
-              to={item.path}
-              onClick={closeMenu}
+              key={link.to}
+              to={link.to}
               className={({ isActive }) =>
-                isActive ? "navbar__link active" : "navbar__link"
+                `navbar__link ${isActive ? "navbar__link--active" : ""}`.trim()
               }
             >
-              {item.label}
+              {link.label}
             </NavLink>
           ))}
         </nav>
-
-        <button
-          className="navbar__toggle"
-          onClick={toggleMenu}
-          aria-label="Toggle navigation menu"
-          aria-expanded={isMenuOpen}
-        >
-          {isMenuOpen ? (
-            <HiOutlineXMark />
-          ) : (
-            <HiOutlineBars3 />
-          )}
-        </button>
-
       </div>
     </header>
   );

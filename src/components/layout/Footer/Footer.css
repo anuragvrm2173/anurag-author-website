@@ -1,0 +1,13 @@
+.footer {
+  padding: 2rem 0;
+  border-top: 1px solid #e8e4da;
+  background: var(--color-background);
+}
+
+.footer__container {
+  width: min(100% - 2rem, var(--container-width));
+  margin-inline: auto;
+  display: flex;
+  justify-content: center;
+  color: var(--color-text);
+}
