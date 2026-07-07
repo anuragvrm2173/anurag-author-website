@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 import BookHero from "../../components/books/BookHero";
 import BookSynopsis from "../../components/books/BookSynopsis";
@@ -19,6 +19,7 @@ import "./BookDetails.css";
 
 function BookDetails() {
   const { bookId } = useParams();
+  const location = useLocation();
   const [selectedEditionKey, setSelectedEditionKey] = useState(null);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
@@ -26,9 +27,25 @@ function BookDetails() {
   const book = getBookById(bookId);
   const relatedBooks = book ? getRelatedBooks(book.id) : books.slice(0, 2);
   const editionEntries = useMemo(() => Object.entries(book?.editions || {}), [book]);
+  const requestedEditionKey = useMemo(() => {
+    const requested = new URLSearchParams(location.search).get("edition");
+    if (!requested) {
+      return null;
+    }
+
+    const normalized = requested.trim().toLowerCase();
+    const match = editionEntries.find(([key, edition]) => {
+      const byKey = key.toLowerCase() === normalized;
+      const byLanguageCode = edition?.languageCode?.toLowerCase() === normalized;
+      return byKey || byLanguageCode;
+    });
+
+    return match?.[0] || null;
+  }, [location.search, editionEntries]);
+
   const defaultEditionKey = useMemo(
-    () => editionEntries.find(([, edition]) => edition.available)?.[0] || editionEntries[0]?.[0] || null,
-    [editionEntries]
+    () => requestedEditionKey || editionEntries.find(([, edition]) => edition.available)?.[0] || editionEntries[0]?.[0] || null,
+    [requestedEditionKey, editionEntries]
   );
 
   useEffect(() => {

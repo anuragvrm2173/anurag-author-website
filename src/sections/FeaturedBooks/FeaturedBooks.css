@@ -23,14 +23,126 @@
   color: var(--color-primary);
 }
 
-.featured-books__grid {
+.featured-books__cards {
   display: grid;
-  gap: 2.8rem;
-  align-items: stretch;
+  gap: 1.8rem;
+}
+
+.featured-books__card {
+  padding: 1.45rem;
+  border-radius: 1.35rem;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(250, 246, 236, 0.9));
+  box-shadow: 0 12px 30px rgba(17, 17, 17, 0.05);
+}
+
+.featured-books__card-head {
+  margin-bottom: 0.95rem;
+}
+
+.featured-books__card-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.55rem, 2.5vw, 2.05rem);
+  color: var(--color-primary);
+}
+
+.featured-books__card-subtitle {
+  margin: 0.35rem 0 0;
+  color: rgba(43, 43, 43, 0.78);
+  line-height: 1.72;
+  max-width: 70ch;
+}
+
+.featured-books__editions {
+  display: grid;
+  gap: 0.95rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.featured-books__edition-block {
+  display: grid;
+  grid-template-columns: minmax(84px, 96px) 1fr;
+  gap: 0.8rem;
+  align-items: start;
+  padding: 0.8rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.featured-books__edition-cover {
+  width: 100%;
+}
+
+.featured-books__edition-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.featured-books__edition-language {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.featured-books__edition-status,
+.featured-books__upcoming-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.24rem 0.62rem;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.07);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.06rem;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.featured-books__edition-link,
+.featured-books__notify-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.featured-books__upcoming {
+  display: grid;
+  gap: 1rem;
+}
+
+.featured-books__upcoming-cover {
+  width: min(100%, 180px);
+}
+
+.featured-books__upcoming-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 @media (min-width: 768px) {
-  .featured-books__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .featured-books__cards {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .featured-books__card {
+    padding: 1.25rem;
+  }
+
+  .featured-books__editions {
+    grid-template-columns: 1fr;
   }
 }

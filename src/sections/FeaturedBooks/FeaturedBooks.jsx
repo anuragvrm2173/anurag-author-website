@@ -1,47 +1,13 @@
 import "./FeaturedBooks.css";
 
-import BookCard from "../../components/ui/BookCard/BookCard";
+import { Link } from "react-router-dom";
+
+import BookCoverArt from "../../components/books/BookCoverArt";
+import UpcomingBookCover from "../../components/books/UpcomingBookCover";
 import Container from "../../components/ui/Container/Container";
 import books from "../../data/books";
 
 function FeaturedBooks() {
-  const publishedBook = books.find((book) => book.status === "Published");
-  const unpublishedBooks = books.filter((book) => book.status !== "Published").slice(0, 2);
-
-  const featuredTiles = [
-    publishedBook
-      ? {
-          key: `${publishedBook.id}-english`,
-          bookId: publishedBook.id,
-          title: publishedBook.title,
-          subtitle: `${publishedBook.subtitle} (English Edition)`,
-          description: publishedBook.shortDescription || publishedBook.description,
-          badge: "Published",
-          editions: { english: publishedBook.editions?.english },
-        }
-      : null,
-    publishedBook
-      ? {
-          key: `${publishedBook.id}-hindi`,
-          bookId: publishedBook.id,
-          title: publishedBook.title,
-          subtitle: `${publishedBook.subtitle} (Hindi Edition)`,
-          description: publishedBook.shortDescription || publishedBook.description,
-          badge: "Published",
-          editions: { hindi: publishedBook.editions?.hindi },
-        }
-      : null,
-    ...unpublishedBooks.map((book) => ({
-      key: `${book.id}-upcoming`,
-      bookId: book.id,
-      title: book.title,
-      subtitle: book.subtitle,
-      description: book.shortDescription || book.description,
-      badge: book.status,
-      editions: { english: book.editions?.english },
-    })),
-  ].filter((tile) => tile?.editions && Object.values(tile.editions).some(Boolean));
-
   return (
     <section className="featured-books" aria-labelledby="featured-books-title">
       <Container>
@@ -52,17 +18,62 @@ function FeaturedBooks() {
           </h2>
         </div>
 
-        <div className="featured-books__grid">
-          {featuredTiles.map((tile) => (
-            <BookCard
-              key={tile.key}
-              bookId={tile.bookId}
-              title={tile.title}
-              subtitle={tile.subtitle}
-              description={tile.description}
-              badge={tile.badge}
-              editions={tile.editions}
-            />
+        <div className="featured-books__cards" role="list" aria-label="Homepage book collection">
+          {books.map((book) => (
+            <article key={book.id} role="listitem" className="featured-books__card">
+              <div className="featured-books__card-head">
+                <h3 className="featured-books__card-title">{book.title}</h3>
+                <p className="featured-books__card-subtitle">{book.subtitle}</p>
+              </div>
+
+              {book.status === "Published" ? (
+                <div className="featured-books__editions" aria-label={`${book.title} editions`}>
+                  {Object.entries(book.editions || {})
+                    .filter(([, edition]) => edition?.available)
+                    .map(([editionKey, edition]) => (
+                      <article key={edition.languageCode} className="featured-books__edition-block">
+                        <BookCoverArt
+                          title={book.title}
+                          subtitle={edition.cover?.subtitle || edition.formatLabel}
+                          author={edition.cover?.author || "Anurag Verma"}
+                          badge={edition.cover?.eyebrow || "Published"}
+                          cover={edition.cover}
+                          variant="front"
+                          alt={`${book.title} ${edition.label} cover`}
+                          className="featured-books__edition-cover"
+                          imageClassName="featured-books__edition-cover-image"
+                          loading="lazy"
+                        />
+
+                        <div className="featured-books__edition-meta">
+                          <p className="featured-books__edition-language">{edition.label}</p>
+                          <span className="featured-books__edition-status">Published</span>
+                          <Link to={`/library/${book.id}?edition=${editionKey}`} className="featured-books__edition-link">
+                            View Details
+                          </Link>
+                        </div>
+                      </article>
+                    ))}
+                </div>
+              ) : (
+                <div className="featured-books__upcoming" aria-label={`${book.title} status`}>
+                  <UpcomingBookCover
+                    title={book.title}
+                    subtitle={book.subtitle}
+                    author="Anurag Verma"
+                    badge="Coming Soon"
+                    className="featured-books__upcoming-cover"
+                  />
+
+                  <div className="featured-books__upcoming-meta">
+                    <span className="featured-books__upcoming-badge">Coming Soon</span>
+                    <Link to="/contact" className="featured-books__notify-link">
+                      Notify Me
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </article>
           ))}
         </div>
       </Container>
