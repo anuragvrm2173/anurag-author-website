@@ -1,27 +1,39 @@
 const books = [
   {
-    id: 1,
+    id: "the-last-goodbye",
     title: "The Last Goodbye I Never Got",
-    language: "English",
+    description:
+      "A quiet, intimate story of love, loss, and the difficult grace of moving forward.",
     status: "Published",
     slug: "the-last-goodbye-i-never-got",
-    cover: "",
+    editions: {
+      english: { label: "English", available: true },
+      hindi: { label: "हिन्दी", available: true },
+    },
   },
   {
-    id: 2,
+    id: "the-untold-stories",
     title: "The Untold Stories Behind The Last Goodbye I Never Got",
-    language: "English",
+    description:
+      "A deeper look into the people, places, and memories that shaped the original story.",
     status: "Coming Soon",
     slug: "the-untold-stories",
-    cover: "",
+    editions: {
+      english: { label: "English", available: true },
+      hindi: { label: "हिन्दी", available: false },
+    },
   },
   {
-    id: 3,
+    id: "lessons-of-the-heart",
     title: "Lessons of the Heart",
-    language: "English",
+    description:
+      "A reflective collection of stories about healing, compassion, and everyday courage.",
     status: "Coming Soon",
     slug: "lessons-of-the-heart",
-    cover: "",
+    editions: {
+      english: { label: "English", available: true },
+      hindi: { label: "हिन्दी", available: false },
+    },
   },
 ];
 

@@ -20,9 +20,9 @@ function FeaturedBooks() {
             <BookCard
               key={book.id}
               title={book.title}
-              author={book.language}
-              description={book.status}
+              description={book.description}
               badge={book.status}
+              editions={book.editions}
             />
           ))}
         </div>

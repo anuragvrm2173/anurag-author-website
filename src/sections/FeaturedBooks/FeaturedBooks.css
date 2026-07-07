@@ -1,9 +1,9 @@
 .featured-books {
-  padding: 5rem 0;
+  padding: 5.5rem 0 6rem;
 }
 
 .featured-books__header {
-  max-width: 40rem;
+  max-width: 44rem;
   margin-bottom: 2.5rem;
 }
 
@@ -18,7 +18,7 @@
 
 .featured-books__title {
   font-family: var(--font-heading);
-  font-size: clamp(2rem, 3.3vw, 2.7rem);
+  font-size: clamp(2.1rem, 3.4vw, 2.8rem);
   line-height: 1.15;
   color: var(--color-primary);
 }
@@ -26,6 +26,7 @@
 .featured-books__grid {
   display: grid;
   gap: 1.5rem;
+  align-items: stretch;
 }
 
 @media (min-width: 768px) {
