@@ -1,3 +1,5 @@
+import { FaAmazon, FaStore } from "react-icons/fa";
+
 const FORMAT_KEYS = new Set(["paperback", "kindle", "ebook", "hardcover", "audiobook"]);
 const FORMAT_PRIORITY = ["paperback", "hardcover", "kindle", "ebook", "audiobook"];
 const RETAILER_PRIORITY = ["pothi", "amazon", "notionPress", "flipkart", "kindle"];
@@ -91,6 +93,22 @@ function formatCurrencyPrice(pricing) {
   }).format(pricing.amount);
 }
 
+function RetailerMark({ retailerKey, retailerName }) {
+  if (retailerKey === "amazon") {
+    return (
+      <span className="purchase-panel__retailer-mark" aria-hidden="true">
+        <FaAmazon />
+      </span>
+    );
+  }
+
+  return (
+    <span className="purchase-panel__retailer-mark" aria-hidden="true">
+      <FaStore />
+    </span>
+  );
+}
+
 function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi = false }) {
   const locale = isHindi ? "hi-IN" : "en-IN";
   const retailers = normalizeRetailers(activeEdition);
@@ -129,16 +147,32 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
       : (isHindi ? "शीघ्र" : "Coming Soon");
 
   const metadata = activeEdition.metadata || {};
+  const publishedValue = formatDisplayDate(metadata.publicationDate || publicationDate, locale);
   const metadataRows = [
-    { key: "publisher", label: "Publisher", value: metadata.publisher || activeEdition.publisher || book?.publisher },
-    { key: "publicationDate", label: "Publication Date", value: formatDisplayDate(metadata.publicationDate || publicationDate, locale) },
+    { key: "format", label: "Format", value: displayFormat },
     { key: "language", label: "Language", value: metadata.language || activeEdition.language || activeEdition.label || book?.language },
     { key: "pages", label: "Pages", value: metadata.pages || activeEdition.pages || book?.pages },
+    { key: "publisher", label: "Publisher", value: metadata.publisher || activeEdition.publisher || book?.publisher },
+    { key: "published", label: "Published", value: publishedValue },
     { key: "isbn13", label: "ISBN-13", value: metadata.isbn13 || activeEdition.isbn13 || activeEdition.isbn || book?.isbn },
     { key: "asin", label: "ASIN", value: metadata.asin || activeEdition.asin },
     { key: "weight", label: "Weight", value: metadata.weight || activeEdition.weight },
     { key: "dimensions", label: "Dimensions", value: metadata.dimensions || activeEdition.dimensions },
     { key: "country", label: "Country", value: metadata.country || activeEdition.country },
+  ].filter((item) => Boolean(item.value));
+
+  const additionalInfoRows = [
+    { key: "packer", label: "Packer", value: activeEdition.packer?.name },
+    {
+      key: "address",
+      label: "Address",
+      value: Array.isArray(activeEdition.packer?.address)
+        ? activeEdition.packer.address.join(", ")
+        : activeEdition.packer?.address,
+    },
+    { key: "website", label: "Website", value: activeEdition.packer?.website },
+    { key: "email", label: "Email", value: activeEdition.packer?.email },
+    { key: "genericName", label: "Generic Name", value: metadata.genericName },
   ].filter((item) => Boolean(item.value));
 
   const handleShare = async () => {
@@ -189,7 +223,8 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
               rel="noreferrer"
               aria-label={retailer.actionLabel}
             >
-              {retailer.name}
+              <RetailerMark retailerKey={retailer.key} retailerName={retailer.name} />
+              <span>[ {retailer.name} ]</span>
             </a>
           ))}
         </div>
@@ -226,6 +261,28 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
           </div>
         ))}
       </dl>
+
+      {additionalInfoRows.length > 0 ? (
+        <details className="purchase-panel__additional">
+          <summary>Additional Information</summary>
+          <dl className="purchase-panel__additional-list">
+            {additionalInfoRows.map((item) => (
+              <div key={item.key} className="purchase-panel__additional-item">
+                <dt>{item.label}</dt>
+                <dd>
+                  {item.key === "website" ? (
+                    <a href={item.value} target="_blank" rel="noreferrer">{item.value}</a>
+                  ) : item.key === "email" ? (
+                    <a href={`mailto:${item.value}`}>{item.value}</a>
+                  ) : (
+                    item.value
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      ) : null}
     </aside>
   );
 }

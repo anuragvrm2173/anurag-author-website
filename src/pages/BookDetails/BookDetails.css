@@ -289,6 +289,13 @@
   flex: 0 1 auto;
 }
 
+.purchase-panel__retailer-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
 .related-books__link,
 .book-details__back-link {
   background: var(--color-primary);
@@ -298,6 +305,10 @@
 .purchase-panel__button--secondary {
   background: rgba(17, 17, 17, 0.05);
   color: var(--color-primary);
+}
+
+.purchase-panel__retailers .purchase-panel__button--secondary {
+  border: 1px solid rgba(17, 17, 17, 0.12);
 }
 
 .purchase-panel__button--ghost {
@@ -337,6 +348,49 @@
 .purchase-panel__metadata-item dd {
   color: var(--color-primary);
   font-weight: 500;
+}
+
+.purchase-panel__additional {
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+  padding-top: 0.8rem;
+}
+
+.purchase-panel__additional summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.purchase-panel__additional-list {
+  margin: 0.8rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.purchase-panel__additional-item {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.purchase-panel__additional-item dt,
+.purchase-panel__additional-item dd {
+  margin: 0;
+}
+
+.purchase-panel__additional-item dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  color: rgba(43, 43, 43, 0.68);
+}
+
+.purchase-panel__additional-item dd {
+  color: var(--color-primary);
+}
+
+.purchase-panel__additional-item a {
+  color: var(--color-primary);
 }
 
 .purchase-panel__button:hover,
@@ -435,6 +489,26 @@
   margin-top: 1rem;
   font-weight: 600;
   color: var(--color-primary);
+}
+
+.book-reviews__cta {
+  margin-top: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: var(--color-white);
+  transition: transform 180ms ease;
+}
+
+.book-reviews__cta:hover {
+  transform: translateY(-1px);
 }
 
 .book-details__missing h1 {

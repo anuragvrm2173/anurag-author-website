@@ -7,7 +7,7 @@ export const timeline = [
 	{
 		year: "2026",
 		title: "Published",
-		text: "The Last Goodbye I Never Got, English & Hindi editions.",
+		text: "The Last Goodbye I Never Got was published on 6 July 2026 (English & Hindi editions).",
 	},
 	{
 		year: "2026",

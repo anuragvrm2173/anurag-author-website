@@ -353,6 +353,10 @@ function BookDetails() {
                   </blockquote>
                 ))}
               </div>
+
+              <Link to="/contact" className="book-reviews__cta">
+                {isHindi ? "अपनी समीक्षा साझा करें" : "Share Your Review"}
+              </Link>
             </section>
           ) : (
             <section className="book-reviews" aria-labelledby="book-reviews-title">
@@ -360,6 +364,10 @@ function BookDetails() {
               <h2 id="book-reviews-title" className="book-reviews__title">
                 {labels.reviewsEmpty}
               </h2>
+
+              <Link to="/contact" className="book-reviews__cta">
+                {isHindi ? "पहली समीक्षा लिखें" : "Write the First Review"}
+              </Link>
             </section>
           )}
 
