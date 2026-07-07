@@ -10,6 +10,7 @@ import "./styles/utilities.css";
 import "./styles/typography.css";
 import "./styles/animations.css";
 import "./styles/responsive.css";
+import "./components/reader/reader.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

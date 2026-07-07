@@ -1,0 +1,138 @@
+.reader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(8, 15, 25, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.reader-shell {
+  width: min(860px, 100%);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+  background: linear-gradient(135deg, #f9f5eb 0%, #f0e7d6 100%);
+  box-shadow: 0 24px 70px rgba(5, 10, 20, 0.35);
+  overflow: hidden;
+}
+
+.reader-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(16, 24, 38, 0.08);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.reader-close,
+.reader-nav-button {
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  transition: transform 180ms ease, opacity 180ms ease, background 180ms ease;
+}
+
+.reader-close {
+  padding: 0.7rem 1rem;
+  background: #111827;
+  color: #f8f2e8;
+}
+
+.reader-progress {
+  font-size: 0.95rem;
+  color: #4b5563;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.reader-page {
+  flex: 1;
+  padding: 2rem 2.25rem 1.5rem;
+  overflow-y: auto;
+}
+
+.reader-page__label {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #8a6d3e;
+}
+
+.reader-page__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.5rem, 2vw, 2.1rem);
+  color: #101827;
+}
+
+.reader-page__content {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #2f3643;
+}
+
+.reader-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid rgba(16, 24, 38, 0.08);
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.reader-nav-button {
+  padding: 0.75rem 1rem;
+  background: rgba(17, 24, 39, 0.08);
+  color: #111827;
+}
+
+.reader-nav-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.reader-close:hover,
+.reader-nav-button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.reader-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(4, 8, 15, 0.84);
+  backdrop-filter: blur(10px);
+}
+
+.reader-modal {
+  width: min(920px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  margin: 1rem auto;
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+@media (max-width: 640px) {
+  .reader-overlay {
+    padding: 0.75rem;
+  }
+
+  .reader-page {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .reader-toolbar,
+  .reader-navigation {
+    padding: 0.9rem 1rem;
+  }
+}

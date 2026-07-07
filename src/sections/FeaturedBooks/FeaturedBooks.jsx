@@ -23,6 +23,7 @@ function FeaturedBooks() {
               description={book.description}
               badge={book.status}
               editions={book.editions}
+              sampleId={book.sampleId}
             />
           ))}
         </div>
