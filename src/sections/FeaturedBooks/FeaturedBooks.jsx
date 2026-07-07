@@ -78,47 +78,43 @@ function FeaturedBooks() {
         <div className="featured-books__shelf" role="list" aria-label="Homepage book collection">
           {homepageTiles.map((tile) => (
             <article key={tile.key} role="listitem" className="featured-books__tile">
-              <p className="featured-books__tile-language">{tile.language}</p>
+              <Link to={tile.ctaTo} className="featured-books__tile-anchor" aria-label={`View ${tile.title}`}>
+                <p className="featured-books__tile-language">{tile.language}</p>
 
-              {tile.cover?.frontCover ? (
-                <BookCoverArt
-                  title={tile.title}
-                  subtitle={tile.subtitle}
-                  author={tile.cover?.author || "Anurag Verma"}
-                  badge={tile.status}
-                  cover={tile.cover}
-                  variant="front"
-                  alt={`${tile.title} ${tile.language} cover`}
-                  className="featured-books__tile-cover"
-                  imageClassName="featured-books__tile-cover-image"
-                  loading="lazy"
-                />
-              ) : (
-                <UpcomingBookCover
-                  title={tile.title}
-                  subtitle=""
-                  author="Anurag Verma"
-                  badge="Coming Soon"
-                  className="featured-books__tile-upcoming"
-                />
-              )}
+                {tile.cover?.frontCover ? (
+                  <BookCoverArt
+                    title={tile.title}
+                    subtitle={tile.subtitle}
+                    author={tile.cover?.author || "Anurag Verma"}
+                    badge={tile.status}
+                    cover={tile.cover}
+                    variant="front"
+                    alt={`${tile.title} ${tile.language} cover`}
+                    className="featured-books__tile-cover"
+                    imageClassName="featured-books__tile-cover-image"
+                    loading="lazy"
+                  />
+                ) : (
+                  <UpcomingBookCover
+                    title={tile.title}
+                    subtitle=""
+                    author="Anurag Verma"
+                    badge="Coming Soon"
+                    className="featured-books__tile-upcoming"
+                  />
+                )}
 
-              <div className="featured-books__tile-head">
-                <h3 className="featured-books__tile-title">{tile.title}</h3>
-                {tile.status === "Coming Soon" ? (
-                  <span className="featured-books__tile-status featured-books__tile-status--coming-soon">Coming Soon</span>
-                ) : null}
-              </div>
+                <div className="featured-books__tile-head">
+                  <h3 className="featured-books__tile-title">{tile.title}</h3>
+                  {tile.status === "Coming Soon" ? (
+                    <span className="featured-books__tile-status featured-books__tile-status--coming-soon">Coming Soon</span>
+                  ) : null}
+                </div>
 
-              {tile.status === "Published" ? (
-                <Link to={tile.ctaTo} className="featured-books__tile-link">
-                  View Book
-                </Link>
-              ) : (
-                <Link to={tile.ctaTo} className="featured-books__tile-link featured-books__tile-link--muted">
-                  {tile.ctaLabel}
-                </Link>
-              )}
+                <span className={`featured-books__tile-link ${tile.status === "Coming Soon" ? "featured-books__tile-link--muted" : ""}`.trim()}>
+                  {tile.status === "Published" ? "View Book" : tile.ctaLabel}
+                </span>
+              </Link>
             </article>
           ))}
         </div>
