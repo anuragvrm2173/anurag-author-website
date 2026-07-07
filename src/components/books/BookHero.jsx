@@ -26,6 +26,7 @@ function BookHero({
     isbn: labels.isbn || "ISBN",
     tba: labels.tba || (isHindi ? "शीघ्र" : "TBA"),
   };
+  const isPublished = book.status === "Published";
 
   return (
     <section className="book-hero">
@@ -59,15 +60,15 @@ function BookHero({
 
         <div className="book-hero__meta">
           <span>
-            {activeEdition.publicationDate
+            {isPublished && activeEdition.publicationDate
               ? new Date(activeEdition.publicationDate).toLocaleDateString("en-IN")
               : t.tba}
           </span>
-          <span>{activeEdition.pages || book.pages} {t.pages}</span>
-          <span>{activeEdition.publisher || book.publisher}</span>
+          {isPublished && (activeEdition.pages || book.pages) ? <span>{activeEdition.pages || book.pages} {t.pages}</span> : null}
+          {isPublished && (activeEdition.publisher || book.publisher) ? <span>{activeEdition.publisher || book.publisher}</span> : null}
           <span>{activeEdition.formatLabel}</span>
           <span>{activeEdition.label}</span>
-          {book.status === "Published" && (activeEdition.isbn || book.isbn) ? (
+          {isPublished && (activeEdition.isbn || book.isbn) ? (
             <span>{t.isbn} {activeEdition.isbn || book.isbn}</span>
           ) : null}
         </div>

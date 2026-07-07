@@ -134,6 +134,7 @@ function BookDetails() {
 
   const activeEdition = book.editions[selectedEditionKey] || editionEntries[0]?.[1];
   const isHindi = activeEdition?.languageCode === "hi";
+  const isPublished = book.status === "Published";
   const activeSample = activeEdition?.sampleId ? sampleMap[activeEdition.sampleId] : null;
   const bookReviews = getReviewsByBookId(book.id);
   const metaTitle = book.seo?.title || `${book.title} | Anurag Verma`;
@@ -143,13 +144,6 @@ function BookDetails() {
     "@type": "Book",
     name: book.title,
     description: metaDescription,
-    isbn: activeEdition?.isbn || book.isbn,
-    datePublished: activeEdition?.publicationDate || book.publicationDate,
-    numberOfPages: activeEdition?.pages || book.pages,
-    publisher: {
-      "@type": "Organization",
-      name: activeEdition?.publisher || book.publisher,
-    },
     author: {
       "@type": "Person",
       name: "Anurag Verma",
@@ -157,6 +151,24 @@ function BookDetails() {
     inLanguage: activeEdition?.languageCode,
     bookFormat: activeEdition?.formatLabel,
   };
+
+  if (isPublished) {
+    if (activeEdition?.isbn || book.isbn) {
+      structuredData.isbn = activeEdition?.isbn || book.isbn;
+    }
+    if (activeEdition?.publicationDate || book.publicationDate) {
+      structuredData.datePublished = activeEdition?.publicationDate || book.publicationDate;
+    }
+    if (activeEdition?.pages || book.pages) {
+      structuredData.numberOfPages = activeEdition?.pages || book.pages;
+    }
+    if (activeEdition?.publisher || book.publisher) {
+      structuredData.publisher = {
+        "@type": "Organization",
+        name: activeEdition?.publisher || book.publisher,
+      };
+    }
+  }
 
   const labels = {
     bookDetails: isHindi ? "पुस्तक विवरण" : "Book Details",
@@ -250,6 +262,8 @@ function BookDetails() {
   const displaySynopsis = localized?.synopsis || book.synopsis;
   const displayGenres = isHindi ? book.genres.map((item) => genreMapHi[item] || item) : book.genres;
   const displayThemes = isHindi ? book.themes.map((item) => themeMapHi[item] || item) : book.themes;
+  const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
+  const availabilityLabel = isHindi ? "शीघ्र" : "Coming Soon";
 
   return (
     <HelmetProvider>
@@ -314,28 +328,40 @@ function BookDetails() {
             <div className="book-synopsis__section">
               <p className="book-synopsis__eyebrow">{labels.bookDetails}</p>
               <ul className="book-synopsis__list">
-                <li className="book-synopsis__list-item">{labels.genres}: {displayGenres.join(", ")}</li>
-                <li className="book-synopsis__list-item">
-                  {labels.publicationDate}: {new Date(activeEdition.publicationDate || book.publicationDate).toLocaleDateString("en-IN")}
-                </li>
-                <li className="book-synopsis__list-item">{labels.pages}: {activeEdition.pages || book.pages}</li>
-                <li className="book-synopsis__list-item">{labels.publisher}: {activeEdition.publisher || book.publisher}</li>
-                {book.status === "Published" && (activeEdition.isbn || book.isbn) ? (
-                  <li className="book-synopsis__list-item">{labels.isbn}: {activeEdition.isbn || book.isbn}</li>
-                ) : null}
+                {isPublished ? (
+                  <>
+                    <li className="book-synopsis__list-item">{labels.genres}: {displayGenres.join(", ")}</li>
+                    <li className="book-synopsis__list-item">
+                      {labels.publicationDate}: {new Date(activeEdition.publicationDate || book.publicationDate).toLocaleDateString("en-IN")}
+                    </li>
+                    <li className="book-synopsis__list-item">{labels.pages}: {activeEdition.pages || book.pages}</li>
+                    <li className="book-synopsis__list-item">{labels.publisher}: {activeEdition.publisher || book.publisher}</li>
+                    {(activeEdition.isbn || book.isbn) ? (
+                      <li className="book-synopsis__list-item">{labels.isbn}: {activeEdition.isbn || book.isbn}</li>
+                    ) : null}
+                  </>
+                ) : (
+                  <>
+                    <li className="book-synopsis__list-item">Status: {toBeAnnouncedLabel}</li>
+                    <li className="book-synopsis__list-item">Language: {activeEdition.language || activeEdition.label || book.language}</li>
+                    <li className="book-synopsis__list-item">Availability: {availabilityLabel}</li>
+                  </>
+                )}
               </ul>
             </div>
 
-            <div className="book-synopsis__section">
-              <p className="book-synopsis__eyebrow">{labels.formats}</p>
-              <ul className="book-synopsis__list">
-                {Object.entries(activeEdition.formats || {}).map(([format, available]) => (
-                  <li key={format} className="book-synopsis__list-item">
-                    {format.toUpperCase()}: {available ? labels.available : labels.comingSoon}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {isPublished ? (
+              <div className="book-synopsis__section">
+                <p className="book-synopsis__eyebrow">{labels.formats}</p>
+                <ul className="book-synopsis__list">
+                  {Object.entries(activeEdition.formats || {}).map(([format, available]) => (
+                    <li key={format} className="book-synopsis__list-item">
+                      {format.toUpperCase()}: {available ? labels.available : labels.comingSoon}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </section>
 
           {bookReviews.length > 0 ? (

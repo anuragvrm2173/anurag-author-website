@@ -93,7 +93,7 @@ function formatCurrencyPrice(pricing) {
   }).format(pricing.amount);
 }
 
-function RetailerMark({ retailerKey, retailerName }) {
+function RetailerMark({ retailerKey }) {
   if (retailerKey === "amazon") {
     return (
       <span className="purchase-panel__retailer-mark" aria-hidden="true">
@@ -111,6 +111,7 @@ function RetailerMark({ retailerKey, retailerName }) {
 
 function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi = false }) {
   const locale = isHindi ? "hi-IN" : "en-IN";
+  const isPublished = bookStatus === "Published";
   const retailers = normalizeRetailers(activeEdition);
   const orderedRetailers = [...retailers].sort((left, right) => {
     const leftIndex = RETAILER_PRIORITY.indexOf(left.key);
@@ -119,13 +120,13 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     const rightRank = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
     return leftRank - rightRank;
   });
-  const availableRetailers = orderedRetailers.filter((item) => item.available && item.url);
+  const availableRetailers = isPublished
+    ? orderedRetailers.filter((item) => item.available && item.url)
+    : [];
   const unavailableRetailers = orderedRetailers.filter((item) => !item.available || !item.url);
   const hasSample = Boolean(activeEdition.sampleId);
   const primaryFormatKey = getPrimaryFormat(activeEdition.formats || {});
   const displayFormat = primaryFormatKey ? toTitleCase(primaryFormatKey) : (activeEdition.formatLabel || (isHindi ? "संस्करण" : "Edition"));
-  const isPublished = bookStatus === "Published";
-
   const directPricing = activeEdition.pricing && typeof activeEdition.pricing.amount === "number" ? activeEdition.pricing : null;
   const formatPricing = primaryFormatKey ? activeEdition.pricing?.[primaryFormatKey] : null;
   const displayPricing = formatPricing || directPricing || (activeEdition.priceInr
@@ -133,35 +134,34 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     : null);
   const displayPrice = formatCurrencyPrice(displayPricing);
   const publicationDate = activeEdition.publicationDate || book?.publicationDate;
-  const publicationLabel = formatDisplayDate(publicationDate, locale);
-  const expectedLabel = publicationDate
-    ? new Intl.DateTimeFormat(locale, {
-      month: "long",
-      year: "numeric",
-    }).format(new Date(publicationDate))
-    : null;
   const availabilityLabel = isPublished
     ? (isHindi ? "उपलब्ध अब" : "Available Now")
-    : expectedLabel
-      ? (isHindi ? `अपेक्षित ${expectedLabel}` : `Expected ${expectedLabel}`)
-      : (isHindi ? "शीघ्र" : "Coming Soon");
+    : (isHindi ? "शीघ्र" : "Coming Soon");
+  const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
 
   const metadata = activeEdition.metadata || {};
   const publishedValue = formatDisplayDate(metadata.publicationDate || publicationDate, locale);
-  const metadataRows = [
-    { key: "format", label: "Format", value: displayFormat },
-    { key: "language", label: "Language", value: metadata.language || activeEdition.language || activeEdition.label || book?.language },
-    { key: "pages", label: "Pages", value: metadata.pages || activeEdition.pages || book?.pages },
-    { key: "publisher", label: "Publisher", value: metadata.publisher || activeEdition.publisher || book?.publisher },
-    { key: "published", label: "Published", value: publishedValue },
-    { key: "isbn13", label: "ISBN-13", value: metadata.isbn13 || activeEdition.isbn13 || activeEdition.isbn || book?.isbn },
-    { key: "asin", label: "ASIN", value: metadata.asin || activeEdition.asin },
-    { key: "weight", label: "Weight", value: metadata.weight || activeEdition.weight },
-    { key: "dimensions", label: "Dimensions", value: metadata.dimensions || activeEdition.dimensions },
-    { key: "country", label: "Country", value: metadata.country || activeEdition.country },
-  ].filter((item) => Boolean(item.value));
+  const metadataRows = isPublished
+    ? [
+      { key: "format", label: "Format", value: displayFormat },
+      { key: "language", label: "Language", value: metadata.language || activeEdition.language || activeEdition.label || book?.language },
+      { key: "pages", label: "Pages", value: metadata.pages || activeEdition.pages || book?.pages },
+      { key: "publisher", label: "Publisher", value: metadata.publisher || activeEdition.publisher || book?.publisher },
+      { key: "published", label: "Published", value: publishedValue },
+      { key: "isbn13", label: "ISBN-13", value: metadata.isbn13 || activeEdition.isbn13 || activeEdition.isbn || book?.isbn },
+      { key: "asin", label: "ASIN", value: metadata.asin || activeEdition.asin },
+      { key: "weight", label: "Weight", value: metadata.weight || activeEdition.weight },
+      { key: "dimensions", label: "Dimensions", value: metadata.dimensions || activeEdition.dimensions },
+      { key: "country", label: "Country", value: metadata.country || activeEdition.country },
+    ].filter((item) => Boolean(item.value))
+    : [
+      { key: "status", label: "Status", value: toBeAnnouncedLabel },
+      { key: "publication", label: "Publication", value: toBeAnnouncedLabel },
+      { key: "publisher", label: "Publisher", value: toBeAnnouncedLabel },
+      { key: "availability", label: "Availability", value: availabilityLabel },
+    ];
 
-  const additionalInfoRows = [
+  const additionalInfoRows = isPublished ? [
     { key: "packer", label: "Packer", value: activeEdition.packer?.name },
     {
       key: "address",
@@ -173,7 +173,7 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     { key: "website", label: "Website", value: activeEdition.packer?.website },
     { key: "email", label: "Email", value: activeEdition.packer?.email },
     { key: "genericName", label: "Generic Name", value: metadata.genericName },
-  ].filter((item) => Boolean(item.value));
+  ].filter((item) => Boolean(item.value)) : [];
 
   const handleShare = async () => {
     const shareUrl = window.location.href;
@@ -223,14 +223,14 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
               rel="noreferrer"
               aria-label={retailer.actionLabel}
             >
-              <RetailerMark retailerKey={retailer.key} retailerName={retailer.name} />
+              <RetailerMark retailerKey={retailer.key} />
               <span>[ {retailer.name} ]</span>
             </a>
           ))}
         </div>
       ) : null}
 
-      {unavailableRetailers.length > 0 ? (
+      {isPublished && unavailableRetailers.length > 0 ? (
         <div className="purchase-panel__retailers-unavailable" aria-label={isHindi ? "अनुपलब्ध विक्रेता" : "Unavailable retailers"}>
           {unavailableRetailers.map((retailer) => (
             <div key={retailer.key} className="purchase-panel__retailer-unavailable-item">
@@ -239,6 +239,12 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
             </div>
           ))}
         </div>
+      ) : null}
+
+      {!isPublished ? (
+        <a href="/contact" className="purchase-panel__button purchase-panel__button--secondary">
+          {isHindi ? "सूचित करें" : "Notify Me"}
+        </a>
       ) : null}
 
       <div className="purchase-panel__secondary-actions">
