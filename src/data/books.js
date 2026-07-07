@@ -10,7 +10,7 @@ const books = [
       english: { label: "English", available: true },
       hindi: { label: "हिन्दी", available: true },
     },
-    sampleId: "riverlight",
+    sampleId: "lastGoodbye-en",
   },
   {
     id: "the-untold-stories",

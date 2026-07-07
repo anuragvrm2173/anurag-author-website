@@ -1,28 +1,48 @@
 import { useEffect, useMemo, useState } from "react";
 
+const READER_OPEN_DELAY = 400;
+
 function BookReader({ sample, onClose }) {
   const [pageIndex, setPageIndex] = useState(0);
+  const [isOpening, setIsOpening] = useState(true);
 
   const pages = useMemo(() => sample?.pages || [], [sample]);
 
   useEffect(() => {
+    if (!sample) {
+      return undefined;
+    }
+
+    setPageIndex(0);
+    setIsOpening(true);
+
+    const timeoutId = window.setTimeout(() => {
+      setIsOpening(false);
+    }, READER_OPEN_DELAY);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [sample]);
+
+  useEffect(() => {
+    if (!sample || isOpening) {
+      return undefined;
+    }
+
     const handleKeyDown = (event) => {
       if (event.key === "ArrowRight") {
+        event.preventDefault();
         setPageIndex((current) => Math.min(current + 1, pages.length - 1));
       }
 
       if (event.key === "ArrowLeft") {
+        event.preventDefault();
         setPageIndex((current) => Math.max(current - 1, 0));
-      }
-
-      if (event.key === "Escape") {
-        onClose?.();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, pages.length]);
+  }, [isOpening, pages.length, sample]);
 
   if (!sample) {
     return null;
@@ -38,26 +58,36 @@ function BookReader({ sample, onClose }) {
             Close
           </button>
           <div className="reader-progress">
-            Page {pageIndex + 1} of {pages.length}
+            {isOpening ? sample.previewLabel || "Sample Preview" : `Page ${pageIndex + 1} of ${pages.length}`}
           </div>
         </div>
 
-        <article className="reader-page">
-          <p className="reader-page__label">Sample Preview</p>
-          <h2 className="reader-page__title">{currentPage.title}</h2>
-          {currentPage.content.map((paragraph, index) => (
-            <p key={`${currentPage.number}-${index}`} className="reader-page__content">
-              {paragraph}
+        {isOpening ? (
+          <div className="reader-cover" aria-live="polite">
+            <p className="reader-cover__eyebrow">{sample.cover?.eyebrow || "Preview Edition"}</p>
+            <h2 className="reader-cover__title">{sample.cover?.title || sample.title}</h2>
+            <p className="reader-cover__subtitle">
+              {sample.cover?.subtitle || sample.previewLabel || "Sample Preview"}
             </p>
-          ))}
-        </article>
+          </div>
+        ) : (
+          <article key={currentPage.number} className="reader-page reader-page--enter">
+            <p className="reader-page__label">{sample.previewLabel || "Sample Preview"}</p>
+            <h2 className="reader-page__title">{currentPage.title}</h2>
+            {currentPage.content.map((paragraph, index) => (
+              <p key={`${currentPage.number}-${index}`} className="reader-page__content">
+                {paragraph}
+              </p>
+            ))}
+          </article>
+        )}
 
         <div className="reader-navigation">
           <button
             type="button"
             className="reader-nav-button"
             onClick={() => setPageIndex((current) => Math.max(current - 1, 0))}
-            disabled={pageIndex === 0}
+            disabled={isOpening || pageIndex === 0}
           >
             Previous
           </button>
@@ -66,7 +96,7 @@ function BookReader({ sample, onClose }) {
             type="button"
             className="reader-nav-button"
             onClick={() => setPageIndex((current) => Math.min(current + 1, pages.length - 1))}
-            disabled={pageIndex === pages.length - 1}
+            disabled={isOpening || pageIndex === pages.length - 1}
           >
             Next
           </button>

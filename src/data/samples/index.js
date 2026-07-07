@@ -1,5 +1,5 @@
-import { riverlightSample } from "./riverlight-sample";
+import { lastGoodbyeEnglishSample } from "./lastGoodbye.en";
 
 export const sampleMap = {
-  riverlight: riverlightSample,
+  "lastGoodbye-en": lastGoodbyeEnglishSample,
 };
