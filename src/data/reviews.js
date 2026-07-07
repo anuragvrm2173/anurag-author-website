@@ -1,5 +1,18 @@
 export const reviews = [
-	// Reviews will be added as verified reader feedback is collected.
+	{
+		id: "goodreads-anurag-last-goodbye-2026-07-07",
+		bookId: "the-last-goodbye",
+		reviewerName: "Anurag Verma",
+		reviewerRole: "Goodreads Author",
+		quote:
+			"As the author of this book, I wanted to share a story that was lived before it was written. The Last Goodbye I Never Got is an autobiographical novel about love, heartbreak, family, loss, healing, and the memories that continue to shape us. Every chapter is inspired by real experiences, making this book deeply personal and emotionally honest. My hope is that readers who have experienced love, grief, or the pain of an unfinished goodbye will find comfort and connection within these pages. Thank you for giving my debut book a chance. I hope this story stays with you long after you've turned the final page.",
+		source: "Goodreads",
+		sourceUrl: "https://www.goodreads.com/book/show/254204000-the-last-goodbye-i-never-got",
+		rating: 5,
+		featured: true,
+		status: "approved",
+		createdAt: "2026-07-07T00:00:00.000Z",
+	},
 ];
 
 export function getFeaturedReviews(limit = 3, list = reviews) {

@@ -18,7 +18,23 @@ function ReviewCard({ review, showVerifiedBadge = true }) {
         {review.reviewerName}
         {review.reviewerRole ? `, ${review.reviewerRole}` : ""}
       </p>
-      {review.source ? <p className="review-card__source">Source: {review.source}</p> : null}
+      {review.source ? (
+        <p className="review-card__source">
+          Source:{" "}
+          {review.sourceUrl ? (
+            <a
+              className="review-card__source-link"
+              href={review.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {review.source}
+            </a>
+          ) : (
+            review.source
+          )}
+        </p>
+      ) : null}
     </article>
   );
 }
