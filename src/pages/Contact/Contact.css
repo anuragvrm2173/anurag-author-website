@@ -31,6 +31,27 @@
   background: rgba(255, 255, 255, 0.6);
 }
 
+.contact-page__author {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.contact-page__author img {
+  width: 3.4rem;
+  height: 3.4rem;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+}
+
+.contact-page__author p {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
 .contact-page__channels {
   display: grid;
   gap: 0.6rem;

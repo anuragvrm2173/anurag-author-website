@@ -1,3 +1,6 @@
+import lastGoodbyeEnCover from "../assets/images/books/last-goodbye-en.jpg";
+import lastGoodbyeHiCover from "../assets/images/books/last-goodbye-hi.jpg";
+
 const books = [
   {
     id: "the-last-goodbye",
@@ -69,8 +72,9 @@ const books = [
         },
         cover: {
           eyebrow: "Published",
-          subtitle: "English edition",
-          gradient: "linear-gradient(160deg, #1f2433 0%, #111111 100%)",
+          author: "Anurag Verma",
+          subtitle: "(English Edition)",
+          image: lastGoodbyeEnCover,
         },
         sampleId: "lastGoodbye-en",
         purchaseLinks: {
@@ -94,8 +98,9 @@ const books = [
         },
         cover: {
           eyebrow: "Published",
-          subtitle: "हिन्दी संस्करण",
-          gradient: "linear-gradient(160deg, #2d1f1f 0%, #181111 100%)",
+          author: "अनुराग वर्मा",
+          subtitle: "(Hindi Edition)",
+          image: lastGoodbyeHiCover,
         },
         sampleId: "lastGoodbye-hi",
         purchaseLinks: {
@@ -162,8 +167,9 @@ const books = [
         },
         cover: {
           eyebrow: "Coming Soon",
-          subtitle: "English edition",
-          gradient: "linear-gradient(160deg, #233034 0%, #11181a 100%)",
+          author: "Anurag Verma",
+          subtitle: "(English Edition)",
+          image: null,
         },
         sampleId: "untold-en",
         purchaseLinks: {},
@@ -183,8 +189,9 @@ const books = [
         },
         cover: {
           eyebrow: "Coming Soon",
-          subtitle: "हिन्दी संस्करण",
-          gradient: "linear-gradient(160deg, #3a2f22 0%, #1a140f 100%)",
+          author: "अनुराग वर्मा",
+          subtitle: "(Hindi Edition)",
+          image: null,
         },
         sampleId: "untold-hi",
         purchaseLinks: {},
@@ -247,8 +254,9 @@ const books = [
         },
         cover: {
           eyebrow: "Coming Soon",
-          subtitle: "English edition",
-          gradient: "linear-gradient(160deg, #262f23 0%, #111812 100%)",
+          author: "Anurag Verma",
+          subtitle: "(English Edition)",
+          image: null,
         },
         sampleId: "lessons-en",
         purchaseLinks: {},
@@ -268,8 +276,9 @@ const books = [
         },
         cover: {
           eyebrow: "Coming Soon",
-          subtitle: "हिन्दी संस्करण",
-          gradient: "linear-gradient(160deg, #332821 0%, #1b1512 100%)",
+          author: "अनुराग वर्मा",
+          subtitle: "(Hindi Edition)",
+          image: null,
         },
         sampleId: "lessons-hi",
         purchaseLinks: {},

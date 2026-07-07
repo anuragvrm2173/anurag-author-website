@@ -1,6 +1,6 @@
 import Container from "../ui/Container/Container";
 
-function AuthorProfile({ name, occupation, shortBio, longBio, basedIn }) {
+function AuthorProfile({ name, occupation, shortBio, longBio, basedIn, authorImage }) {
   return (
     <section className="author-profile" aria-labelledby="author-profile-title">
       <Container>
@@ -12,6 +12,12 @@ function AuthorProfile({ name, occupation, shortBio, longBio, basedIn }) {
             <p className="author-profile__name">{name}</p>
             <p className="author-profile__occupation">{occupation}</p>
           </header>
+
+          {authorImage ? (
+            <figure className="author-profile__portrait-wrap">
+              <img src={authorImage} alt={`${name} portrait`} className="author-profile__portrait" loading="lazy" />
+            </figure>
+          ) : null}
 
           <div className="author-profile__bios">
             <div className="author-profile__bio-block" aria-labelledby="author-short-bio-title">

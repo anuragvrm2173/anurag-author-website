@@ -46,9 +46,10 @@ function Library() {
           <div className="library-page__grid" role="list" aria-label="Book collection">
             {books.map((book) => (
               <div key={book.id} role="listitem">
-                <BookCard
+                  <BookCard
                   bookId={book.id}
                   title={book.title}
+                    subtitle={book.subtitle}
                   description={book.shortDescription || book.description}
                   badge={book.status}
                   editions={book.editions}

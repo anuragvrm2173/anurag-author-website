@@ -1,3 +1,5 @@
+import BookCoverArt from "./BookCoverArt";
+
 function BookHero({
   book,
   activeEdition,
@@ -16,16 +18,18 @@ function BookHero({
 
   return (
     <section className="book-hero">
-      <div
-        className="book-hero__cover"
-        aria-hidden="true"
-        style={activeEdition.cover?.gradient ? { background: activeEdition.cover.gradient } : undefined}
-      >
-        <p className="book-hero__cover-eyebrow">{activeEdition.cover?.eyebrow || book.status}</p>
-        <h1 className="book-hero__cover-title">{book.title}</h1>
-        <p className="book-hero__cover-subtitle">
-          {activeEdition.cover?.subtitle || activeEdition.formatLabel}
-        </p>
+      <div className="book-hero__cover" aria-hidden="true">
+        <BookCoverArt
+          title={book.title}
+          subtitle={activeEdition.cover?.subtitle || activeEdition.formatLabel}
+          author={activeEdition.cover?.author || "Anurag Verma"}
+          badge={activeEdition.cover?.eyebrow || book.status}
+          coverImage={activeEdition.cover?.image || null}
+          alt={`${book.title} ${activeEdition.label} cover`}
+          className="book-hero__cover-art"
+          imageClassName="book-hero__cover-image"
+          loading="eager"
+        />
       </div>
 
       <div className="book-hero__content">

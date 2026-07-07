@@ -21,6 +21,7 @@ function FeaturedBooks() {
               key={book.id}
               bookId={book.id}
               title={book.title}
+              subtitle={book.subtitle}
               description={book.shortDescription || book.description}
               badge={book.status}
               editions={book.editions}

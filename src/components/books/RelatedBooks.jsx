@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import BookCoverArt from "./BookCoverArt";
 
 function RelatedBooks({ books }) {
   if (books.length === 0) {
@@ -17,6 +18,17 @@ function RelatedBooks({ books }) {
       <div className="related-books__grid">
         {books.map((book) => (
           <article key={book.id} className="related-books__card">
+            <BookCoverArt
+              title={book.title}
+              subtitle={book.editions?.english?.cover?.subtitle || book.subtitle}
+              author={book.editions?.english?.cover?.author || "Anurag Verma"}
+              badge={book.status}
+              coverImage={book.editions?.english?.cover?.image || null}
+              alt={`${book.title} cover`}
+              className="related-books__cover"
+              imageClassName="related-books__cover-image"
+              loading="lazy"
+            />
             <p className="related-books__status">{book.status}</p>
             <h3 className="related-books__card-title">{book.title}</h3>
             <p className="related-books__card-copy">{book.shortDescription || book.description}</p>

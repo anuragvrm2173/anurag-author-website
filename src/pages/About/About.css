@@ -107,6 +107,20 @@
   margin-bottom: 2rem;
 }
 
+.author-profile__portrait-wrap {
+  margin: 0 0 2rem;
+  max-width: 18rem;
+}
+
+.author-profile__portrait {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  box-shadow: 0 16px 32px rgba(17, 17, 17, 0.14);
+}
+
 .author-profile__name {
   margin-bottom: 0.35rem;
   font-family: var(--font-heading);

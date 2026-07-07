@@ -6,6 +6,7 @@ import ContactForm from "../../components/forms/ContactForm/ContactForm";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
+import authorImage from "../../assets/images/author/author.jpg";
 import siteConfig from "../../data/siteConfig";
 import socialLinks from "../../data/socialLinks";
 
@@ -54,6 +55,11 @@ function Contact() {
               </div>
 
               <aside className="contact-page__aside" aria-labelledby="contact-channels-title">
+                <div className="contact-page__author">
+                  <img src={authorImage} alt="Anurag Verma portrait" loading="lazy" />
+                  <p>Anurag Verma</p>
+                </div>
+
                 <h2 id="contact-channels-title" className="contact-page__section-title">
                   Other Ways to Connect
                 </h2>

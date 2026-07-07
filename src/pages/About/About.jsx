@@ -8,6 +8,7 @@ import WritingFocus from "../../components/about/WritingFocus";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
+import authorImage from "../../assets/images/author/author.jpg";
 import siteConfig from "../../data/siteConfig";
 import socialLinks from "../../data/socialLinks";
 import { timeline } from "../../data/timeline";
@@ -133,6 +134,7 @@ function About() {
         <AuthorProfile
           name="Anurag Verma"
           occupation="Author"
+          authorImage={authorImage}
           shortBio="Anurag Verma is an Indian author whose books explore love, loss, healing, and personal growth through deeply human stories. Drawing from real-life experiences, he writes with honesty and emotional depth, creating books that help readers find hope, resilience, and meaning in life's most difficult moments."
           longBio="Anurag Verma is an Indian author who believes that the most powerful stories are often the ones we live ourselves. His writing explores the emotional realities of love, grief, healing, and personal growth, transforming lived experiences into stories that feel deeply personal yet universally relatable. Rather than offering easy answers, his books invite readers to reflect, heal, and discover strength within their own journeys. His debut book, The Last Goodbye I Never Got, introduced readers to an intimate story of love, loss, and the echoes that remain long after goodbye. Building on that foundation, he continues to write books that blend memoir, storytelling, and thoughtful reflection-encouraging readers to embrace vulnerability, rediscover hope, and find meaning even in life's hardest chapters. Anurag's goal is simple: to create books that stay with readers long after the final page, offering comfort, perspective, and the reminder that even our deepest wounds can become the beginning of something stronger."
           basedIn="India"

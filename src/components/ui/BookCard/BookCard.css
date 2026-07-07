@@ -41,6 +41,15 @@
   letter-spacing: 0.09rem;
 }
 
+.book-card__cover {
+  margin-left: 0.45rem;
+  width: min(100%, 11.5rem);
+}
+
+.book-card__cover-image {
+  object-fit: cover;
+}
+
 .book-card__content {
   display: flex;
   flex-direction: column;

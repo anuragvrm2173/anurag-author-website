@@ -28,20 +28,19 @@
 }
 
 .book-hero__cover {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   min-height: 470px;
-  padding: 1.8rem;
-  border-radius: 1.8rem;
-  background:
-    radial-gradient(circle at top, rgba(201, 163, 78, 0.28), transparent 40%),
-    linear-gradient(160deg, #1c2330 0%, #111111 100%);
-  box-shadow: 0 28px 80px rgba(17, 17, 17, 0.22);
-  color: var(--color-white);
+  display: grid;
+  align-items: center;
 }
 
-.book-hero__cover-eyebrow,
+.book-hero__cover-art {
+  border-radius: 1.8rem;
+}
+
+.book-hero__cover-image {
+  object-fit: cover;
+}
+
 .book-synopsis__eyebrow,
 .related-books__eyebrow,
 .book-reviews__eyebrow,
@@ -54,7 +53,6 @@
   color: var(--color-accent);
 }
 
-.book-hero__cover-title,
 .book-hero__title,
 .related-books__title,
 .book-reviews__title {
@@ -63,15 +61,6 @@
   line-height: 1.02;
 }
 
-.book-hero__cover-title {
-  font-size: clamp(2.25rem, 4vw, 3.5rem);
-}
-
-.book-hero__cover-subtitle {
-  margin: 1rem 0 0;
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.74);
-}
 
 .book-hero__content {
   display: flex;
@@ -312,6 +301,10 @@
   font-weight: 700;
   letter-spacing: 0.1rem;
   text-transform: uppercase;
+}
+
+.related-books__cover {
+  margin-bottom: 1rem;
 }
 
 .related-books__card-title {
