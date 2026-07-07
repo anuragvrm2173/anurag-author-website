@@ -36,7 +36,7 @@ function ContactForm() {
 
       event.currentTarget.reset();
       setStatus("success");
-    } catch (error) {
+    } catch {
       setStatus("error");
     }
   };

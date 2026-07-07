@@ -74,18 +74,6 @@ function normalizeRetailers(activeEdition) {
     }));
 }
 
-function formatDisplayDate(dateValue, locale) {
-  if (!dateValue) {
-    return null;
-  }
-
-  return new Intl.DateTimeFormat(locale, {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(dateValue));
-}
-
 function formatCurrencyPrice(pricing) {
   if (!pricing || typeof pricing.amount !== "number") {
     return null;

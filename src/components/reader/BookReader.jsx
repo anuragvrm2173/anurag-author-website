@@ -14,9 +14,6 @@ function BookReader({ sample, onClose, buyLink }) {
       return undefined;
     }
 
-    setPageIndex(0);
-    setIsOpening(true);
-
     const timeoutId = window.setTimeout(() => {
       setIsOpening(false);
     }, READER_OPEN_DELAY);

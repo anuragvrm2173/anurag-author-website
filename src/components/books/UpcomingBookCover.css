@@ -3,6 +3,7 @@
   width: 100%;
   aspect-ratio: 2 / 3;
   padding: 0.8rem;
+  overflow: hidden;
   border-radius: 1rem;
   border: 1px solid rgba(17, 17, 17, 0.14);
   background: #f5efe2;
@@ -22,10 +23,12 @@
 .upcoming-book-cover__inner {
   height: 100%;
   display: grid;
-  align-content: space-between;
+  grid-template-rows: auto auto 1fr auto;
+  align-content: start;
   gap: 0.7rem;
   text-align: center;
   padding: 0.8rem 0.6rem;
+  overflow: hidden;
 }
 
 .upcoming-book-cover__title {
@@ -35,6 +38,11 @@
   line-height: 1.2;
   color: var(--color-primary);
   letter-spacing: 0.01em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
 }
 
 .upcoming-book-cover__subtitle {
@@ -42,6 +50,7 @@
   line-height: 1.45;
   color: rgba(43, 43, 43, 0.72);
   font-size: 0.86rem;
+  min-height: 1.25rem;
 }
 
 .upcoming-book-cover__badge {

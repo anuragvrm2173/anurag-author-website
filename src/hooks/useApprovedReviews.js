@@ -20,7 +20,33 @@ function useApprovedReviews() {
   };
 
   useEffect(() => {
-    refresh();
+    let isActive = true;
+
+    const loadInitialReviews = async () => {
+      try {
+        const items = await fetchApprovedReviews();
+        if (!isActive) {
+          return;
+        }
+        setReviews(items);
+        setError(null);
+      } catch (err) {
+        if (!isActive) {
+          return;
+        }
+        setError(err);
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadInitialReviews();
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   return { reviews, loading, error, refresh };

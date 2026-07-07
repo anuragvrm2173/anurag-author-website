@@ -95,6 +95,32 @@
   height: 100%;
 }
 
+.featured-books__tile-upcoming .upcoming-book-cover__inner {
+  gap: 0.45rem;
+  padding: 0.62rem 0.5rem;
+}
+
+.featured-books__tile-upcoming .upcoming-book-cover__title {
+  font-size: clamp(0.88rem, 1.1vw, 1.1rem);
+  line-height: 1.14;
+  -webkit-line-clamp: 8;
+}
+
+.featured-books__tile-upcoming .upcoming-book-cover__subtitle {
+  min-height: 0;
+}
+
+.featured-books__tile-upcoming .upcoming-book-cover__badge {
+  font-size: 0.64rem;
+  letter-spacing: 0.06rem;
+  padding: 0.22rem 0.5rem;
+}
+
+.featured-books__tile-upcoming .upcoming-book-cover__author {
+  font-size: 0.7rem;
+  letter-spacing: 0.06rem;
+}
+
 .featured-books__tile-status {
   display: inline-flex;
   align-items: center;

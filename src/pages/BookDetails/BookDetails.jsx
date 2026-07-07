@@ -56,6 +56,7 @@ function BookDetails() {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isCoverZoomed, setIsCoverZoomed] = useState(false);
   const closeButtonRef = useRef(null);
+  const { reviews, refresh } = useApprovedReviews();
 
   const book = getBookById(bookId);
   const relatedBooks = book ? getRelatedBooks(book.id) : booksData.slice(0, 2);
@@ -80,13 +81,6 @@ function BookDetails() {
     () => requestedEditionKey || editionEntries.find(([, edition]) => edition.available)?.[0] || editionEntries[0]?.[0] || null,
     [requestedEditionKey, editionEntries]
   );
-
-  useEffect(() => {
-    setSelectedEditionKey(defaultEditionKey);
-    setIsReaderOpen(false);
-    setIsCoverOpen(false);
-    setIsCoverZoomed(false);
-  }, [defaultEditionKey, bookId]);
 
   useEffect(() => {
     if (!isCoverOpen) {
@@ -135,11 +129,13 @@ function BookDetails() {
     );
   }
 
-  const activeEdition = book.editions[selectedEditionKey] || editionEntries[0]?.[1];
+  const effectiveEditionKey = (selectedEditionKey && book.editions[selectedEditionKey])
+    ? selectedEditionKey
+    : defaultEditionKey;
+  const activeEdition = book.editions[effectiveEditionKey] || editionEntries[0]?.[1];
   const isHindi = activeEdition?.languageCode === "hi";
   const isPublished = book.status === "Published";
   const activeSample = activeEdition?.sampleId ? sampleMap[activeEdition.sampleId] : null;
-  const { reviews, refresh } = useApprovedReviews();
   const bookReviews = getReviewsByBookId(book.id, reviews);
   const metaTitle = book.seo?.title || `${book.title} | Anurag Verma`;
   const metaDescription = book.seo?.description || book.shortDescription || book.description;
@@ -353,8 +349,7 @@ function BookDetails() {
     return displayFavoriteQuotes;
   })();
   const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
-  const availabilityLabel = isHindi ? "शीघ्र" : "Coming Soon";
-  const pageUrl = `${siteConfig.url}/library/${book.id}${selectedEditionKey ? `?edition=${selectedEditionKey}` : ""}`;
+  const pageUrl = `${siteConfig.url}/library/${book.id}${effectiveEditionKey ? `?edition=${effectiveEditionKey}` : ""}`;
   const shareText = `${book.title} by Anurag Verma`;
 
   return (
@@ -398,7 +393,7 @@ function BookDetails() {
           >
             <EditionSelector
               editions={editionEntries}
-              selectedEditionKey={selectedEditionKey}
+              selectedEditionKey={effectiveEditionKey}
               onChange={setSelectedEditionKey}
               isHindi={isHindi}
             />
@@ -613,6 +608,7 @@ function BookDetails() {
 
       <ReaderModal open={isReaderOpen} onClose={() => setIsReaderOpen(false)}>
         <BookReader
+          key={activeEdition?.sampleId || `${book.id}-${effectiveEditionKey || "default"}`}
           sample={activeSample}
           onClose={() => setIsReaderOpen(false)}
           buyLink={getPrimaryBuyLink(activeEdition)}
