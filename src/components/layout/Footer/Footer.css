@@ -1,5 +1,5 @@
 .footer {
-  padding: 2.4rem 0;
+  padding: 3.2rem 0;
   border-top: 1px solid #e8e4da;
   background: linear-gradient(180deg, rgba(246, 241, 231, 0.5), rgba(255, 255, 255, 0.96));
 }
@@ -13,7 +13,7 @@
 .footer__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .footer__title {
@@ -44,7 +44,7 @@
 }
 
 .footer__bar {
-  margin: 1.2rem 0;
+  margin: 1.9rem 0;
   height: 1px;
   background: rgba(17, 17, 17, 0.1);
 }

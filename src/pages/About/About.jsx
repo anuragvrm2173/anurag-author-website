@@ -2,8 +2,6 @@ import { HelmetProvider } from "react-helmet-async";
 
 import AuthorProfile from "../../components/about/AuthorProfile";
 import ReaderConnection from "../../components/about/ReaderConnection";
-import SocialLinks from "../../components/about/SocialLinks";
-import StorySection from "../../components/about/StorySection";
 import WritingFocus from "../../components/about/WritingFocus";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
@@ -11,19 +9,10 @@ import Container from "../../components/ui/Container/Container";
 import authorImage from "../../assets/images/author/author.jpg";
 import siteConfig from "../../data/siteConfig";
 import socialLinks from "../../data/socialLinks";
-import { timeline } from "../../data/timeline";
 import Newsletter from "../../sections/Newsletter/Newsletter";
+import Timeline from "../../sections/Timeline/Timeline";
 
-import "../../sections/Timeline/Timeline.css";
 import "./About.css";
-
-const storyParagraphs = [
-  "I'm Anurag Verma, an Indian author who writes about the moments that quietly change us-the love we remember, the goodbyes we never expected, and the strength we discover while learning to move forward.",
-  "My books aren't written to offer perfect answers.",
-  "They're written to remind you that you're not alone in the questions.",
-  "Every story begins with something real. Sometimes it's loss. Sometimes it's hope. Most often, it's both.",
-  "Whether you're healing, reflecting, or simply searching for a book that understands how life really feels, I hope you find a part of yourself somewhere in these pages.",
-];
 
 const writingThemes = [
   "Love that changes us",
@@ -110,8 +99,6 @@ function About() {
           basedIn="India"
         />
 
-        <StorySection title="The Story Behind the Words" paragraphs={storyParagraphs} />
-
         <section className="about-philosophy" aria-labelledby="about-philosophy-title">
           <Container>
             <h2 id="about-philosophy-title" className="about-story__title">Why I Write</h2>
@@ -122,6 +109,17 @@ function About() {
             </div>
           </Container>
         </section>
+
+        <WritingFocus
+          title="Writing Themes"
+          intro="I write emotionally driven books that explore:"
+          themes={writingThemes}
+          outro="My writing blends memoir, storytelling, and reflection-not to tell readers what to think, but to help them see their own lives a little differently."
+        />
+
+        <ReaderConnection title="Why Readers Connect" paragraphs={readerConnectionParagraphs} />
+
+        <Timeline />
 
         <section className="about-stats" aria-labelledby="about-stats-title">
           <Container>
@@ -148,40 +146,6 @@ function About() {
             </blockquote>
           </Container>
         </section>
-
-        <WritingFocus
-          title="What I Write"
-          intro="I write emotionally driven books that explore:"
-          themes={writingThemes}
-          outro="My writing blends memoir, storytelling, and reflection-not to tell readers what to think, but to help them see their own lives a little differently."
-        />
-
-        <ReaderConnection title="Why Readers Connect" paragraphs={readerConnectionParagraphs} />
-
-        <section className="timeline about-timeline" aria-labelledby="about-timeline-title">
-          <Container>
-            <div className="timeline__header">
-              <p className="timeline__eyebrow">Writing Journey Timeline</p>
-              <h2 id="about-timeline-title" className="timeline__title">
-                The chapters that shaped this journey.
-              </h2>
-            </div>
-
-            <div className="timeline__list" role="list" aria-label="Writing journey milestones">
-              {timeline.map((item) => (
-                <article className="timeline__item" key={`${item.year}-${item.title}`} role="listitem">
-                  <div className="timeline__year">{item.year}</div>
-                  <div className="timeline__content">
-                    <h3>{item.title}</h3>
-                    <p>{item.text}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        <SocialLinks links={socialLinks} />
 
         <Newsletter source="About" />
       </main>

@@ -33,8 +33,9 @@ function Reviews() {
           ) : (
             <article className="review-card" aria-live="polite">
               <p className="review-card__quote">
-                Reader reviews will appear here as more readers share their thoughts.
+                Reader reviews will appear here after publication.
               </p>
+              <p className="review-card__author">Be the first to share your thoughts.</p>
             </article>
           )}
         </div>

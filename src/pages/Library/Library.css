@@ -39,14 +39,14 @@
 
 .library-page__editions {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .library-page__edition-block {
   display: grid;
-  grid-template-columns: minmax(86px, 100px) 1fr;
-  gap: 0.85rem;
+  grid-template-columns: 104px 1fr;
+  gap: 0.9rem;
   align-items: start;
   padding: 0.85rem;
   border-radius: 1rem;
@@ -55,7 +55,7 @@
 }
 
 .library-page__edition-cover {
-  width: 100%;
+  width: 104px;
 }
 
 .library-page__edition-meta {
@@ -76,7 +76,7 @@
 .library-page__upcoming-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.24rem 0.62rem;
+  padding: 0.2rem 0.58rem;
   border-radius: 999px;
   background: rgba(17, 17, 17, 0.07);
   font-size: 0.74rem;
@@ -101,7 +101,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.58rem 0.9rem;
+  min-height: 2.8rem;
+  padding: 0.58rem 0.95rem;
   border-radius: 999px;
   background: var(--color-primary);
   color: var(--color-white);

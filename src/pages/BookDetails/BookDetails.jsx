@@ -423,9 +423,7 @@ function BookDetails() {
                   </>
                 ) : (
                   <>
-                    <li className="book-synopsis__list-item">Status: {toBeAnnouncedLabel}</li>
-                    <li className="book-synopsis__list-item">Language: {activeEdition.language || activeEdition.label || book.language}</li>
-                    <li className="book-synopsis__list-item">Availability: {availabilityLabel}</li>
+                    <li className="book-synopsis__list-item">Publication: {toBeAnnouncedLabel}</li>
                   </>
                 )}
               </ul>
@@ -473,6 +471,7 @@ function BookDetails() {
               <h2 id="book-reviews-title" className="book-reviews__title">
                 {labels.reviewsEmpty}
               </h2>
+              <p className="book-reviews__empty-copy">Be the first to share your thoughts.</p>
 
               <Link to="/contact" className="book-reviews__cta">
                 {isHindi ? "पहली समीक्षा लिखें" : "Write the First Review"}
@@ -514,6 +513,8 @@ function BookDetails() {
               src={activeEdition?.cover?.fullCover || activeEdition?.cover?.frontCover || ""}
               alt={`${book.title} ${activeEdition.label} cover preview`}
               className={`book-cover-modal__image ${isCoverZoomed ? "book-cover-modal__image--zoomed" : ""}`.trim()}
+              width="1600"
+              height="1153"
               onClick={() => setIsCoverZoomed((prev) => !prev)}
               role="button"
               tabIndex={0}

@@ -110,20 +110,28 @@ function RetailerMark({ retailerKey }) {
 }
 
 function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi = false }) {
-  const locale = isHindi ? "hi-IN" : "en-IN";
   const isPublished = bookStatus === "Published";
   const retailers = normalizeRetailers(activeEdition);
-  const orderedRetailers = [...retailers].sort((left, right) => {
-    const leftIndex = RETAILER_PRIORITY.indexOf(left.key);
-    const rightIndex = RETAILER_PRIORITY.indexOf(right.key);
-    const leftRank = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
-    const rightRank = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
-    return leftRank - rightRank;
-  });
-  const availableRetailers = isPublished
-    ? orderedRetailers.filter((item) => item.available && item.url)
-    : [];
-  const unavailableRetailers = orderedRetailers.filter((item) => !item.available || !item.url);
+  const retailerByKey = retailers.reduce((acc, item) => {
+    acc[item.key] = item;
+    return acc;
+  }, {});
+  const displayRetailers = RETAILER_PRIORITY
+    .filter((key) => ["amazon", "notionPress", "pothi", "flipkart"].includes(key))
+    .map((key) => {
+      const item = retailerByKey[key];
+      if (item) {
+        return item;
+      }
+      return {
+        key,
+        name: toTitleCase(key),
+        available: false,
+        url: null,
+        actionLabel: `Buy from ${toTitleCase(key)}`,
+        statusLabel: "Coming Soon",
+      };
+    });
   const hasSample = Boolean(activeEdition.sampleId);
   const primaryFormatKey = getPrimaryFormat(activeEdition.formats || {});
   const displayFormat = primaryFormatKey ? toTitleCase(primaryFormatKey) : (activeEdition.formatLabel || (isHindi ? "संस्करण" : "Edition"));
@@ -133,47 +141,9 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     ? { currency: "INR", amount: activeEdition.priceInr }
     : null);
   const displayPrice = formatCurrencyPrice(displayPricing);
-  const publicationDate = activeEdition.publicationDate || book?.publicationDate;
   const availabilityLabel = isPublished
     ? (isHindi ? "उपलब्ध अब" : "Available Now")
     : (isHindi ? "शीघ्र" : "Coming Soon");
-  const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
-
-  const metadata = activeEdition.metadata || {};
-  const publishedValue = formatDisplayDate(metadata.publicationDate || publicationDate, locale);
-  const metadataRows = isPublished
-    ? [
-      { key: "format", label: "Format", value: displayFormat },
-      { key: "language", label: "Language", value: metadata.language || activeEdition.language || activeEdition.label || book?.language },
-      { key: "pages", label: "Pages", value: metadata.pages || activeEdition.pages || book?.pages },
-      { key: "publisher", label: "Publisher", value: metadata.publisher || activeEdition.publisher || book?.publisher },
-      { key: "published", label: "Published", value: publishedValue },
-      { key: "isbn13", label: "ISBN-13", value: metadata.isbn13 || activeEdition.isbn13 || activeEdition.isbn || book?.isbn },
-      { key: "asin", label: "ASIN", value: metadata.asin || activeEdition.asin },
-      { key: "weight", label: "Weight", value: metadata.weight || activeEdition.weight },
-      { key: "dimensions", label: "Dimensions", value: metadata.dimensions || activeEdition.dimensions },
-      { key: "country", label: "Country", value: metadata.country || activeEdition.country },
-    ].filter((item) => Boolean(item.value))
-    : [
-      { key: "status", label: "Status", value: toBeAnnouncedLabel },
-      { key: "publication", label: "Publication", value: toBeAnnouncedLabel },
-      { key: "publisher", label: "Publisher", value: toBeAnnouncedLabel },
-      { key: "availability", label: "Availability", value: availabilityLabel },
-    ];
-
-  const additionalInfoRows = isPublished ? [
-    { key: "packer", label: "Packer", value: activeEdition.packer?.name },
-    {
-      key: "address",
-      label: "Address",
-      value: Array.isArray(activeEdition.packer?.address)
-        ? activeEdition.packer.address.join(", ")
-        : activeEdition.packer?.address,
-    },
-    { key: "website", label: "Website", value: activeEdition.packer?.website },
-    { key: "email", label: "Email", value: activeEdition.packer?.email },
-    { key: "genericName", label: "Generic Name", value: metadata.genericName },
-  ].filter((item) => Boolean(item.value)) : [];
 
   const handleShare = async () => {
     const shareUrl = window.location.href;
@@ -206,102 +176,76 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
   return (
     <aside className="purchase-panel">
       <div className="purchase-panel__header">
-        <h2 className="purchase-panel__title">{isHindi ? "यहां उपलब्ध" : "Available At"}</h2>
-        <p className="purchase-panel__status">{availabilityLabel}</p>
+        <h2 className="purchase-panel__title">{isPublished ? (isHindi ? "यहां उपलब्ध" : "Available At") : (isHindi ? "उपलब्धता" : "Availability")}</h2>
+        <p className="purchase-panel__status">{isPublished ? availabilityLabel : (isHindi ? "शीघ्र" : "Coming Soon")}</p>
       </div>
 
-      <div className="purchase-panel__price-block" aria-label={isHindi ? "संस्करण मूल्य" : "Edition pricing"}>
-        <p className="purchase-panel__price-format">{displayFormat}</p>
-        {displayPrice ? (
-          <p className="purchase-panel__price">{displayPrice}</p>
-        ) : (
-          <p className="purchase-panel__note">{isHindi ? "मूल्य शीघ्र घोषित होगा" : "Price to be announced"}</p>
-        )}
-        {availableRetailers.length > 0 ? (
-          <p className="purchase-panel__note">{isHindi ? "उपलब्ध" : "Available at"}</p>
-        ) : null}
-      </div>
+      {isPublished ? (
+        <>
+          <div className="purchase-panel__price-block" aria-label={isHindi ? "संस्करण मूल्य" : "Edition pricing"}>
+            <p className="purchase-panel__price-format">{displayFormat}</p>
+            {displayPrice ? (
+              <p className="purchase-panel__price">{displayPrice}</p>
+            ) : (
+              <p className="purchase-panel__note">{isHindi ? "मूल्य शीघ्र घोषित होगा" : "Price to be announced"}</p>
+            )}
+          </div>
 
-      {availableRetailers.length > 0 ? (
-        <div className="purchase-panel__retailers">
-          {availableRetailers.map((retailer) => (
-            <a
-              key={retailer.key}
-              href={retailer.url}
-              className="purchase-panel__button purchase-panel__button--secondary"
-              target="_blank"
-              rel="noreferrer"
-              aria-label={retailer.actionLabel}
-            >
-              <span className="purchase-panel__retailer-top-row">
-                <RetailerMark retailerKey={retailer.key} />
-                <span>[ {retailer.name} ]</span>
-              </span>
-              <span className="purchase-panel__retailer-subtext">{getRetailerDescriptor(retailer)}</span>
-            </a>
-          ))}
-        </div>
-      ) : null}
+          <div className="purchase-panel__retailers">
+            {displayRetailers.map((retailer) => {
+              const content = (
+                <>
+                  <span className="purchase-panel__retailer-top-row">
+                    <RetailerMark retailerKey={retailer.key} />
+                    <span>{retailer.name}</span>
+                  </span>
+                  <span className="purchase-panel__retailer-subtext">
+                    {retailer.available && retailer.url ? getRetailerDescriptor(retailer) : "Coming Soon"}
+                  </span>
+                </>
+              );
 
-      {isPublished && unavailableRetailers.length > 0 ? (
-        <div className="purchase-panel__retailers-unavailable" aria-label={isHindi ? "अनुपलब्ध विक्रेता" : "Unavailable retailers"}>
-          {unavailableRetailers.map((retailer) => (
-            <div key={retailer.key} className="purchase-panel__retailer-unavailable-item">
-              <p className="purchase-panel__retailer-name">{retailer.name}</p>
-              <p className="purchase-panel__retailer-status">{retailer.statusLabel}</p>
-            </div>
-          ))}
-        </div>
-      ) : null}
+              if (retailer.available && retailer.url) {
+                return (
+                  <a
+                    key={retailer.key}
+                    href={retailer.url}
+                    className="purchase-panel__button purchase-panel__button--secondary"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={retailer.actionLabel}
+                  >
+                    {content}
+                  </a>
+                );
+              }
 
-      {!isPublished ? (
+              return (
+                <div key={retailer.key} className="purchase-panel__button purchase-panel__button--secondary purchase-panel__button--disabled" aria-label={`${retailer.name} coming soon`}>
+                  {content}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="purchase-panel__secondary-actions">
+            {hasSample ? (
+              <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={onPreviewOpen}>
+                {isHindi ? "अंश पढ़ें" : "Read Sample"}
+              </button>
+            ) : null}
+
+            <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={handleShare}>
+              {isHindi ? "पुस्तक साझा करें" : "Share Book"}
+            </button>
+          </div>
+        </>
+      ) : (
         <a href="/contact" className="purchase-panel__button purchase-panel__button--secondary">
           {isHindi ? "सूचित करें" : "Notify Me"}
         </a>
-      ) : null}
+      )}
 
-      <div className="purchase-panel__secondary-actions">
-        {hasSample ? (
-          <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={onPreviewOpen}>
-            {isHindi ? "अंश पढ़ें" : "Read Sample"}
-          </button>
-        ) : null}
-
-        <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={handleShare}>
-          {isHindi ? "पुस्तक साझा करें" : "Share Book"}
-        </button>
-      </div>
-
-      <dl className="purchase-panel__metadata" aria-label={isHindi ? "पुस्तक मेटाडेटा" : "Book metadata"}>
-        {metadataRows.map((item) => (
-          <div key={item.key} className="purchase-panel__metadata-item">
-            <dt>{item.label}</dt>
-            <dd>{item.value}</dd>
-          </div>
-        ))}
-      </dl>
-
-      {additionalInfoRows.length > 0 ? (
-        <details className="purchase-panel__additional">
-          <summary>Additional Information</summary>
-          <dl className="purchase-panel__additional-list">
-            {additionalInfoRows.map((item) => (
-              <div key={item.key} className="purchase-panel__additional-item">
-                <dt>{item.label}</dt>
-                <dd>
-                  {item.key === "website" ? (
-                    <a href={item.value} target="_blank" rel="noreferrer">{item.value}</a>
-                  ) : item.key === "email" ? (
-                    <a href={`mailto:${item.value}`}>{item.value}</a>
-                  ) : (
-                    item.value
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </details>
-      ) : null}
     </aside>
   );
 }

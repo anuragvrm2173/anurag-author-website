@@ -103,7 +103,9 @@ function Reviews() {
               </div>
             ) : (
               <p className="reviews-page__empty">
-                Reader reviews will appear here as more readers share their thoughts.
+                Reader reviews will appear here after publication.
+                <br />
+                Be the first to share your thoughts.
               </p>
             )}
           </Container>
@@ -136,7 +138,9 @@ function Reviews() {
                 Reviews by Book
               </h2>
               <p className="reviews-page__empty">
-                Reader reviews will appear here as more readers share their thoughts.
+                Reader reviews will appear here after publication.
+                <br />
+                Be the first to share your thoughts.
               </p>
             </Container>
           </section>

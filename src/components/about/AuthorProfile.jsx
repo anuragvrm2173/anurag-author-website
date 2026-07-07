@@ -6,7 +6,7 @@ function AuthorProfile({ name, occupation, shortBio, longBio, basedIn, authorIma
       <Container>
         <div className="author-profile__inner">
           <h2 id="author-profile-title" className="author-profile__title">
-            Author Profile
+            AUTHOR
           </h2>
 
           <div className="author-profile__layout">

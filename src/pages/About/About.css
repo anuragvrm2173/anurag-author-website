@@ -161,24 +161,25 @@
 .author-profile__layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2.4rem;
+  gap: 2.8rem;
   align-items: start;
 }
 
 .author-profile__content {
   min-width: 0;
-  max-width: 74ch;
+  max-width: 78ch;
 }
 
 .author-profile__portrait-wrap {
   margin: 0;
-  width: min(100%, 360px);
+  width: min(100%, 460px);
 }
 
 @media (min-width: 980px) {
   .author-profile__layout {
-    grid-template-columns: minmax(300px, 360px) 1fr;
-    column-gap: 3.2rem;
+    grid-template-columns: minmax(360px, 460px) 1fr;
+    column-gap: 3.6rem;
+    align-items: center;
   }
 }
 
@@ -194,7 +195,7 @@
 }
 
 .author-profile__name {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.55rem;
   font-family: var(--font-heading);
   font-size: clamp(2.2rem, 4.2vw, 3.3rem);
   line-height: 1.02;
@@ -202,7 +203,7 @@
 }
 
 .author-profile__occupation {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.16rem;

@@ -370,6 +370,11 @@
   border: 1px solid rgba(201, 163, 78, 0.34);
 }
 
+.purchase-panel__button--disabled {
+  opacity: 0.72;
+  cursor: default;
+}
+
 .purchase-panel__button--ghost {
   border-color: rgba(17, 17, 17, 0.12);
   background: transparent;
@@ -579,6 +584,11 @@
 
 .book-reviews__cta:hover {
   transform: translateY(-1px);
+}
+
+.book-reviews__empty-copy {
+  margin: 0.75rem 0 0;
+  color: rgba(43, 43, 43, 0.78);
 }
 
 .book-details__missing h1 {
