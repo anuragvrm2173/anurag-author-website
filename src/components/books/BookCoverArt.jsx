@@ -6,13 +6,21 @@ function BookCoverArt({
   subtitle,
   author,
   badge,
+  cover,
   coverImage,
+  variant = "front",
   alt,
   className = "",
   imageClassName = "",
   loading = "lazy",
 }) {
-  if (!coverImage) {
+  const preferredImage =
+    coverImage ||
+    (variant === "full"
+      ? (cover?.fullCover || cover?.frontCover || null)
+      : (cover?.frontCover || cover?.fullCover || null));
+
+  if (!preferredImage) {
     return (
       <UpcomingBookCover
         title={title}
@@ -25,15 +33,15 @@ function BookCoverArt({
   }
 
   return (
-    <div className={`book-cover-art ${className}`.trim()}>
+    <div className={`book-cover-art book-cover-art--${variant} ${className}`.trim()}>
       <img
-        src={coverImage}
+        src={preferredImage}
         alt={alt}
         className={`book-cover-art__image ${imageClassName}`.trim()}
         loading={loading}
         decoding="async"
-        width="800"
-        height="1200"
+        width={variant === "full" ? "1600" : "800"}
+        height={variant === "full" ? "1153" : "1200"}
       />
     </div>
   );

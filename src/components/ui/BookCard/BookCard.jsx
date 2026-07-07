@@ -6,9 +6,10 @@ import "./BookCard.css";
 function BookCard({ title, subtitle, description, badge, editions, bookId }) {
   const editionEntries = Object.entries(editions || {});
   const preferredEdition = editionEntries.find(([, edition]) => edition.languageCode === "en")?.[1] || editionEntries[0]?.[1];
+  const statusClass = String(badge || "").toLowerCase().replace(/\s+/g, "-");
 
   return (
-    <article className="book-card" aria-label={`${title} book card`}>
+    <article className={`book-card book-card--${statusClass}`} aria-label={`${title} book card`}>
       <div className="book-card__spine" aria-hidden="true" />
       <div className="book-card__badge">{badge}</div>
 
@@ -17,7 +18,8 @@ function BookCard({ title, subtitle, description, badge, editions, bookId }) {
         subtitle={preferredEdition?.cover?.subtitle || subtitle}
         author={preferredEdition?.cover?.author || "Anurag Verma"}
         badge={preferredEdition?.cover?.eyebrow || badge}
-        coverImage={preferredEdition?.cover?.image || null}
+        cover={preferredEdition?.cover}
+        variant="front"
         alt={`${title} cover`}
         className="book-card__cover"
         imageClassName="book-card__cover-image"

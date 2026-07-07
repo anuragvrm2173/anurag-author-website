@@ -1,5 +1,7 @@
-import lastGoodbyeEnCover from "../assets/images/books/last-goodbye-en.jpg";
-import lastGoodbyeHiCover from "../assets/images/books/last-goodbye-hi.jpg";
+import lastGoodbyeEnFrontCover from "../assets/images/books/(eng)lgb.jpeg";
+import lastGoodbyeHiFrontCover from "../assets/images/books/(hin)lgb.jpeg";
+import lastGoodbyeEnFullCover from "../assets/images/books/last-goodbye-en.jpg";
+import lastGoodbyeHiFullCover from "../assets/images/books/last-goodbye-hi.jpg";
 
 const books = [
   {
@@ -74,7 +76,8 @@ const books = [
           eyebrow: "Published",
           author: "Anurag Verma",
           subtitle: "(English Edition)",
-          image: lastGoodbyeEnCover,
+          frontCover: lastGoodbyeEnFrontCover,
+          fullCover: lastGoodbyeEnFullCover,
         },
         sampleId: "lastGoodbye-en",
         purchaseLinks: {
@@ -100,7 +103,8 @@ const books = [
           eyebrow: "Published",
           author: "अनुराग वर्मा",
           subtitle: "(Hindi Edition)",
-          image: lastGoodbyeHiCover,
+          frontCover: lastGoodbyeHiFrontCover,
+          fullCover: lastGoodbyeHiFullCover,
         },
         sampleId: "lastGoodbye-hi",
         purchaseLinks: {
@@ -169,7 +173,8 @@ const books = [
           eyebrow: "Coming Soon",
           author: "Anurag Verma",
           subtitle: "(English Edition)",
-          image: null,
+          frontCover: null,
+          fullCover: null,
         },
         sampleId: "untold-en",
         purchaseLinks: {},
@@ -191,7 +196,8 @@ const books = [
           eyebrow: "Coming Soon",
           author: "अनुराग वर्मा",
           subtitle: "(Hindi Edition)",
-          image: null,
+          frontCover: null,
+          fullCover: null,
         },
         sampleId: "untold-hi",
         purchaseLinks: {},
@@ -256,7 +262,8 @@ const books = [
           eyebrow: "Coming Soon",
           author: "Anurag Verma",
           subtitle: "(English Edition)",
-          image: null,
+          frontCover: null,
+          fullCover: null,
         },
         sampleId: "lessons-en",
         purchaseLinks: {},
@@ -278,7 +285,8 @@ const books = [
           eyebrow: "Coming Soon",
           author: "अनुराग वर्मा",
           subtitle: "(Hindi Edition)",
-          image: null,
+          frontCover: null,
+          fullCover: null,
         },
         sampleId: "lessons-hi",
         purchaseLinks: {},

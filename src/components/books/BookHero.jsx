@@ -24,7 +24,8 @@ function BookHero({
           subtitle={activeEdition.cover?.subtitle || activeEdition.formatLabel}
           author={activeEdition.cover?.author || "Anurag Verma"}
           badge={activeEdition.cover?.eyebrow || book.status}
-          coverImage={activeEdition.cover?.image || null}
+          cover={activeEdition.cover}
+          variant="full"
           alt={`${book.title} ${activeEdition.label} cover`}
           className="book-hero__cover-art"
           imageClassName="book-hero__cover-image"

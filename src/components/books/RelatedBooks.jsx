@@ -23,7 +23,8 @@ function RelatedBooks({ books }) {
               subtitle={book.editions?.english?.cover?.subtitle || book.subtitle}
               author={book.editions?.english?.cover?.author || "Anurag Verma"}
               badge={book.status}
-              coverImage={book.editions?.english?.cover?.image || null}
+              cover={book.editions?.english?.cover}
+              variant="front"
               alt={`${book.title} cover`}
               className="related-books__cover"
               imageClassName="related-books__cover-image"
