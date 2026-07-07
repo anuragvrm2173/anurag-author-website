@@ -9,22 +9,19 @@ function AboutPreview() {
     <section className="about-preview" aria-labelledby="about-preview-title">
       <Container>
         <div className="about-preview__content">
-          <div className="about-preview__image" aria-hidden="true">
-            <div className="about-preview__image-inner">Author Portrait</div>
-          </div>
-
           <div className="about-preview__text">
             <p className="about-preview__eyebrow">About the Author</p>
             <h2 id="about-preview-title" className="about-preview__title">
-              A voice shaped by reflection, resilience, and literary care.
+              The Story Behind the Words
             </h2>
             <p className="about-preview__description">
-              Anurag Verma writes with a rare sensitivity to memory, emotion, and the quiet
-              wisdom that follows personal transformation. His work invites readers into calm,
-              intelligent stories that remain with them long after they close the book.
+              Anurag Verma is an Indian author who writes about love, loss, healing, and
+              personal growth through deeply human stories. His books are built from lived
+              experience and emotional honesty, offering readers reflection, hope, and meaning
+              that stays with them long after the final page.
             </p>
             <Link to="/about">
-              <Button>Read More</Button>
+              <Button>Read The Story</Button>
             </Link>
           </div>
         </div>
