@@ -1,16 +1,90 @@
-# React + Vite
+# Anurag Verma Author Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A premium editorial React application for books, essays, and reader connection.
 
-Currently, two official plugins are available:
+## Core Routes
+- `/`
+- `/about`
+- `/library`
+- `/library/:bookId`
+- `/reviews`
+- `/blog`
+- `/contact`
+- `/search`
+- `/privacy`
+- `/terms`
+- `*` (404)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Design System
+- Background: `#F8F6F1`
+- Primary text: `#111111`
+- Body text: `#2B2B2B`
+- Accent: `#C9A34E`
+- Heading font: `Cormorant Garamond`
+- Body font: `Inter`
+- Principles: editorial spacing, luxury typography, minimal motion, responsive-first
 
-## React Compiler
+## Book Data Model
+Each book in `src/data/books.js` follows a complete launch schema:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```js
+{
+  id,
+  slug,
+  title,
+  subtitle,
+  shortDescription,
+  longDescription,
+  description,
+  genres: [],
+  themes: [],
+  status,
+  publicationDate,
+  pages,
+  language,
+  isbn,
+  publisher,
+  formats: {
+    paperback,
+    ebook
+  },
+  purchaseLinks: {},
+  sampleId,
+  relatedBooks: [],
+  seo: {},
+  synopsis: [],
+  discoveries: [],
+  editions: {
+    english: {},
+    hindi: {}
+  }
+}
+```
 
-## Expanding the ESLint configuration
+## Content Architecture
+- One source of truth for books: `src/data/books.js`
+- One source of truth for reviews: `src/data/reviews.js`
+- One source of truth for timeline milestones: `src/data/timeline.js`
+- One source of truth for social links: `src/data/socialLinks.js`
+- One source of truth for blog posts: `src/data/blog.js`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Reader
+- Keyboard navigation (`ArrowLeft`, `ArrowRight`)
+- Swipe navigation on touch devices
+- Focus-trapped modal with Escape support
+- Edition-specific sample previews
+
+## Contact
+- Form submission to FormSubmit endpoint
+- Success and error feedback states
+
+## Run
+```bash
+npm install
+npm run dev
+```
+
+## Build
+```bash
+npm run build
+```

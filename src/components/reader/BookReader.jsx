@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 
 const READER_OPEN_DELAY = 400;
 
-function BookReader({ sample, onClose }) {
+function BookReader({ sample, onClose, buyLink }) {
   const [pageIndex, setPageIndex] = useState(0);
   const [isOpening, setIsOpening] = useState(true);
+  const [touchStartX, setTouchStartX] = useState(null);
 
   const pages = useMemo(() => sample?.pages || [], [sample]);
 
@@ -49,6 +50,27 @@ function BookReader({ sample, onClose }) {
   }
 
   const currentPage = pages[pageIndex];
+  const isLastPage = pageIndex === pages.length - 1;
+
+  const handleTouchStart = (event) => {
+    setTouchStartX(event.changedTouches[0]?.clientX || null);
+  };
+
+  const handleTouchEnd = (event) => {
+    const endX = event.changedTouches[0]?.clientX;
+    if (touchStartX === null || typeof endX !== "number") {
+      return;
+    }
+
+    const deltaX = touchStartX - endX;
+    if (deltaX > 40) {
+      setPageIndex((current) => Math.min(current + 1, pages.length - 1));
+    }
+    if (deltaX < -40) {
+      setPageIndex((current) => Math.max(current - 1, 0));
+    }
+    setTouchStartX(null);
+  };
 
   return (
     <div className="reader-overlay" role="dialog" aria-modal="true" aria-label="Book preview reader">
@@ -71,7 +93,12 @@ function BookReader({ sample, onClose }) {
             </p>
           </div>
         ) : (
-          <article key={currentPage.number} className="reader-page reader-page--enter">
+          <article
+            key={currentPage.number}
+            className={`reader-page reader-page--enter ${isLastPage ? "reader-page--final" : ""}`.trim()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <p className="reader-page__label">{sample.previewLabel || "Sample Preview"}</p>
             <h2 className="reader-page__title">{currentPage.title}</h2>
             {currentPage.content.map((paragraph, index) => (
@@ -79,6 +106,11 @@ function BookReader({ sample, onClose }) {
                 {paragraph}
               </p>
             ))}
+            {isLastPage && buyLink ? (
+              <a href={buyLink} target="_blank" rel="noreferrer" className="reader-buy-cta">
+                Continue Reading: Buy the Book
+              </a>
+            ) : null}
           </article>
         )}
 

@@ -1,5 +1,1 @@
-function Privacy() {
-  return <div>Privacy Policy Page</div>;
-}
-
-export default Privacy;
+export { default } from "./Privacy/Privacy";

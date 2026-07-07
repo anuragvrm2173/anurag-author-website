@@ -12,6 +12,7 @@ import ReaderModal from "../../components/reader/ReaderModal";
 import Container from "../../components/ui/Container/Container";
 import { sampleMap } from "../../data/samples";
 import { getReviewsByBookId } from "../../data/reviews";
+import siteConfig from "../../data/siteConfig";
 import books, { getBookById, getRelatedBooks } from "../../data/books";
 
 import "./BookDetails.css";
@@ -67,12 +68,19 @@ function BookDetails() {
   const activeSample = activeEdition?.sampleId ? sampleMap[activeEdition.sampleId] : null;
   const bookReviews = getReviewsByBookId(book.id);
   const metaTitle = book.seo?.title || `${book.title} | Anurag Verma`;
-  const metaDescription = book.seo?.description || book.description;
+  const metaDescription = book.seo?.description || book.shortDescription || book.description;
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Book",
     name: book.title,
     description: metaDescription,
+    isbn: activeEdition?.isbn || book.isbn,
+    datePublished: activeEdition?.publicationDate || book.publicationDate,
+    numberOfPages: activeEdition?.pages || book.pages,
+    publisher: {
+      "@type": "Organization",
+      name: activeEdition?.publisher || book.publisher,
+    },
     author: {
       "@type": "Person",
       name: "Anurag Verma",
@@ -90,6 +98,11 @@ function BookDetails() {
         <meta property="og:description" content={metaDescription} />
         <meta property="og:type" content="book" />
         <meta property="og:site_name" content="Anurag Verma" />
+        <meta property="og:url" content={`${siteConfig.url}/library/${book.id}`} />
+        <link rel="canonical" href={`${siteConfig.url}/library/${book.id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDescription} />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
       </Helmet>
 
@@ -117,9 +130,35 @@ function BookDetails() {
             />
           </BookHero>
 
-          <BookSynopsis synopsis={book.synopsis} discoveries={book.discoveries} />
+          <BookSynopsis longDescription={book.longDescription} synopsis={book.synopsis} themes={book.themes} />
 
-          {bookReviews.length > 0 || book.reviews.length > 0 ? (
+          <section className="book-synopsis" aria-label="Book metadata">
+            <div className="book-synopsis__section">
+              <p className="book-synopsis__eyebrow">Book Details</p>
+              <ul className="book-synopsis__list">
+                <li className="book-synopsis__list-item">Genres: {book.genres.join(", ")}</li>
+                <li className="book-synopsis__list-item">
+                  Publication Date: {new Date(book.publicationDate).toLocaleDateString("en-IN")}
+                </li>
+                <li className="book-synopsis__list-item">Pages: {activeEdition.pages || book.pages}</li>
+                <li className="book-synopsis__list-item">Publisher: {activeEdition.publisher || book.publisher}</li>
+                <li className="book-synopsis__list-item">ISBN: {activeEdition.isbn || book.isbn}</li>
+              </ul>
+            </div>
+
+            <div className="book-synopsis__section">
+              <p className="book-synopsis__eyebrow">Formats</p>
+              <ul className="book-synopsis__list">
+                {Object.entries(activeEdition.formats || {}).map(([format, available]) => (
+                  <li key={format} className="book-synopsis__list-item">
+                    {format.toUpperCase()}: {available ? "Available" : "Coming Soon"}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          {bookReviews.length > 0 ? (
             <section className="book-reviews" aria-labelledby="book-reviews-title">
               <p className="book-reviews__eyebrow">Reader Reviews</p>
               <h2 id="book-reviews-title" className="book-reviews__title">
@@ -127,25 +166,38 @@ function BookDetails() {
               </h2>
 
               <div className="book-reviews__grid">
-                {(bookReviews.length > 0 ? bookReviews : book.reviews).map((review) => (
-                  <blockquote
-                    key={review.id || review.quote}
-                    className="book-reviews__card"
-                  >
+                {bookReviews.map((review) => (
+                  <blockquote key={review.id} className="book-reviews__card">
                     <p>{review.quote}</p>
-                    <footer>{review.reviewerName || review.name}</footer>
+                    <footer>{review.reviewerName}</footer>
                   </blockquote>
                 ))}
               </div>
             </section>
-          ) : null}
+          ) : (
+            <section className="book-reviews" aria-labelledby="book-reviews-title">
+              <p className="book-reviews__eyebrow">Reader Reviews</p>
+              <h2 id="book-reviews-title" className="book-reviews__title">
+                Reader reviews will appear here as more readers share their thoughts.
+              </h2>
+            </section>
+          )}
 
           <RelatedBooks books={relatedBooks} />
         </Container>
       </section>
 
       <ReaderModal open={isReaderOpen} onClose={() => setIsReaderOpen(false)}>
-        <BookReader sample={activeSample} onClose={() => setIsReaderOpen(false)} />
+        <BookReader
+          sample={activeSample}
+          onClose={() => setIsReaderOpen(false)}
+          buyLink={
+            activeEdition?.purchaseLinks?.paperback ||
+            activeEdition?.purchaseLinks?.kindle ||
+            activeEdition?.purchaseLinks?.amazon ||
+            null
+          }
+        />
       </ReaderModal>
     </HelmetProvider>
   );

@@ -1,3 +1,24 @@
-.privacy-page {
-  padding: 2rem;
+.privacy-page__hero {
+  padding: 5.5rem 0 2rem;
+}
+
+.privacy-page__content {
+  padding: 1rem 0 5rem;
+}
+
+.privacy-page__card {
+  padding: 1.5rem;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.privacy-page__card h2 {
+  margin: 1rem 0 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+}
+
+.privacy-page__card p {
+  line-height: 1.9;
+  color: var(--color-text);
 }

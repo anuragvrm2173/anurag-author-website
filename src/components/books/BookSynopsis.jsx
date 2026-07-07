@@ -1,8 +1,11 @@
-function BookSynopsis({ synopsis, discoveries }) {
+function BookSynopsis({ longDescription, synopsis, themes }) {
   return (
     <section className="book-synopsis">
       <div className="book-synopsis__section">
         <p className="book-synopsis__eyebrow">About the Book</p>
+        {longDescription ? (
+          <p className="book-synopsis__paragraph book-synopsis__paragraph--lead">{longDescription}</p>
+        ) : null}
         {synopsis.map((paragraph) => (
           <p key={paragraph} className="book-synopsis__paragraph">
             {paragraph}
@@ -11,9 +14,9 @@ function BookSynopsis({ synopsis, discoveries }) {
       </div>
 
       <div className="book-synopsis__section">
-        <p className="book-synopsis__eyebrow">What Readers Will Discover</p>
+        <p className="book-synopsis__eyebrow">Themes</p>
         <ul className="book-synopsis__list">
-          {discoveries.map((item) => (
+          {themes.map((item) => (
             <li key={item} className="book-synopsis__list-item">
               {item}
             </li>

@@ -1,3 +1,54 @@
 .not-found-page {
+  padding: 6rem 0;
+}
+
+.not-found-page__card {
+  max-width: 42rem;
   padding: 2rem;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.not-found-page__eyebrow {
+  margin-bottom: 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.13rem;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.not-found-page__title {
+  margin-bottom: 0.8rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.12;
+}
+
+.not-found-page__text {
+  margin-bottom: 1.3rem;
+  line-height: 1.8;
+}
+
+.not-found-page__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.not-found-page__link:hover {
+  background: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.not-found-page__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
 }

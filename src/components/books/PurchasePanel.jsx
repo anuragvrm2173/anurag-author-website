@@ -11,6 +11,9 @@ function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen }) {
   const primaryLinks = purchaseLinks.filter(([key]) => key === "paperback" || key === "kindle");
   const retailerLinks = purchaseLinks.filter(([key]) => key !== "paperback" && key !== "kindle");
   const hasSample = Boolean(activeEdition.sampleId);
+  const formatNames = Object.entries(activeEdition.formats || {})
+    .filter(([, isAvailable]) => Boolean(isAvailable))
+    .map(([name]) => name.toUpperCase());
 
   return (
     <aside className="purchase-panel">
@@ -18,6 +21,15 @@ function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen }) {
         <h2 className="purchase-panel__title">Get the Book</h2>
         <p className="purchase-panel__status">{bookStatus}</p>
       </div>
+
+      <p className="purchase-panel__note">
+        {activeEdition.publicationDate
+          ? `Publication: ${new Date(activeEdition.publicationDate).toLocaleDateString("en-IN")}`
+          : "Publication date to be announced."}
+      </p>
+      <p className="purchase-panel__note">
+        Formats: {formatNames.length > 0 ? formatNames.join(", ") : "Coming Soon"}
+      </p>
 
       {primaryLinks.length > 0 ? (
         <div className="purchase-panel__actions">

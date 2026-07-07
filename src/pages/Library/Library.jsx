@@ -6,6 +6,7 @@ import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import BookCard from "../../components/ui/BookCard/BookCard";
 import Container from "../../components/ui/Container/Container";
 import books from "../../data/books";
+import siteConfig from "../../data/siteConfig";
 
 function Library() {
   return (
@@ -22,6 +23,14 @@ function Library() {
           content="Discover the books of Anurag Verma and find your next reflective read."
         />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${siteConfig.url}/library`} />
+        <link rel="canonical" href={`${siteConfig.url}/library`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Library | Anurag Verma" />
+        <meta
+          name="twitter:description"
+          content="Explore the complete library of books by Anurag Verma, including published work and upcoming titles."
+        />
       </Helmet>
 
       <section className="library-page" aria-labelledby="library-title">
@@ -40,7 +49,7 @@ function Library() {
                 <BookCard
                   bookId={book.id}
                   title={book.title}
-                  description={book.description}
+                  description={book.shortDescription || book.description}
                   badge={book.status}
                   editions={book.editions}
                 />

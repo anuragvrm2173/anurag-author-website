@@ -28,7 +28,12 @@ function SEO({
       <meta property="og:url" content={og.url || resolvedUrl} />
       <meta property="og:site_name" content={siteConfig.siteName} />
 
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={og.title || resolvedTitle} />
+      <meta name="twitter:description" content={og.description || resolvedDescription} />
+
       {og.image ? <meta property="og:image" content={og.image} /> : null}
+      {og.image ? <meta name="twitter:image" content={og.image} /> : null}
       {structuredData ? <script type="application/ld+json">{JSON.stringify(structuredData)}</script> : null}
     </Helmet>
   );

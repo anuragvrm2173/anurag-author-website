@@ -47,17 +47,23 @@ function Reviews() {
               Featured Reader Voices
             </h2>
 
-            <div className="reviews-page__grid" role="list" aria-label="Featured reader reviews">
-              {featuredReviews.map((review) => (
-                <div key={review.id} role="listitem">
-                  <ReviewCard review={review} />
-                </div>
-              ))}
-            </div>
+            {featuredReviews.length > 0 ? (
+              <div className="reviews-page__grid" role="list" aria-label="Featured reader reviews">
+                {featuredReviews.map((review) => (
+                  <div key={review.id} role="listitem">
+                    <ReviewCard review={review} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="reviews-page__empty">
+                Reader reviews will appear here as more readers share their thoughts.
+              </p>
+            )}
           </Container>
         </section>
 
-        {groupedReviews.map((group) => (
+        {groupedReviews.length > 0 ? groupedReviews.map((group) => (
           <section
             className="reviews-page__book-section"
             aria-labelledby={`reviews-book-${group.book.id}`}
@@ -77,7 +83,18 @@ function Reviews() {
               </div>
             </Container>
           </section>
-        ))}
+        )) : (
+          <section className="reviews-page__book-section" aria-labelledby="reviews-awaiting-title">
+            <Container>
+              <h2 id="reviews-awaiting-title" className="reviews-page__section-title">
+                Reviews by Book
+              </h2>
+              <p className="reviews-page__empty">
+                Reader reviews will appear here as more readers share their thoughts.
+              </p>
+            </Container>
+          </section>
+        )}
       </main>
     </HelmetProvider>
   );

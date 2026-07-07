@@ -19,7 +19,7 @@ function RelatedBooks({ books }) {
           <article key={book.id} className="related-books__card">
             <p className="related-books__status">{book.status}</p>
             <h3 className="related-books__card-title">{book.title}</h3>
-            <p className="related-books__card-copy">{book.description}</p>
+            <p className="related-books__card-copy">{book.shortDescription || book.description}</p>
             <Link to={`/library/${book.id}`} className="related-books__link">
               View Book
             </Link>

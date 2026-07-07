@@ -18,9 +18,15 @@ function Reviews() {
         </div>
 
         <div className="reviews-preview__grid">
-          {testimonials.map((item) => (
-            <ReviewCard review={item} key={item.id} />
-          ))}
+          {testimonials.length > 0 ? (
+            testimonials.map((item) => <ReviewCard review={item} key={item.id} />)
+          ) : (
+            <article className="review-card" aria-live="polite">
+              <p className="review-card__quote">
+                Reader reviews will appear here as more readers share their thoughts.
+              </p>
+            </article>
+          )}
         </div>
       </Container>
     </section>

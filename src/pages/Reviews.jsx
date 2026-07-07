@@ -1,5 +1,1 @@
-function Reviews() {
-  return <div>Reviews Page</div>;
-}
-
-export default Reviews;
+export { default } from "./Reviews/Reviews";

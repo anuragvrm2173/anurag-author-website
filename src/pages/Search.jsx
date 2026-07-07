@@ -1,5 +1,1 @@
-function Search() {
-  return <div>Search Page</div>;
-}
-
-export default Search;
+export { default } from "./Search/Search";
