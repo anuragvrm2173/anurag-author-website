@@ -22,6 +22,10 @@ function HeroBook() {
   const featuredBook = books[0];
   const englishEdition = featuredBook.editions?.english;
   const hindiEdition = featuredBook.editions?.hindi;
+  const editionRouteByLanguage = {
+    en: `/library/${featuredBook.id}?edition=english`,
+    hi: `/library/${featuredBook.id}?edition=hindi`,
+  };
 
   return (
     <div className="hero__image">
@@ -33,34 +37,41 @@ function HeroBook() {
 
         <div className="hero__spotlight-editions" aria-label="Published editions">
           {[englishEdition, hindiEdition].filter(Boolean).map((edition) => (
-            <picture key={edition.languageCode}>
-              <source
-                type="image/avif"
-                srcSet={buildSrcSet(EDITION_OPTIMIZED_BASE[edition.languageCode], "avif")}
-                sizes="(max-width: 768px) 42vw, 220px"
-              />
-              <source
-                type="image/webp"
-                srcSet={buildSrcSet(EDITION_OPTIMIZED_BASE[edition.languageCode], "webp")}
-                sizes="(max-width: 768px) 42vw, 220px"
-              />
-              <img
-                src={edition.cover?.frontCover || edition.cover?.fullCover}
-                alt={`${featuredBook.title} ${edition.label} cover`}
-                className="hero__spotlight-edition-cover"
-                loading="eager"
-                fetchpriority="high"
-                width="800"
-                height="1200"
-              />
-            </picture>
+            <Link
+              key={edition.languageCode}
+              to={editionRouteByLanguage[edition.languageCode] || `/library/${featuredBook.id}`}
+              className="hero__spotlight-edition-link"
+              aria-label={`View ${featuredBook.title} ${edition.label} edition`}
+            >
+              <picture>
+                <source
+                  type="image/avif"
+                  srcSet={buildSrcSet(EDITION_OPTIMIZED_BASE[edition.languageCode], "avif")}
+                  sizes="(max-width: 768px) 42vw, 220px"
+                />
+                <source
+                  type="image/webp"
+                  srcSet={buildSrcSet(EDITION_OPTIMIZED_BASE[edition.languageCode], "webp")}
+                  sizes="(max-width: 768px) 42vw, 220px"
+                />
+                <img
+                  src={edition.cover?.frontCover || edition.cover?.fullCover}
+                  alt={`${featuredBook.title} ${edition.label} cover`}
+                  className="hero__spotlight-edition-cover"
+                  loading="eager"
+                  fetchpriority="high"
+                  width="800"
+                  height="1200"
+                />
+              </picture>
+            </Link>
           ))}
         </div>
 
         <h2 className="hero__spotlight-title">{featuredBook.title}</h2>
         <p className="hero__spotlight-copy">A Story of Love, Loss,<br />and the Echoes We Carry.</p>
 
-        <div className="hero__spotlight-author" aria-label="Author summary">
+        <Link to="/about" className="hero__spotlight-author hero__spotlight-author-link" aria-label="View author details">
           <picture>
             <source
               type="image/avif"
@@ -85,7 +96,7 @@ function HeroBook() {
             <p className="hero__spotlight-author-name">Anurag Verma</p>
             <p className="hero__spotlight-author-line">Indian author writing stories of love, loss, and healing.</p>
           </div>
-        </div>
+        </Link>
 
         <Link to={`/library/${featuredBook.id}?edition=english`} className="hero__spotlight-cta">
           Explore the Book →
