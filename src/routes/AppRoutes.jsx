@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import Home from "../pages/Home/Home";
 import About from "../pages/About/About";
+import BookDetails from "../pages/BookDetails/BookDetails";
 import Library from "../pages/Library/Library";
 import Book from "../pages/Book/Book";
 import Reviews from "../pages/Reviews/Reviews";
@@ -20,6 +21,7 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/library" element={<Library />} />
+        <Route path="/library/:bookId" element={<BookDetails />} />
         <Route path="/book" element={<Book />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/blog" element={<Blog />} />

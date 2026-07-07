@@ -1,18 +1,12 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import "./BookCard.css";
-import BookReader from "../../reader/BookReader";
-import ReaderModal from "../../reader/ReaderModal";
-import { sampleMap } from "../../../data/samples";
 
-function BookCard({ title, description, badge, editions, sampleId }) {
-  const [isReaderOpen, setIsReaderOpen] = useState(false);
+function BookCard({ title, description, badge, editions, bookId }) {
   const editionEntries = Object.entries(editions || {});
-  const sample = sampleId ? sampleMap[sampleId] : null;
 
   return (
-    <>
-      <article className="book-card" aria-label={`${title} book card`}>
+    <article className="book-card" aria-label={`${title} book card`}>
       <div className="book-card__spine" aria-hidden="true" />
       <div className="book-card__badge">{badge}</div>
 
@@ -33,20 +27,11 @@ function BookCard({ title, description, badge, editions, sampleId }) {
       </div>
 
         <div className="book-card__footer">
-          <button
-            type="button"
-            className="book-card__button"
-            onClick={() => setIsReaderOpen(Boolean(sample))}
-          >
-            {sample ? "Preview Sample" : "View Book"}
-          </button>
+          <Link to={`/library/${bookId}`} className="book-card__button">
+            View Book
+          </Link>
         </div>
-      </article>
-
-      <ReaderModal open={isReaderOpen} onClose={() => setIsReaderOpen(false)}>
-        <BookReader sample={sample} onClose={() => setIsReaderOpen(false)} />
-      </ReaderModal>
-    </>
+    </article>
   );
 }
 

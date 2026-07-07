@@ -100,6 +100,10 @@
 }
 
 .book-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   border: none;
   padding: 0.8rem 1.1rem;
   border-radius: 999px;

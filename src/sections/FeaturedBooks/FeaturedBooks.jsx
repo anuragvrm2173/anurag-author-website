@@ -19,11 +19,11 @@ function FeaturedBooks() {
           {books.map((book) => (
             <BookCard
               key={book.id}
+              bookId={book.id}
               title={book.title}
               description={book.description}
               badge={book.status}
               editions={book.editions}
-              sampleId={book.sampleId}
             />
           ))}
         </div>
