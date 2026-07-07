@@ -56,6 +56,7 @@ function Reviews() {
           description: "Read honest reflections from readers who connected with the books of Anurag Verma.",
           type: "website",
           url: `${siteConfig.url}/reviews`,
+          image: `${siteConfig.url}/og/reviews.svg`,
         }}
       />
 

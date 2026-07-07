@@ -26,6 +26,7 @@ function Library() {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${siteConfig.url}/library`} />
+        <meta property="og:image" content={`${siteConfig.url}/og/book.svg`} />
         <link rel="canonical" href={`${siteConfig.url}/library`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Library | Anurag Verma" />
@@ -33,6 +34,7 @@ function Library() {
           name="twitter:description"
           content="Explore the complete library of books by Anurag Verma, including published work and upcoming titles."
         />
+        <meta name="twitter:image" content={`${siteConfig.url}/og/book.svg`} />
       </Helmet>
 
       <section className="library-page" aria-labelledby="library-title">

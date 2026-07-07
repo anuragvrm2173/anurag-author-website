@@ -12,7 +12,19 @@ function AuthorProfile({ name, occupation, shortBio, longBio, basedIn, authorIma
           <div className="author-profile__layout">
             {authorImage ? (
               <figure className="author-profile__portrait-wrap">
-                <img src={authorImage} alt={`${name} portrait`} className="author-profile__portrait" loading="lazy" width="640" height="640" />
+                <picture>
+                  <source
+                    type="image/avif"
+                    srcSet="/images/optimized/author/author-400.avif 400w, /images/optimized/author/author-800.avif 800w, /images/optimized/author/author-1200.avif 1200w"
+                    sizes="(max-width: 768px) 88vw, 640px"
+                  />
+                  <source
+                    type="image/webp"
+                    srcSet="/images/optimized/author/author-400.webp 400w, /images/optimized/author/author-800.webp 800w, /images/optimized/author/author-1200.webp 1200w"
+                    sizes="(max-width: 768px) 88vw, 640px"
+                  />
+                  <img src={authorImage} alt={`${name} portrait`} className="author-profile__portrait" loading="lazy" width="640" height="640" />
+                </picture>
               </figure>
             ) : null}
 

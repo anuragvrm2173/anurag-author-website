@@ -1,4 +1,5 @@
 import BookCoverArt from "./BookCoverArt";
+import { FaCalendarDay, FaLanguage, FaRegStar, FaRegFileLines } from "react-icons/fa6";
 
 function BookHero({
   book,
@@ -27,6 +28,9 @@ function BookHero({
     tba: labels.tba || (isHindi ? "शीघ्र" : "TBA"),
   };
   const isPublished = book.status === "Published";
+  const publicationText = activeEdition.publicationDate
+    ? new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(new Date(activeEdition.publicationDate))
+    : t.tba;
 
   return (
     <section className="book-hero">
@@ -71,6 +75,15 @@ function BookHero({
           {isPublished && (activeEdition.isbn || book.isbn) ? (
             <span>{t.isbn} {activeEdition.isbn || book.isbn}</span>
           ) : null}
+        </div>
+
+        <div className="book-hero__stats" aria-label="Book quick stats">
+          {isPublished && (activeEdition.pages || book.pages) ? (
+            <span><FaRegFileLines aria-hidden="true" /> {activeEdition.pages || book.pages} Pages</span>
+          ) : null}
+          <span><FaRegStar aria-hidden="true" /> ★★★★★</span>
+          <span><FaLanguage aria-hidden="true" /> {activeEdition.label}</span>
+          <span><FaCalendarDay aria-hidden="true" /> Published {publicationText}</span>
         </div>
 
         {children}

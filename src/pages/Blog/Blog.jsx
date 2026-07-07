@@ -31,6 +31,7 @@ function Blog() {
             "Read reflective essays and writing notes from Anurag Verma on love, loss, healing, and personal growth.",
           type: "website",
           url: `${siteConfig.url}/blog`,
+          image: `${siteConfig.url}/og/blog.svg`,
         }}
       />
 

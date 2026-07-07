@@ -7,6 +7,28 @@
   }
 }
 
+@keyframes subtleFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-page > section,
+.about-page > section,
+.blog-page > section,
+.library-page,
+.reviews-page > section,
+.contact-page > section,
+.search-page > section {
+  animation: subtleFadeUp 0.5s ease both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

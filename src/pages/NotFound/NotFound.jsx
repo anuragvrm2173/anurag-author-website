@@ -24,7 +24,7 @@ function NotFound() {
             <h1 id="not-found-title" className="not-found-page__title">
               Every story has a missing page.
             </h1>
-            <p className="not-found-page__text">The page you are looking for could not be found.</p>
+            <p className="not-found-page__text">It seems this page has become one of the stories that got away.</p>
             <Link to="/" className="not-found-page__link">
               Return Home
             </Link>

@@ -75,6 +75,15 @@
   color: var(--color-primary);
 }
 
+.about-signature {
+  margin: 1.2rem auto 0;
+  max-width: 52rem;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: rgba(17, 17, 17, 0.85);
+}
+
 .about-philosophy__content {
   max-width: 44rem;
   display: grid;

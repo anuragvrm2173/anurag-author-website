@@ -309,10 +309,12 @@ function BookDetails() {
         <meta property="og:type" content="book" />
         <meta property="og:site_name" content="Anurag Verma" />
         <meta property="og:url" content={`${siteConfig.url}/library/${book.id}`} />
+        <meta property="og:image" content={activeEdition?.cover?.fullCover || activeEdition?.cover?.frontCover || `${siteConfig.url}/og/book.svg`} />
         <link rel="canonical" href={`${siteConfig.url}/library/${book.id}`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={metaTitle} />
         <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content={activeEdition?.cover?.fullCover || activeEdition?.cover?.frontCover || `${siteConfig.url}/og/book.svg`} />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbStructuredData)}</script>
       </Helmet>
@@ -352,7 +354,7 @@ function BookDetails() {
             />
 
             <div className="book-details__share" aria-label="Share this book">
-              <span className="book-details__share-label">Share</span>
+              <p className="book-details__share-label">Share this Book</p>
               <a
                 className="book-details__share-link"
                 href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${pageUrl}`)}`}
@@ -360,7 +362,9 @@ function BookDetails() {
                 rel="noreferrer"
                 aria-label="Share on WhatsApp"
               >
+                <span aria-hidden="true">○</span>
                 <FaWhatsapp />
+                <span>WhatsApp</span>
               </a>
               <a
                 className="book-details__share-link"
@@ -369,7 +373,9 @@ function BookDetails() {
                 rel="noreferrer"
                 aria-label="Share on X"
               >
+                <span aria-hidden="true">○</span>
                 <FaXTwitter />
+                <span>X</span>
               </a>
               <a
                 className="book-details__share-link"
@@ -378,7 +384,9 @@ function BookDetails() {
                 rel="noreferrer"
                 aria-label="Share on Facebook"
               >
+                <span aria-hidden="true">○</span>
                 <FaFacebookF />
+                <span>Facebook</span>
               </a>
               <button
                 type="button"
@@ -390,7 +398,9 @@ function BookDetails() {
                   }
                 }}
               >
+                <span aria-hidden="true">○</span>
                 <FaLink />
+                <span>Copy Link</span>
               </button>
             </div>
           </BookHero>

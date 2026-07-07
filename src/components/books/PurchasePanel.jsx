@@ -1,4 +1,9 @@
-import { FaAmazon, FaStore } from "react-icons/fa";
+const STORE_LOGOS = {
+  amazon: "/store-logos/amazon.svg",
+  notionPress: "/store-logos/notion-press.svg",
+  pothi: "/store-logos/pothi.svg",
+  flipkart: "/store-logos/flipkart.svg",
+};
 
 const FORMAT_KEYS = new Set(["paperback", "kindle", "ebook", "hardcover", "audiobook"]);
 const FORMAT_PRIORITY = ["paperback", "hardcover", "kindle", "ebook", "audiobook"];
@@ -94,17 +99,14 @@ function formatCurrencyPrice(pricing) {
 }
 
 function RetailerMark({ retailerKey }) {
-  if (retailerKey === "amazon") {
-    return (
-      <span className="purchase-panel__retailer-mark" aria-hidden="true">
-        <FaAmazon />
-      </span>
-    );
+  const logo = STORE_LOGOS[retailerKey];
+  if (logo) {
+    return <img src={logo} alt="" aria-hidden="true" className="purchase-panel__retailer-logo" loading="lazy" width="120" height="32" />;
   }
 
   return (
     <span className="purchase-panel__retailer-mark" aria-hidden="true">
-      <FaStore />
+      {toTitleCase(retailerKey)}
     </span>
   );
 }

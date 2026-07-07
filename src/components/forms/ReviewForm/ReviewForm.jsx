@@ -26,7 +26,12 @@ function ReviewForm({ books, defaultBookId, source = "reviews-page", onSubmitted
     setStatus("loading");
 
     try {
-      await submitPendingReview({ ...form, source });
+      await submitPendingReview({
+        ...form,
+        reviewerName: form.reviewerName.trim() || "Anonymous Reader",
+        reviewerEmail: form.reviewerEmail.trim() || "no-email@example.com",
+        source,
+      });
       setStatus("success");
       setForm((current) => ({ ...current, quote: "" }));
       if (onSubmitted) {
@@ -43,13 +48,13 @@ function ReviewForm({ books, defaultBookId, source = "reviews-page", onSubmitted
 
       <div className="review-form__grid">
         <label>
-          Name
-          <input type="text" value={form.reviewerName} onChange={handleChange("reviewerName")} required />
+          Name (Optional)
+          <input type="text" value={form.reviewerName} onChange={handleChange("reviewerName")} />
         </label>
 
         <label>
-          Email
-          <input type="email" value={form.reviewerEmail} onChange={handleChange("reviewerEmail")} required />
+          Email (Optional)
+          <input type="email" value={form.reviewerEmail} onChange={handleChange("reviewerEmail")} />
         </label>
       </div>
 
@@ -84,7 +89,7 @@ function ReviewForm({ books, defaultBookId, source = "reviews-page", onSubmitted
 
       {status === "success" ? (
         <p className="review-form__status review-form__status--success" role="status">
-          Thanks. Your review is pending admin approval.
+          Your review will appear after approval.
         </p>
       ) : null}
 

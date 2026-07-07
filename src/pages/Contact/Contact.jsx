@@ -26,6 +26,7 @@ function Contact() {
             "Reach out to Anurag Verma for reader messages, collaborations, and thoughtful literary conversations.",
           type: "website",
           url: `${siteConfig.url}/contact`,
+          image: `${siteConfig.url}/og/contact.svg`,
         }}
       />
 
@@ -58,11 +59,24 @@ function Contact() {
                   I read every message with care. Thank you for writing with sincerity.
                 </p>
                 <ContactForm />
+                <p className="contact-page__response-time">Typical response time: 1-3 business days</p>
               </div>
 
               <aside className="contact-page__aside" aria-labelledby="contact-channels-title">
                 <div className="contact-page__author">
-                  <img src={authorImage} alt="Anurag Verma portrait" loading="lazy" width="320" height="320" />
+                  <picture>
+                    <source
+                      type="image/avif"
+                      srcSet="/images/optimized/author/author-400.avif 400w, /images/optimized/author/author-800.avif 800w, /images/optimized/author/author-1200.avif 1200w"
+                      sizes="56px"
+                    />
+                    <source
+                      type="image/webp"
+                      srcSet="/images/optimized/author/author-400.webp 400w, /images/optimized/author/author-800.webp 800w, /images/optimized/author/author-1200.webp 1200w"
+                      sizes="56px"
+                    />
+                    <img src={authorImage} alt="Anurag Verma portrait" loading="lazy" width="320" height="320" />
+                  </picture>
                   <p>Anurag Verma</p>
                 </div>
 

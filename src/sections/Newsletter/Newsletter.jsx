@@ -34,10 +34,10 @@ function Newsletter({ source = "Homepage" }) {
           <div className="newsletter__content">
             <p className="newsletter__eyebrow">Stay Connected</p>
             <h2 id="newsletter-title" className="newsletter__title">
-              Receive updates on new releases and literary reflections.
+              Receive new stories before they're published.
             </h2>
             <p className="newsletter__description">
-              Join the newsletter for thoughtful updates, behind-the-scenes notes, and first access to new work.
+              Join my readers for thoughtful updates, behind-the-scenes notes, and first access to new work.
             </p>
           </div>
 
@@ -46,7 +46,7 @@ function Newsletter({ source = "Homepage" }) {
               Email address
             </label>
             <input id="newsletter-email" name="email" type="email" placeholder="Email address" required />
-            <Button type="submit">{status === "loading" ? "Subscribing..." : "Subscribe"}</Button>
+            <Button type="submit">{status === "loading" ? "Joining..." : "Join my readers"}</Button>
           </form>
 
           {status === "success" ? (

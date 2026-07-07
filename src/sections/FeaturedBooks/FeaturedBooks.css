@@ -85,6 +85,16 @@
   font-size: 0.96rem;
 }
 
+.featured-books__tile-upcoming {
+  width: 100%;
+  max-width: min(340px, 100%);
+  aspect-ratio: 2 / 3;
+}
+
+.featured-books__tile-upcoming .upcoming-book-cover {
+  height: 100%;
+}
+
 .featured-books__tile-status {
   display: inline-flex;
   align-items: center;

@@ -148,27 +148,47 @@
   font-size: 0.92rem;
 }
 
-.book-details__share {
+.book-hero__stats {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
   flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.book-hero__stats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--color-primary);
+  font-size: 0.85rem;
+}
+
+.book-details__share {
+  display: grid;
+  gap: 0.45rem;
 }
 
 .book-details__share-label {
-  color: rgba(43, 43, 43, 0.72);
-  font-size: 0.92rem;
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 0.98rem;
+  font-weight: 700;
 }
 
 .book-details__share-link {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: fit-content;
+  min-height: 2.35rem;
   border-radius: 999px;
   border: 1px solid rgba(17, 17, 17, 0.12);
   background: rgba(255, 255, 255, 0.72);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  padding: 0.35rem 0.72rem;
   color: var(--color-primary);
   text-decoration: none;
   cursor: pointer;
@@ -349,6 +369,11 @@
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+}
+
+.purchase-panel__retailer-logo {
+  width: auto;
+  height: 1.05rem;
 }
 
 .related-books__link,

@@ -72,6 +72,7 @@ function About() {
             "Learn about Indian author Anurag Verma, his writing journey, philosophy, and the stories behind his books on love, loss, healing, and personal growth.",
           type: "profile",
           url: `${siteConfig.url}/about`,
+          image: `${siteConfig.url}/og/about.svg`,
         }}
         structuredData={personStructuredData}
       />
@@ -83,7 +84,7 @@ function About() {
               titleId="about-hero-title"
               eyebrow="About"
               title="The Story Behind the Words"
-              description="Every story begins somewhere. Mine began with ordinary moments that quietly changed everything. The books I write are shaped by love, loss, healing, and the belief that even life's hardest chapters can leave us with hope."
+              description="Every book begins with a story. Mine began long before I wrote my first page. The books I write are shaped by love, loss, healing, and the belief that even life's hardest chapters can leave us with hope."
               align="left"
             />
           </Container>
@@ -144,6 +145,7 @@ function About() {
               <br />
               and leave lighter than they arrived."
             </blockquote>
+            <p className="about-signature">- Anurag Verma</p>
           </Container>
         </section>
 

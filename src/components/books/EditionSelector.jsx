@@ -19,7 +19,9 @@ function EditionSelector({ editions, selectedEditionKey, onChange, isHindi = fal
               onChange={() => onChange(key)}
               disabled={!edition.available}
             />
-            <span className="edition-selector__label">{edition.label}</span>
+            <span className="edition-selector__label">
+              {selectedEditionKey === key ? `✓ ${edition.label}` : edition.label}
+            </span>
           </label>
         ))}
       </div>

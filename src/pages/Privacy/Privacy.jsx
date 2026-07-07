@@ -19,6 +19,7 @@ function Privacy() {
           description: "Read the privacy policy for the official website of author Anurag Verma.",
           type: "website",
           url: `${siteConfig.url}/privacy`,
+          image: `${siteConfig.url}/og/home.svg`,
         }}
       />
 

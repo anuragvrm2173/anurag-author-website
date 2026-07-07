@@ -31,6 +31,7 @@ function highlightText(text, query) {
 
 function Search() {
   const [query, setQuery] = useState("");
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [recentSearches, setRecentSearches] = useState(() => {
     try {
       return JSON.parse(window.localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
@@ -49,7 +50,11 @@ function Search() {
 
       if (isShortcut || isSlash) {
         event.preventDefault();
-        inputRef.current?.focus();
+        setIsPaletteOpen(true);
+      }
+
+      if (event.key === "Escape") {
+        setIsPaletteOpen(false);
       }
     };
 
@@ -117,10 +122,38 @@ function Search() {
           description: "Search books and essays by Anurag Verma across themes, genres, and reflections.",
           type: "website",
           url: `${siteConfig.url}/search`,
+          image: `${siteConfig.url}/og/search.svg`,
         }}
       />
 
       <main className="search-page">
+        {isPaletteOpen ? (
+          <div className="search-page__palette" role="dialog" aria-modal="true" aria-label="Quick search" onClick={() => setIsPaletteOpen(false)}>
+            <div className="search-page__palette-card" onClick={(event) => event.stopPropagation()}>
+              <button
+                type="button"
+                className="search-page__palette-action"
+                onClick={() => {
+                  setIsPaletteOpen(false);
+                  setTimeout(() => inputRef.current?.focus(), 0);
+                }}
+              >
+                Search books...
+              </button>
+              <button
+                type="button"
+                className="search-page__palette-action"
+                onClick={() => {
+                  setIsPaletteOpen(false);
+                  setTimeout(() => inputRef.current?.focus(), 0);
+                }}
+              >
+                Search articles...
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         <section className="search-page__hero" aria-labelledby="search-title">
           <Container>
             <SectionHeader

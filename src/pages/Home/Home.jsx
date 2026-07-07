@@ -36,6 +36,7 @@ function Home() {
           description: "Explore books, reviews, and essays on love, loss, healing, and personal growth.",
           type: "website",
           url: siteConfig.url,
+          image: `${siteConfig.url}/og/home.svg`,
         }}
         structuredData={websiteStructuredData}
       />

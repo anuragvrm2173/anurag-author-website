@@ -25,6 +25,12 @@
   color: var(--color-text);
 }
 
+.contact-page__response-time {
+  margin: 0.8rem 0 0;
+  color: rgba(43, 43, 43, 0.76);
+  font-size: 0.92rem;
+}
+
 .contact-page__inquiries {
   margin-bottom: 0.9rem;
   display: flex;

@@ -23,6 +23,7 @@ function Navbar() {
             <NavLink
               key={link.to}
               to={link.to}
+              end={link.to === "/"}
               className={({ isActive }) =>
                 `navbar__link ${isActive ? "navbar__link--active" : ""}`.trim()
               }

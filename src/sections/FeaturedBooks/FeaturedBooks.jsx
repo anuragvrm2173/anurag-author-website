@@ -3,6 +3,7 @@ import "./FeaturedBooks.css";
 import { Link } from "react-router-dom";
 
 import BookCoverArt from "../../components/books/BookCoverArt";
+import UpcomingBookCover from "../../components/books/UpcomingBookCover";
 import Container from "../../components/ui/Container/Container";
 import books from "../../data/books";
 
@@ -93,9 +94,13 @@ function FeaturedBooks() {
                   loading="lazy"
                 />
               ) : (
-                <div className="featured-books__tile-placeholder" aria-hidden="true">
-                  {tile.title}
-                </div>
+                <UpcomingBookCover
+                  title={tile.title}
+                  subtitle=""
+                  author="Anurag Verma"
+                  badge="Coming Soon"
+                  className="featured-books__tile-upcoming"
+                />
               )}
 
               <div className="featured-books__tile-head">
