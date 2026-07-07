@@ -1,23 +1,41 @@
 .book-card {
-  background: var(--color-surface);
-  border-radius: 1rem;
-  box-shadow: 0 16px 40px rgba(17, 17, 17, 0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   padding: 1.5rem;
+  min-height: 230px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(17, 17, 17, 0.06);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.book-card__badge {
+  width: fit-content;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(201, 163, 78, 0.16);
+  color: var(--color-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
 }
 
 .book-card__title {
-  font-size: 1.25rem;
   margin-bottom: 0.5rem;
+  font-size: 1.25rem;
   color: var(--color-primary);
 }
 
 .book-card__author {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  color: var(--color-text-secondary);
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--color-accent);
 }
 
 .book-card__description {
-  line-height: 1.8;
+  line-height: 1.75;
   color: var(--color-text);
 }

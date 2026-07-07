@@ -1,0 +1,43 @@
+.writing-philosophy {
+  padding: 5rem 0;
+  background: linear-gradient(180deg, rgba(201, 163, 78, 0.08), transparent 70%);
+}
+
+.writing-philosophy__content {
+  max-width: 48rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.writing-philosophy__eyebrow {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.16rem;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.writing-philosophy__title {
+  margin-bottom: 1.25rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.8vw, 2.8rem);
+  line-height: 1.15;
+  color: var(--color-primary);
+}
+
+.writing-philosophy__text {
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--color-text);
+}
+
+.writing-philosophy__quote {
+  padding: 1.5rem 2rem;
+  border-left: 3px solid var(--color-accent);
+  background: rgba(255,255,255,0.5);
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  color: var(--color-primary);
+}

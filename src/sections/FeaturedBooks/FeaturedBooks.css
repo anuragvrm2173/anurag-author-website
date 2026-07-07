@@ -1,17 +1,35 @@
 .featured-books {
-  padding: 4rem 0;
-  text-align: center;
+  padding: 5rem 0;
+}
+
+.featured-books__header {
+  max-width: 40rem;
+  margin-bottom: 2.5rem;
+}
+
+.featured-books__eyebrow {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.16rem;
+  text-transform: uppercase;
+  color: var(--color-accent);
 }
 
 .featured-books__title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 1rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.3vw, 2.7rem);
+  line-height: 1.15;
   color: var(--color-primary);
 }
 
-.featured-books__subtitle {
-  font-size: 1.125rem;
-  color: var(--color-text-secondary);
-  max-width: 680px;
-  margin: 0 auto;
+.featured-books__grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .featured-books__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
