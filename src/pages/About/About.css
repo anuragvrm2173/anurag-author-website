@@ -124,6 +124,13 @@
   width: min(100%, 360px);
 }
 
+@media (min-width: 980px) {
+  .author-profile__layout {
+    grid-template-columns: minmax(300px, 360px) 1fr;
+    column-gap: 3.2rem;
+  }
+}
+
 .author-profile__portrait {
   display: block;
   width: 100%;

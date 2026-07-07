@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link, useLocation, useParams } from "react-router-dom";
 
@@ -23,6 +23,8 @@ function BookDetails() {
   const [selectedEditionKey, setSelectedEditionKey] = useState(null);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isCoverZoomed, setIsCoverZoomed] = useState(false);
+  const closeButtonRef = useRef(null);
 
   const book = getBookById(bookId);
   const relatedBooks = book ? getRelatedBooks(book.id) : books.slice(0, 2);
@@ -52,7 +54,26 @@ function BookDetails() {
     setSelectedEditionKey(defaultEditionKey);
     setIsReaderOpen(false);
     setIsCoverOpen(false);
+    setIsCoverZoomed(false);
   }, [defaultEditionKey, bookId]);
+
+  useEffect(() => {
+    if (!isCoverOpen) {
+      return undefined;
+    }
+
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsCoverOpen(false);
+        setIsCoverZoomed(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isCoverOpen]);
 
   if (!book) {
     return (
@@ -123,7 +144,7 @@ function BookDetails() {
     reviewsTitle: isHindi ? "पाठकों की राय" : "What readers are saying.",
     reviewsEmpty: isHindi
       ? "जैसे-जैसे पाठक अपनी राय साझा करेंगे, समीक्षाएँ यहां दिखाई देंगी।"
-      : "Reader reviews will appear here as more readers share their thoughts.",
+      : "Reader reviews will appear here after publication.",
   };
 
   const hindiContent = {
@@ -323,13 +344,20 @@ function BookDetails() {
           role="dialog"
           aria-modal="true"
           aria-label="Book cover preview"
-          onClick={() => setIsCoverOpen(false)}
+          onClick={() => {
+            setIsCoverOpen(false);
+            setIsCoverZoomed(false);
+          }}
         >
           <div className="book-cover-modal__inner" onClick={(event) => event.stopPropagation()}>
             <button
               type="button"
               className="book-cover-modal__close"
-              onClick={() => setIsCoverOpen(false)}
+              ref={closeButtonRef}
+              onClick={() => {
+                setIsCoverOpen(false);
+                setIsCoverZoomed(false);
+              }}
               aria-label="Close cover preview"
             >
               Close
@@ -337,7 +365,17 @@ function BookDetails() {
             <img
               src={activeEdition?.cover?.fullCover || activeEdition?.cover?.frontCover || ""}
               alt={`${book.title} ${activeEdition.label} cover preview`}
-              className="book-cover-modal__image"
+              className={`book-cover-modal__image ${isCoverZoomed ? "book-cover-modal__image--zoomed" : ""}`.trim()}
+              onClick={() => setIsCoverZoomed((prev) => !prev)}
+              role="button"
+              tabIndex={0}
+              aria-label={isCoverZoomed ? "Zoom out cover image" : "Zoom in cover image"}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setIsCoverZoomed((prev) => !prev);
+                }
+              }}
             />
           </div>
         </div>

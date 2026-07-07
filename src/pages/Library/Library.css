@@ -86,6 +86,16 @@
   color: var(--color-primary);
 }
 
+.library-page__edition-status--published {
+  background: rgba(84, 128, 93, 0.16);
+  color: #325f3c;
+}
+
+.library-page__upcoming-badge--coming-soon {
+  background: rgba(201, 163, 78, 0.2);
+  color: #7b5c17;
+}
+
 .library-page__edition-link,
 .library-page__notify-link {
   display: inline-flex;

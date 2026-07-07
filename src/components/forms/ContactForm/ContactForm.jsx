@@ -17,7 +17,7 @@ function ContactForm() {
       name: formData.get("name"),
       email: formData.get("email"),
       message: formData.get("message"),
-      _subject: "New message from anurag-author-website",
+      _subject: "Contact Form Submission",
     };
 
     try {

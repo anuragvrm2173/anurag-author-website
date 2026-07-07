@@ -3,11 +3,69 @@ import "./FeaturedBooks.css";
 import { Link } from "react-router-dom";
 
 import BookCoverArt from "../../components/books/BookCoverArt";
-import UpcomingBookCover from "../../components/books/UpcomingBookCover";
 import Container from "../../components/ui/Container/Container";
 import books from "../../data/books";
 
 function FeaturedBooks() {
+  const publishedBook = books.find((book) => book.id === "the-last-goodbye");
+  const untoldBook = books.find((book) => book.id === "the-untold-stories");
+  const lessonsBook = books.find((book) => book.id === "lessons-of-the-heart");
+
+  const homepageTiles = [
+    publishedBook
+      ? {
+          key: "last-goodbye-english",
+          bookId: publishedBook.id,
+          title: publishedBook.title,
+          subtitle: publishedBook.subtitle,
+          language: "English",
+          status: "Published",
+          cover: publishedBook.editions?.english?.cover,
+          ctaLabel: "View Book",
+          ctaTo: `/library/${publishedBook.id}?edition=english`,
+        }
+      : null,
+    publishedBook
+      ? {
+          key: "last-goodbye-hindi",
+          bookId: publishedBook.id,
+          title: publishedBook.title,
+          subtitle: publishedBook.subtitle,
+          language: "हिन्दी",
+          status: "Published",
+          cover: publishedBook.editions?.hindi?.cover,
+          ctaLabel: "View Book",
+          ctaTo: `/library/${publishedBook.id}?edition=hindi`,
+        }
+      : null,
+    untoldBook
+      ? {
+          key: "untold-upcoming",
+          bookId: untoldBook.id,
+          title: untoldBook.title,
+          subtitle: untoldBook.subtitle,
+          language: "English & हिन्दी",
+          status: "Coming Soon",
+          cover: untoldBook.editions?.english?.cover,
+          ctaLabel: "Notify Me",
+          ctaTo: "/contact",
+        }
+      : null,
+    lessonsBook
+      ? {
+          key: "lessons-upcoming",
+          bookId: lessonsBook.id,
+          title: lessonsBook.title,
+          subtitle: lessonsBook.subtitle,
+          language: "English & हिन्दी",
+          status: "Coming Soon",
+          cover: lessonsBook.editions?.english?.cover,
+          ctaLabel: "Notify Me",
+          ctaTo: "/contact",
+        }
+      : null,
+  ].filter(Boolean);
+
   return (
     <section className="featured-books" aria-labelledby="featured-books-title">
       <Container>
@@ -19,60 +77,34 @@ function FeaturedBooks() {
         </div>
 
         <div className="featured-books__cards" role="list" aria-label="Homepage book collection">
-          {books.map((book) => (
-            <article key={book.id} role="listitem" className="featured-books__card">
+          {homepageTiles.map((tile) => (
+            <article key={tile.key} role="listitem" className="featured-books__card">
+              <BookCoverArt
+                title={tile.title}
+                subtitle={tile.subtitle}
+                author={tile.cover?.author || "Anurag Verma"}
+                badge={tile.status}
+                cover={tile.cover}
+                variant="front"
+                alt={`${tile.title} ${tile.language} cover`}
+                className="featured-books__cover"
+                imageClassName="featured-books__cover-image"
+                loading="lazy"
+              />
+
               <div className="featured-books__card-head">
-                <h3 className="featured-books__card-title">{book.title}</h3>
-                <p className="featured-books__card-subtitle">{book.subtitle}</p>
+                <h3 className="featured-books__card-title">{tile.title}</h3>
+                <p className="featured-books__language">{tile.language}</p>
+                <span
+                  className={`featured-books__status featured-books__status--${tile.status.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  {tile.status}
+                </span>
               </div>
 
-              {book.status === "Published" ? (
-                <div className="featured-books__editions" aria-label={`${book.title} editions`}>
-                  {Object.entries(book.editions || {})
-                    .filter(([, edition]) => edition?.available)
-                    .map(([editionKey, edition]) => (
-                      <article key={edition.languageCode} className="featured-books__edition-block">
-                        <BookCoverArt
-                          title={book.title}
-                          subtitle={edition.cover?.subtitle || edition.formatLabel}
-                          author={edition.cover?.author || "Anurag Verma"}
-                          badge={edition.cover?.eyebrow || "Published"}
-                          cover={edition.cover}
-                          variant="front"
-                          alt={`${book.title} ${edition.label} cover`}
-                          className="featured-books__edition-cover"
-                          imageClassName="featured-books__edition-cover-image"
-                          loading="lazy"
-                        />
-
-                        <div className="featured-books__edition-meta">
-                          <p className="featured-books__edition-language">{edition.label}</p>
-                          <span className="featured-books__edition-status">Published</span>
-                          <Link to={`/library/${book.id}?edition=${editionKey}`} className="featured-books__edition-link">
-                            View Details
-                          </Link>
-                        </div>
-                      </article>
-                    ))}
-                </div>
-              ) : (
-                <div className="featured-books__upcoming" aria-label={`${book.title} status`}>
-                  <UpcomingBookCover
-                    title={book.title}
-                    subtitle={book.subtitle}
-                    author="Anurag Verma"
-                    badge="Coming Soon"
-                    className="featured-books__upcoming-cover"
-                  />
-
-                  <div className="featured-books__upcoming-meta">
-                    <span className="featured-books__upcoming-badge">Coming Soon</span>
-                    <Link to="/contact" className="featured-books__notify-link">
-                      Notify Me
-                    </Link>
-                  </div>
-                </div>
-              )}
+              <Link to={tile.ctaTo} className="featured-books__view-link">
+                {tile.ctaLabel}
+              </Link>
             </article>
           ))}
         </div>

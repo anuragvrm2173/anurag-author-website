@@ -74,7 +74,7 @@ function Library() {
 
                           <div className="library-page__edition-meta">
                             <p className="library-page__edition-language">{edition.label}</p>
-                            <span className="library-page__edition-status">Published</span>
+                            <span className="library-page__edition-status library-page__edition-status--published">Published</span>
                             <Link to={`/library/${book.id}?edition=${editionKey}`} className="library-page__edition-link">
                               View Details
                             </Link>
@@ -93,7 +93,7 @@ function Library() {
                     />
 
                     <div className="library-page__upcoming-meta">
-                      <span className="library-page__upcoming-badge">Coming Soon</span>
+                      <span className="library-page__upcoming-badge library-page__upcoming-badge--coming-soon">Coming Soon</span>
                       <Link to="/contact" className="library-page__notify-link">
                         Notify Me
                       </Link>

@@ -40,6 +40,13 @@
   cursor: zoom-in;
 }
 
+.book-hero__cover-trigger:focus-visible,
+.book-cover-modal__close:focus-visible,
+.book-cover-modal__image:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
 .book-hero__cover-art {
   border-radius: 1.8rem;
 }
@@ -381,6 +388,13 @@
   object-fit: contain;
   border-radius: 0.9rem;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  cursor: zoom-in;
+  transition: transform 220ms ease;
+}
+
+.book-cover-modal__image--zoomed {
+  transform: scale(1.3);
+  cursor: zoom-out;
 }
 
 @media (max-width: 900px) {
