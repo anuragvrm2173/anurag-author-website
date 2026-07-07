@@ -21,6 +21,7 @@ function BookDetails() {
   const { bookId } = useParams();
   const [selectedEditionKey, setSelectedEditionKey] = useState(null);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
+  const [isCoverOpen, setIsCoverOpen] = useState(false);
 
   const book = getBookById(bookId);
   const relatedBooks = book ? getRelatedBooks(book.id) : books.slice(0, 2);
@@ -33,6 +34,7 @@ function BookDetails() {
   useEffect(() => {
     setSelectedEditionKey(defaultEditionKey);
     setIsReaderOpen(false);
+    setIsCoverOpen(false);
   }, [defaultEditionKey, bookId]);
 
   if (!book) {
@@ -213,6 +215,7 @@ function BookDetails() {
           <BookHero
             book={book}
             activeEdition={activeEdition}
+            onCoverPreviewOpen={() => setIsCoverOpen(true)}
             isHindi={isHindi}
             labels={labels}
             displaySubtitle={displaySubtitle}
@@ -296,6 +299,32 @@ function BookDetails() {
           <RelatedBooks books={relatedBooks} />
         </Container>
       </section>
+
+      {isCoverOpen ? (
+        <div
+          className="book-cover-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Book cover preview"
+          onClick={() => setIsCoverOpen(false)}
+        >
+          <div className="book-cover-modal__inner" onClick={(event) => event.stopPropagation()}>
+            <button
+              type="button"
+              className="book-cover-modal__close"
+              onClick={() => setIsCoverOpen(false)}
+              aria-label="Close cover preview"
+            >
+              Close
+            </button>
+            <img
+              src={activeEdition?.cover?.fullCover || activeEdition?.cover?.frontCover || ""}
+              alt={`${book.title} ${activeEdition.label} cover preview`}
+              className="book-cover-modal__image"
+            />
+          </div>
+        </div>
+      ) : null}
 
       <ReaderModal open={isReaderOpen} onClose={() => setIsReaderOpen(false)}>
         <BookReader

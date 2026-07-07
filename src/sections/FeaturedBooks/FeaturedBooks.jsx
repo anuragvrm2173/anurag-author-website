@@ -46,9 +46,9 @@ function FeaturedBooks() {
     <section className="featured-books" aria-labelledby="featured-books-title">
       <Container>
         <div className="featured-books__header">
-          <p className="featured-books__eyebrow">Featured Books</p>
+          <p className="featured-books__eyebrow">Books</p>
           <h2 id="featured-books-title" className="featured-books__title">
-            Published editions and upcoming titles in one curated shelf.
+            Explore the Collection
           </h2>
         </div>
 

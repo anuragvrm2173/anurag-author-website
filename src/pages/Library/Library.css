@@ -6,21 +6,85 @@
   margin-bottom: 2.8rem;
 }
 
-.library-page__grid {
+.library-page__collection {
   display: grid;
-  gap: 2.8rem;
+  gap: 1rem;
 }
 
-.library-page__grid > [role="listitem"] {
-  min-width: 0;
+.library-page__item {
+  padding: 1.35rem 1.2rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.library-page__item-head {
+  margin-bottom: 0.85rem;
+}
+
+.library-page__item-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.35rem, 2.5vw, 1.9rem);
+  color: var(--color-primary);
+}
+
+.library-page__item-subtitle {
+  margin: 0.3rem 0 0;
+  color: rgba(43, 43, 43, 0.78);
+  line-height: 1.6;
+}
+
+.library-page__editions {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.library-page__edition-row {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.8rem;
+  background: rgba(17, 17, 17, 0.04);
+}
+
+.library-page__edition-name {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.library-page__edition-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06rem;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.library-page__item-link {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  padding: 0.6rem 0.95rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  text-decoration: none;
+  font-weight: 600;
 }
 
 @media (min-width: 768px) {
-  .library-page__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 3rem;
+  .library-page__collection {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
   }
 }
 
@@ -29,9 +93,8 @@
     padding: 6.5rem 0 7rem;
   }
 
-  .library-page__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 3.4rem;
+  .library-page__collection {
+    gap: 1.25rem;
   }
 }
 

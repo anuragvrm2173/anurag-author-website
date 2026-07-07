@@ -21,14 +21,6 @@
   box-shadow: 0 13px 28px rgba(17, 17, 17, 0.1);
 }
 
-.book-card--published {
-  background: linear-gradient(145deg, #eaf4ff 0%, #d8ebff 100%);
-}
-
-.book-card--coming-soon {
-  background: linear-gradient(145deg, #fff2e5 0%, #ffe3c4 100%);
-}
-
 .book-card__spine {
   position: absolute;
   top: 0.75rem;

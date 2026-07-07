@@ -109,12 +109,14 @@
 
 .author-profile__layout {
   display: grid;
-  gap: 2rem;
+  grid-template-columns: 1fr;
+  gap: 2.4rem;
   align-items: start;
 }
 
 .author-profile__content {
   min-width: 0;
+  max-width: 74ch;
 }
 
 .author-profile__portrait-wrap {
@@ -240,13 +242,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@media (min-width: 768px) {
-  .author-profile__layout {
-    grid-template-columns: minmax(320px, 380px) 1fr;
-    column-gap: 2.6rem;
   }
 }
 

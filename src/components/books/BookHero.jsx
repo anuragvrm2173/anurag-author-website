@@ -4,6 +4,7 @@ function BookHero({
   book,
   activeEdition,
   children,
+  onCoverPreviewOpen,
   isHindi = false,
   labels = {},
   displaySubtitle,
@@ -18,19 +19,26 @@ function BookHero({
 
   return (
     <section className="book-hero">
-      <div className="book-hero__cover" aria-hidden="true">
-        <BookCoverArt
-          title={book.title}
-          subtitle={activeEdition.cover?.subtitle || activeEdition.formatLabel}
-          author={activeEdition.cover?.author || "Anurag Verma"}
-          badge={activeEdition.cover?.eyebrow || book.status}
-          cover={activeEdition.cover}
-          variant="full"
-          alt={`${book.title} ${activeEdition.label} cover`}
-          className="book-hero__cover-art"
-          imageClassName="book-hero__cover-image"
-          loading="eager"
-        />
+      <div className="book-hero__cover">
+        <button
+          type="button"
+          className="book-hero__cover-trigger"
+          onClick={onCoverPreviewOpen}
+          aria-label={`Open ${book.title} ${activeEdition.label} cover preview`}
+        >
+          <BookCoverArt
+            title={book.title}
+            subtitle={activeEdition.cover?.subtitle || activeEdition.formatLabel}
+            author={activeEdition.cover?.author || "Anurag Verma"}
+            badge={activeEdition.cover?.eyebrow || book.status}
+            cover={activeEdition.cover}
+            variant="full"
+            alt={`${book.title} ${activeEdition.label} cover`}
+            className="book-hero__cover-art"
+            imageClassName="book-hero__cover-image"
+            loading="eager"
+          />
+        </button>
       </div>
 
       <div className="book-hero__content">
