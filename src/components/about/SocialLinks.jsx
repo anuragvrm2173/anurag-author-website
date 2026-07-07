@@ -23,21 +23,21 @@ function SocialLinks({ links }) {
           <ul className="about-social-links__list">
             {activeLinks.map((link) => {
               const isMail = link.url.startsWith("mailto:");
-              const Icon = platformIcons[link.platform] || FaEnvelope;
+              const Icon = platformIcons[link.icon] || FaEnvelope;
 
               return (
-                <li key={link.label}>
+                <li key={link.id}>
                   <a
                     href={link.url}
                     className="about-social-links__anchor"
-                    target={isMail ? undefined : "_blank"}
-                    rel={isMail ? undefined : "noreferrer noopener"}
-                    aria-label={`${link.label} profile`}
+                    target={!isMail && link.external ? "_blank" : undefined}
+                    rel={!isMail && link.external ? "noreferrer noopener" : undefined}
+                    aria-label={`${link.name} profile`}
                   >
                     <span className="about-social-links__icon" aria-hidden="true">
                       <Icon />
                     </span>
-                    <span>{link.label}</span>
+                    <span>{link.name}</span>
                   </a>
                 </li>
               );

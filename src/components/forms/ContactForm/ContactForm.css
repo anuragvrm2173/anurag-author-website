@@ -1,0 +1,35 @@
+.contact-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.contact-form__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.contact-form__field label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.contact-form__field input,
+.contact-form__field textarea {
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-body);
+  color: var(--color-text);
+}
+
+.contact-form__field textarea {
+  resize: vertical;
+}
+
+.contact-form__field input:focus-visible,
+.contact-form__field textarea:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

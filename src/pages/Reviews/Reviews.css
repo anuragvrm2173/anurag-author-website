@@ -1,3 +1,33 @@
-.reviews-page {
-  padding: 2rem;
+.reviews-page__hero {
+  padding: 5.5rem 0 2.2rem;
+}
+
+.reviews-page__featured,
+.reviews-page__book-section {
+  padding: 2.4rem 0 3.6rem;
+}
+
+.reviews-page__section-title {
+  margin-bottom: 1.5rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+  line-height: 1.2;
+  color: var(--color-primary);
+}
+
+.reviews-page__grid {
+  display: grid;
+  gap: 1.2rem;
+}
+
+@media (min-width: 768px) {
+  .reviews-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .reviews-page__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }

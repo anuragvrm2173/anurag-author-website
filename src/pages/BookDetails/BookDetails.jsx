@@ -11,6 +11,7 @@ import BookReader from "../../components/reader/BookReader";
 import ReaderModal from "../../components/reader/ReaderModal";
 import Container from "../../components/ui/Container/Container";
 import { sampleMap } from "../../data/samples";
+import { getReviewsByBookId } from "../../data/reviews";
 import books, { getBookById, getRelatedBooks } from "../../data/books";
 
 import "./BookDetails.css";
@@ -64,6 +65,7 @@ function BookDetails() {
 
   const activeEdition = book.editions[selectedEditionKey] || editionEntries[0]?.[1];
   const activeSample = activeEdition?.sampleId ? sampleMap[activeEdition.sampleId] : null;
+  const bookReviews = getReviewsByBookId(book.id);
   const metaTitle = book.seo?.title || `${book.title} | Anurag Verma`;
   const metaDescription = book.seo?.description || book.description;
   const structuredData = {
@@ -117,7 +119,7 @@ function BookDetails() {
 
           <BookSynopsis synopsis={book.synopsis} discoveries={book.discoveries} />
 
-          {book.reviews.length > 0 ? (
+          {bookReviews.length > 0 || book.reviews.length > 0 ? (
             <section className="book-reviews" aria-labelledby="book-reviews-title">
               <p className="book-reviews__eyebrow">Reader Reviews</p>
               <h2 id="book-reviews-title" className="book-reviews__title">
@@ -125,10 +127,13 @@ function BookDetails() {
               </h2>
 
               <div className="book-reviews__grid">
-                {book.reviews.map((review) => (
-                  <blockquote key={review.quote} className="book-reviews__card">
+                {(bookReviews.length > 0 ? bookReviews : book.reviews).map((review) => (
+                  <blockquote
+                    key={review.id || review.quote}
+                    className="book-reviews__card"
+                  >
                     <p>{review.quote}</p>
-                    <footer>{review.name}</footer>
+                    <footer>{review.reviewerName || review.name}</footer>
                   </blockquote>
                 ))}
               </div>

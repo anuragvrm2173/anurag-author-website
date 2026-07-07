@@ -1,3 +1,59 @@
-.contact-page {
-  padding: 2rem;
+.contact-page__hero {
+  padding: 5.5rem 0 2.2rem;
+}
+
+.contact-page__content {
+  padding: 1rem 0 5rem;
+}
+
+.contact-page__grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.contact-page__section-title {
+  margin-bottom: 0.8rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  line-height: 1.2;
+  color: var(--color-primary);
+}
+
+.contact-page__note {
+  margin-bottom: 1rem;
+  line-height: 1.85;
+  color: var(--color-text);
+}
+
+.contact-page__aside {
+  padding: 1.4rem;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.contact-page__channels {
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+}
+
+.contact-page__channels a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.contact-page__channels a:hover {
+  color: var(--color-accent);
+}
+
+.contact-page__channels a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (min-width: 960px) {
+  .contact-page__grid {
+    grid-template-columns: 1.35fr 0.8fr;
+    align-items: start;
+  }
 }

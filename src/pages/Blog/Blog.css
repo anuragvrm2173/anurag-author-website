@@ -1,3 +1,7 @@
-.blog-page {
-  padding: 2rem;
+.blog-page__hero {
+  padding: 5.5rem 0 2.5rem;
+}
+
+.blog-page__list {
+  padding: 1rem 0 5rem;
 }

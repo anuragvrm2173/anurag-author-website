@@ -1,22 +1,11 @@
 import "./Reviews.css";
 
+import ReviewCard from "../../components/reviews/ReviewCard/ReviewCard";
 import Container from "../../components/ui/Container/Container";
+import { getFeaturedReviews } from "../../data/reviews";
 
 function Reviews() {
-  const testimonials = [
-    {
-      quote: "Elegant, thoughtful, and deeply human. Anurag Verma writes with rare clarity.",
-      author: "— Reader Review",
-    },
-    {
-      quote: "Every page feels considered, intimate, and quietly transformative.",
-      author: "— Literary Journal",
-    },
-    {
-      quote: "A writer who understands the power of restraint and emotional truth.",
-      author: "— Book Club Member",
-    },
-  ];
+  const testimonials = getFeaturedReviews(3);
 
   return (
     <section className="reviews-preview" aria-labelledby="reviews-preview-title">
@@ -30,10 +19,7 @@ function Reviews() {
 
         <div className="reviews-preview__grid">
           {testimonials.map((item) => (
-            <article className="review-card" key={item.author}>
-              <p className="review-card__quote">“{item.quote}”</p>
-              <p className="review-card__author">{item.author}</p>
-            </article>
+            <ReviewCard review={item} key={item.id} />
           ))}
         </div>
       </Container>

@@ -1,0 +1,29 @@
+.blog-card {
+  padding: 1.6rem;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.blog-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.07rem;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.blog-card__title {
+  margin-bottom: 0.8rem;
+  font-family: var(--font-heading);
+  font-size: 1.55rem;
+  line-height: 1.2;
+  color: var(--color-primary);
+}
+
+.blog-card__excerpt {
+  line-height: 1.85;
+  color: var(--color-text);
+}
