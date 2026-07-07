@@ -1,7 +1,7 @@
-function EditionSelector({ editions, selectedEditionKey, onChange }) {
+function EditionSelector({ editions, selectedEditionKey, onChange, isHindi = false }) {
   return (
     <fieldset className="edition-selector">
-      <legend className="edition-selector__legend">Available Editions</legend>
+      <legend className="edition-selector__legend">{isHindi ? "उपलब्ध संस्करण" : "Available Editions"}</legend>
 
       <div className="edition-selector__list">
         {editions.map(([key, edition]) => (

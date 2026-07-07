@@ -6,7 +6,16 @@ const PURCHASE_LABELS = {
   notionPress: "Notion Press",
 };
 
-function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen }) {
+const PURCHASE_LABELS_HI = {
+  paperback: "पेपरबैक खरीदें",
+  kindle: "किंडल खरीदें",
+  amazon: "अमेज़न",
+  pothi: "पोथी",
+  notionPress: "नोटियन प्रेस",
+};
+
+function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen, isHindi = false }) {
+  const labels = isHindi ? PURCHASE_LABELS_HI : PURCHASE_LABELS;
   const purchaseLinks = Object.entries(activeEdition.purchaseLinks || {}).filter(([, value]) => value);
   const primaryLinks = purchaseLinks.filter(([key]) => key === "paperback" || key === "kindle");
   const retailerLinks = purchaseLinks.filter(([key]) => key !== "paperback" && key !== "kindle");
@@ -18,17 +27,19 @@ function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen }) {
   return (
     <aside className="purchase-panel">
       <div className="purchase-panel__header">
-        <h2 className="purchase-panel__title">Get the Book</h2>
-        <p className="purchase-panel__status">{bookStatus}</p>
+        <h2 className="purchase-panel__title">{isHindi ? "पुस्तक प्राप्त करें" : "Get the Book"}</h2>
+        <p className="purchase-panel__status">{isHindi && bookStatus === "Published" ? "प्रकाशित" : bookStatus}</p>
       </div>
 
       <p className="purchase-panel__note">
         {activeEdition.publicationDate
-          ? `Publication: ${new Date(activeEdition.publicationDate).toLocaleDateString("en-IN")}`
-          : "Publication date to be announced."}
+          ? `${isHindi ? "प्रकाशन" : "Publication"}: ${new Date(activeEdition.publicationDate).toLocaleDateString("en-IN")}`
+          : isHindi
+            ? "प्रकाशन तिथि शीघ्र घोषित होगी।"
+            : "Publication date to be announced."}
       </p>
       <p className="purchase-panel__note">
-        Formats: {formatNames.length > 0 ? formatNames.join(", ") : "Coming Soon"}
+        {isHindi ? "फॉर्मेट" : "Formats"}: {formatNames.length > 0 ? formatNames.join(", ") : (isHindi ? "शीघ्र" : "Coming Soon")}
       </p>
 
       {primaryLinks.length > 0 ? (
@@ -41,12 +52,12 @@ function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen }) {
               target="_blank"
               rel="noreferrer"
             >
-              {PURCHASE_LABELS[key]}
+              {labels[key]}
             </a>
           ))}
         </div>
       ) : (
-        <p className="purchase-panel__note">Purchase links are not available for this edition yet.</p>
+        <p className="purchase-panel__note">{isHindi ? "अभी खरीद लिंक उपलब्ध नहीं हैं।" : "Purchase links are not available for this edition yet."}</p>
       )}
 
       {retailerLinks.length > 0 ? (
@@ -59,15 +70,21 @@ function PurchasePanel({ bookStatus, activeEdition, onPreviewOpen }) {
               target="_blank"
               rel="noreferrer"
             >
-              {PURCHASE_LABELS[key]}
+              {labels[key]}
             </a>
           ))}
         </div>
       ) : null}
 
+      {purchaseLinks.length === 0 ? (
+        <button type="button" className="purchase-panel__button purchase-panel__button--secondary" disabled>
+          {isHindi ? "सूचित करें" : "Notify Me"}
+        </button>
+      ) : null}
+
       {hasSample ? (
         <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={onPreviewOpen}>
-          Look Inside
+          {isHindi ? "अंश पढ़ें" : "Look Inside"}
         </button>
       ) : null}
     </aside>

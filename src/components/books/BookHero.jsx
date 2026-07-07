@@ -1,4 +1,19 @@
-function BookHero({ book, activeEdition, children }) {
+function BookHero({
+  book,
+  activeEdition,
+  children,
+  isHindi = false,
+  labels = {},
+  displaySubtitle,
+  displayDescription,
+}) {
+  const publishedLabel = isHindi ? "प्रकाशित" : "Published";
+  const t = {
+    pages: labels.pages || (isHindi ? "पृष्ठ" : "Pages"),
+    isbn: labels.isbn || "ISBN",
+    tba: labels.tba || (isHindi ? "शीघ्र" : "TBA"),
+  };
+
   return (
     <section className="book-hero">
       <div
@@ -14,18 +29,24 @@ function BookHero({ book, activeEdition, children }) {
       </div>
 
       <div className="book-hero__content">
-        <p className="book-hero__status">{book.status}</p>
+        <p className="book-hero__status">{book.status === "Published" ? publishedLabel : book.status}</p>
         <h1 className="book-hero__title">{book.title}</h1>
-        <p className="book-hero__subtitle">{book.subtitle}</p>
-        <p className="book-hero__description">{book.shortDescription || book.description}</p>
+        <p className="book-hero__subtitle">{displaySubtitle || book.subtitle}</p>
+        <p className="book-hero__description">{displayDescription || book.shortDescription || book.description}</p>
 
         <div className="book-hero__meta">
-          <span>{book.publicationDate ? new Date(book.publicationDate).toLocaleDateString("en-IN") : "TBA"}</span>
-          <span>{activeEdition.pages || book.pages} pages</span>
+          <span>
+            {activeEdition.publicationDate
+              ? new Date(activeEdition.publicationDate).toLocaleDateString("en-IN")
+              : t.tba}
+          </span>
+          <span>{activeEdition.pages || book.pages} {t.pages}</span>
           <span>{activeEdition.publisher || book.publisher}</span>
           <span>{activeEdition.formatLabel}</span>
           <span>{activeEdition.label}</span>
-          {activeEdition.isbn || book.isbn ? <span>ISBN {activeEdition.isbn || book.isbn}</span> : null}
+          {book.status === "Published" && (activeEdition.isbn || book.isbn) ? (
+            <span>{t.isbn} {activeEdition.isbn || book.isbn}</span>
+          ) : null}
         </div>
 
         {children}

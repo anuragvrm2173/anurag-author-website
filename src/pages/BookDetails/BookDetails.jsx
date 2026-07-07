@@ -65,6 +65,7 @@ function BookDetails() {
   }
 
   const activeEdition = book.editions[selectedEditionKey] || editionEntries[0]?.[1];
+  const isHindi = activeEdition?.languageCode === "hi";
   const activeSample = activeEdition?.sampleId ? sampleMap[activeEdition.sampleId] : null;
   const bookReviews = getReviewsByBookId(book.id);
   const metaTitle = book.seo?.title || `${book.title} | Anurag Verma`;
@@ -88,6 +89,99 @@ function BookDetails() {
     inLanguage: activeEdition?.languageCode,
     bookFormat: activeEdition?.formatLabel,
   };
+
+  const labels = {
+    bookDetails: isHindi ? "पुस्तक विवरण" : "Book Details",
+    genres: isHindi ? "शैली" : "Genres",
+    publicationDate: isHindi ? "प्रकाशन तिथि" : "Publication Date",
+    pages: isHindi ? "पृष्ठ" : "Pages",
+    publisher: isHindi ? "प्रकाशक" : "Publisher",
+    isbn: "ISBN",
+    formats: isHindi ? "फॉर्मेट" : "Formats",
+    available: isHindi ? "उपलब्ध" : "Available",
+    comingSoon: isHindi ? "शीघ्र" : "Coming Soon",
+    readerReviews: isHindi ? "पाठक समीक्षाएँ" : "Reader Reviews",
+    reviewsTitle: isHindi ? "पाठकों की राय" : "What readers are saying.",
+    reviewsEmpty: isHindi
+      ? "जैसे-जैसे पाठक अपनी राय साझा करेंगे, समीक्षाएँ यहां दिखाई देंगी।"
+      : "Reader reviews will appear here as more readers share their thoughts.",
+  };
+
+  const hindiContent = {
+    "the-last-goodbye": {
+      subtitle: "प्रेम, वियोग और यादों की कहानी",
+      shortDescription: "कुछ अलविदा कहे जाते हैं, कुछ बिना कहे रह जाते हैं, और कुछ जीवन भर साथ चलते हैं।",
+      longDescription:
+        "यह एक आत्मकथात्मक यात्रा है जिसमें प्रेम, परिवार, दोस्ती, टूटन और जिम्मेदारियों के बीच स्वयं को पहचानने की कहानी सामने आती है।",
+      synopsis: [
+        "यह पुस्तक बचपन की स्मृतियों से शुरू होकर रिश्तों, बिछड़न और अधूरी बातों के दर्द तक पहुंचती है।",
+        "यह केवल प्रेम कहानी नहीं, बल्कि जीवन की कठिन घड़ियों में साहस और अर्थ खोजने की कहानी है।",
+      ],
+    },
+    "the-untold-stories": {
+      subtitle: "अध्यायों के बीच छिपी कहानियाँ",
+      shortDescription: "हर कहानी के पीछे कुछ ऐसे पल होते हैं जो अंतिम पांडुलिपि तक नहीं पहुंचते।",
+      longDescription:
+        "यह सहचर पुस्तक पहली किताब के पीछे छूटे अनुभवों, भावनाओं और स्मृतियों को नए दृष्टिकोण से सामने लाती है।",
+      synopsis: [
+        "यह मूल कथा को दोहराती नहीं, बल्कि उसके बीच छिपे प्रसंगों को विस्तार देती है।",
+        "यह पाठकों को उन अनकहे हिस्सों तक ले जाती है जिन्होंने पूरी यात्रा को आकार दिया।",
+      ],
+    },
+    "lessons-of-the-heart": {
+      subtitle: "प्रेम, वियोग और जीवन से मिले गहरे सबक",
+      shortDescription:
+        "जीवन के सबसे महत्वपूर्ण सबक अक्सर सफलता से नहीं, बल्कि प्रेम, वियोग और अनुभवों से मिलते हैं।",
+      longDescription:
+        "यह पुस्तक स्मृतियों को जीवन-सीख में बदलते हुए उपचार, क्षमा, उद्देश्य और आशा की दिशा देती है।",
+      synopsis: [
+        "यह रचना बीते अनुभवों को रोजमर्रा के जीवन के लिए उपयोगी समझ में बदलती है।",
+        "हर विदाई, हर भूल और हर नई शुरुआत में छिपे अर्थ को यह पुस्तक संवेदनशीलता से सामने लाती है।",
+      ],
+    },
+  };
+
+  const genreMapHi = {
+    "Autobiographical Novel": "आत्मकथात्मक उपन्यास",
+    "Literary Fiction": "साहित्यिक कथा",
+    "Coming-of-Age": "यौवन-विकास कथा",
+    Memoir: "संस्मरण",
+    "Companion Memoir": "सहचर संस्मरण",
+    "Personal Reflections": "व्यक्तिगत चिंतन",
+    "Literary Nonfiction": "साहित्यिक गद्य",
+    "Inspirational Nonfiction": "प्रेरक गद्य",
+    "Personal Growth": "व्यक्तिगत विकास",
+    Philosophy: "दर्शन",
+    "Self-Reflection": "आत्मचिंतन",
+  };
+
+  const themeMapHi = {
+    Love: "प्रेम",
+    Loss: "वियोग",
+    Family: "परिवार",
+    Friendship: "मित्रता",
+    Grief: "शोक",
+    Hope: "आशा",
+    Resilience: "धैर्य",
+    "Self-discovery": "स्व-खोज",
+    Reflection: "चिंतन",
+    Memory: "स्मृति",
+    Relationships: "रिश्ते",
+    "Behind the Story": "कहानी के पीछे",
+    Healing: "उपचार",
+    Wisdom: "बुद्धिमत्ता",
+    Purpose: "उद्देश्य",
+    Forgiveness: "क्षमा",
+    "Life Lessons": "जीवन के सबक",
+  };
+
+  const localized = isHindi ? hindiContent[book.id] : null;
+  const displaySubtitle = localized?.subtitle || book.subtitle;
+  const displayDescription = localized?.shortDescription || book.shortDescription || book.description;
+  const displayLongDescription = localized?.longDescription || book.longDescription;
+  const displaySynopsis = localized?.synopsis || book.synopsis;
+  const displayGenres = isHindi ? book.genres.map((item) => genreMapHi[item] || item) : book.genres;
+  const displayThemes = isHindi ? book.themes.map((item) => themeMapHi[item] || item) : book.themes;
 
   return (
     <HelmetProvider>
@@ -116,42 +210,58 @@ function BookDetails() {
             <span>{book.title}</span>
           </p>
 
-          <BookHero book={book} activeEdition={activeEdition}>
+          <BookHero
+            book={book}
+            activeEdition={activeEdition}
+            isHindi={isHindi}
+            labels={labels}
+            displaySubtitle={displaySubtitle}
+            displayDescription={displayDescription}
+          >
             <EditionSelector
               editions={editionEntries}
               selectedEditionKey={selectedEditionKey}
               onChange={setSelectedEditionKey}
+              isHindi={isHindi}
             />
 
             <PurchasePanel
               bookStatus={book.status}
               activeEdition={activeEdition}
               onPreviewOpen={() => setIsReaderOpen(true)}
+              isHindi={isHindi}
             />
           </BookHero>
 
-          <BookSynopsis longDescription={book.longDescription} synopsis={book.synopsis} themes={book.themes} />
+          <BookSynopsis
+            longDescription={displayLongDescription}
+            synopsis={displaySynopsis}
+            themes={displayThemes}
+            isHindi={isHindi}
+          />
 
           <section className="book-synopsis" aria-label="Book metadata">
             <div className="book-synopsis__section">
-              <p className="book-synopsis__eyebrow">Book Details</p>
+              <p className="book-synopsis__eyebrow">{labels.bookDetails}</p>
               <ul className="book-synopsis__list">
-                <li className="book-synopsis__list-item">Genres: {book.genres.join(", ")}</li>
+                <li className="book-synopsis__list-item">{labels.genres}: {displayGenres.join(", ")}</li>
                 <li className="book-synopsis__list-item">
-                  Publication Date: {new Date(book.publicationDate).toLocaleDateString("en-IN")}
+                  {labels.publicationDate}: {new Date(activeEdition.publicationDate || book.publicationDate).toLocaleDateString("en-IN")}
                 </li>
-                <li className="book-synopsis__list-item">Pages: {activeEdition.pages || book.pages}</li>
-                <li className="book-synopsis__list-item">Publisher: {activeEdition.publisher || book.publisher}</li>
-                <li className="book-synopsis__list-item">ISBN: {activeEdition.isbn || book.isbn}</li>
+                <li className="book-synopsis__list-item">{labels.pages}: {activeEdition.pages || book.pages}</li>
+                <li className="book-synopsis__list-item">{labels.publisher}: {activeEdition.publisher || book.publisher}</li>
+                {book.status === "Published" && (activeEdition.isbn || book.isbn) ? (
+                  <li className="book-synopsis__list-item">{labels.isbn}: {activeEdition.isbn || book.isbn}</li>
+                ) : null}
               </ul>
             </div>
 
             <div className="book-synopsis__section">
-              <p className="book-synopsis__eyebrow">Formats</p>
+              <p className="book-synopsis__eyebrow">{labels.formats}</p>
               <ul className="book-synopsis__list">
                 {Object.entries(activeEdition.formats || {}).map(([format, available]) => (
                   <li key={format} className="book-synopsis__list-item">
-                    {format.toUpperCase()}: {available ? "Available" : "Coming Soon"}
+                    {format.toUpperCase()}: {available ? labels.available : labels.comingSoon}
                   </li>
                 ))}
               </ul>
@@ -160,9 +270,9 @@ function BookDetails() {
 
           {bookReviews.length > 0 ? (
             <section className="book-reviews" aria-labelledby="book-reviews-title">
-              <p className="book-reviews__eyebrow">Reader Reviews</p>
+              <p className="book-reviews__eyebrow">{labels.readerReviews}</p>
               <h2 id="book-reviews-title" className="book-reviews__title">
-                What readers are saying.
+                {labels.reviewsTitle}
               </h2>
 
               <div className="book-reviews__grid">
@@ -176,9 +286,9 @@ function BookDetails() {
             </section>
           ) : (
             <section className="book-reviews" aria-labelledby="book-reviews-title">
-              <p className="book-reviews__eyebrow">Reader Reviews</p>
+              <p className="book-reviews__eyebrow">{labels.readerReviews}</p>
               <h2 id="book-reviews-title" className="book-reviews__title">
-                Reader reviews will appear here as more readers share their thoughts.
+                {labels.reviewsEmpty}
               </h2>
             </section>
           )}

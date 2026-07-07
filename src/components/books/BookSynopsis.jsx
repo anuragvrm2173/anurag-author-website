@@ -1,8 +1,11 @@
-function BookSynopsis({ longDescription, synopsis, themes }) {
+function BookSynopsis({ longDescription, synopsis, themes, isHindi = false }) {
+  const aboutLabel = isHindi ? "पुस्तक परिचय" : "About the Book";
+  const themesLabel = isHindi ? "विषय" : "Themes";
+
   return (
     <section className="book-synopsis">
       <div className="book-synopsis__section">
-        <p className="book-synopsis__eyebrow">About the Book</p>
+        <p className="book-synopsis__eyebrow">{aboutLabel}</p>
         {longDescription ? (
           <p className="book-synopsis__paragraph book-synopsis__paragraph--lead">{longDescription}</p>
         ) : null}
@@ -14,7 +17,7 @@ function BookSynopsis({ longDescription, synopsis, themes }) {
       </div>
 
       <div className="book-synopsis__section">
-        <p className="book-synopsis__eyebrow">Themes</p>
+        <p className="book-synopsis__eyebrow">{themesLabel}</p>
         <ul className="book-synopsis__list">
           {themes.map((item) => (
             <li key={item} className="book-synopsis__list-item">
