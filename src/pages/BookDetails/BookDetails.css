@@ -674,6 +674,15 @@
   cursor: zoom-out;
 }
 
+.book-details__copyright-note {
+  margin: 2.4rem 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  letter-spacing: 0.03rem;
+  color: rgba(43, 43, 43, 0.68);
+}
+
 @media (max-width: 900px) {
   .book-hero,
   .book-synopsis,

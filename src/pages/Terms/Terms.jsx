@@ -19,7 +19,7 @@ function Terms() {
           description: "Read the terms of use for the official website of author Anurag Verma.",
           type: "website",
           url: `${siteConfig.url}/terms`,
-          image: `${siteConfig.url}/og/home.svg`,
+          image: `${siteConfig.url}/og/about.svg`,
         }}
       />
 

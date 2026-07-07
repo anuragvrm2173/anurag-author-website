@@ -14,6 +14,13 @@ function NotFound() {
         title="Page Not Found | Anurag Verma"
         description="The page you are looking for could not be found."
         canonicalUrl={`${siteConfig.url}/not-found`}
+        openGraph={{
+          title: "Page Not Found | Anurag Verma",
+          description: "The page you are looking for could not be found.",
+          type: "website",
+          url: `${siteConfig.url}/not-found`,
+          image: `${siteConfig.url}/og/search.svg`,
+        }}
         noindex
       />
 

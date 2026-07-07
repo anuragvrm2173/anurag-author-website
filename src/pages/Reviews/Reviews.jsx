@@ -40,10 +40,10 @@ function Reviews() {
 
   const featuredReviews = getFeaturedReviews(3, sortedReviews);
   const groupedReviews = getReviewGroupsByBook(books, sortedReviews);
-  const totalReviews = sortedReviews.length || 32;
+  const totalReviews = sortedReviews.length;
   const averageRating = sortedReviews.length
     ? (sortedReviews.reduce((sum, item) => sum + (item.rating || 0), 0) / sortedReviews.length).toFixed(1)
-    : "5.0";
+    : null;
 
   return (
     <HelmetProvider>
@@ -77,8 +77,8 @@ function Reviews() {
           <Container>
             <div className="reviews-page__stats-row" aria-label="Review summary and sorting">
               <div>
-                <p className="reviews-page__avg">Average Rating {averageRating} ★★★★★</p>
-                <p className="reviews-page__count">{totalReviews} Reader Reviews</p>
+                {averageRating ? <p className="reviews-page__avg">Average Rating {averageRating} ★★★★★</p> : null}
+                {totalReviews > 0 ? <p className="reviews-page__count">{totalReviews} Reader Reviews</p> : null}
               </div>
               <label className="reviews-page__sort" htmlFor="reviews-sort">
                 <span>Sort</span>
@@ -104,7 +104,7 @@ function Reviews() {
               </div>
             ) : (
               <p className="reviews-page__empty">
-                Reader reviews will appear here after publication.
+                No reader reviews yet.
                 <br />
                 Be the first to share your thoughts.
               </p>
@@ -139,7 +139,7 @@ function Reviews() {
                 Reviews by Book
               </h2>
               <p className="reviews-page__empty">
-                Reader reviews will appear here after publication.
+                No reader reviews yet.
                 <br />
                 Be the first to share your thoughts.
               </p>

@@ -32,8 +32,8 @@ const writingPhilosophyParagraphs = [
 const readingStats = [
   { label: "Books Published", value: "2" },
   { label: "Languages", value: "2" },
-  { label: "Readers", value: "Growing Every Day" },
   { label: "Current Project", value: "Lessons of the Heart" },
+  { label: "Writing Since", value: "2023" },
 ];
 
 const readerConnectionParagraphs = [

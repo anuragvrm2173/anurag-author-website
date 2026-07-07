@@ -6,12 +6,13 @@ function BookSynopsis({
   favoriteQuotes = [],
   readingTime = null,
   isHindi = false,
+  labels = {},
 }) {
-  const aboutLabel = isHindi ? "पुस्तक परिचय" : "About the Book";
-  const themesLabel = isHindi ? "विषय" : "Themes";
-  const whoForLabel = isHindi ? "यह पुस्तक किनके लिए है" : "Who This Book Is For";
-  const readingTimeLabel = isHindi ? "अनुमानित पढ़ने का समय" : "Approx Reading Time";
-  const favoriteQuotesLabel = isHindi ? "पसंदीदा उद्धरण" : "Favorite Quotes";
+  const aboutLabel = labels.synopsis || (isHindi ? "पुस्तक परिचय" : "About the Book");
+  const themesLabel = labels.themes || (isHindi ? "विषय" : "Themes");
+  const whoForLabel = labels.whoThisBookIsFor || (isHindi ? "यह पुस्तक किनके लिए है" : "Who This Book Is For");
+  const readingTimeLabel = labels.readingTime || (isHindi ? "अनुमानित पढ़ने का समय" : "Approx Reading Time");
+  const favoriteQuotesLabel = labels.favoriteQuotes || (isHindi ? "पसंदीदा उद्धरण" : "Favorite Quotes");
 
   return (
     <section className="book-synopsis">

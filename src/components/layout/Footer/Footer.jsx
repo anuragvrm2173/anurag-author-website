@@ -1,6 +1,7 @@
 import "./Footer.css";
 
 import { Link } from "react-router-dom";
+import socialLinks from "../../../data/socialLinks";
 
 const pages = [
   { label: "Books", path: "/library" },
@@ -10,12 +11,7 @@ const pages = [
   { label: "Contact", path: "/contact" },
 ];
 
-const social = [
-  { label: "Instagram", href: "https://instagram.com/anuragvrm2173" },
-  { label: "Facebook", href: "https://facebook.com" },
-  { label: "Threads", href: "https://threads.net" },
-  { label: "YouTube", href: "https://youtube.com/@anuragvermavlog" },
-];
+const social = socialLinks.filter((item) => item.active !== false);
 
 function Footer() {
   return (
@@ -37,8 +33,8 @@ function Footer() {
             <p className="footer__title">Follow</p>
             <ul className="footer__list" aria-label="Social links">
               {social.map((item) => (
-                <li key={item.label}>
-                  <a href={item.href} target="_blank" rel="noreferrer">{item.label}</a>
+                <li key={item.id}>
+                  <a href={item.url} target={item.external ? "_blank" : undefined} rel={item.external ? "noreferrer noopener" : undefined}>{item.name}</a>
                 </li>
               ))}
             </ul>
@@ -48,7 +44,8 @@ function Footer() {
         <div className="footer__bar" />
 
         <div className="footer__bottom">
-          <p>Copyright © 2026 Anurag Verma</p>
+          <p>© 2026 Anurag Verma</p>
+          <p>All Rights Reserved.</p>
           <p className="footer__legal">
             <Link to="/privacy">Privacy</Link>
             <span>•</span>

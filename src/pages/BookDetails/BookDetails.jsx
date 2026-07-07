@@ -294,6 +294,64 @@ function BookDetails() {
   const displayFavoriteQuotes = activeEdition?.favoriteQuotes || book.favoriteQuotes || [];
   const displayGenres = isHindi ? book.genres.map((item) => genreMapHi[item] || item) : book.genres;
   const displayThemes = isHindi ? book.themes.map((item) => themeMapHi[item] || item) : book.themes;
+  const bookEmphasis = {
+    "the-last-goodbye": {
+      synopsisLabel: isHindi ? "कथा-सार" : "Synopsis",
+      themesLabel: isHindi ? "मुख्य थीम" : "Themes",
+      quotesLabel: isHindi ? "पसंदीदा उद्धरण" : "Favorite Quotes",
+      whoForLabel: isHindi ? "यह पुस्तक किनके लिए है" : "Who This Book Is For",
+      readingLabel: isHindi ? "पढ़ने का समय" : "Reading Time",
+    },
+    "the-untold-stories": {
+      synopsisLabel: isHindi ? "किताब के पीछे" : "Behind the Book",
+      themesLabel: isHindi ? "अनकही कहानियाँ" : "Untold Stories",
+      quotesLabel: isHindi ? "चिंतन" : "Reflections",
+      whoForLabel: isHindi ? "यह पुस्तक किनके लिए है" : "Who This Book Is For",
+      readingLabel: isHindi ? "पढ़ने का समय" : "Reading Time",
+    },
+    "lessons-of-the-heart": {
+      synopsisLabel: isHindi ? "जीवन के सबक" : "Life Lessons",
+      themesLabel: isHindi ? "मुख्य सीख" : "Key Takeaways",
+      quotesLabel: isHindi ? "पसंदीदा चिंतन" : "Favorite Reflections",
+      whoForLabel: isHindi ? "यह पुस्तक किनके लिए है" : "Who This Book Is For",
+      readingLabel: isHindi ? "पढ़ने का समय" : "Reading Time",
+    },
+  };
+  const emphasis = bookEmphasis[book.id] || {
+    synopsisLabel: isHindi ? "कथा-सार" : "Synopsis",
+    themesLabel: isHindi ? "मुख्य थीम" : "Themes",
+    quotesLabel: isHindi ? "पसंदीदा उद्धरण" : "Favorite Quotes",
+    whoForLabel: isHindi ? "यह पुस्तक किनके लिए है" : "Who This Book Is For",
+    readingLabel: isHindi ? "पढ़ने का समय" : "Reading Time",
+  };
+  const reorderedSynopsis = (() => {
+    if (book.id === "the-untold-stories") {
+      return [displaySynopsis[1], displaySynopsis[0]].filter(Boolean);
+    }
+    if (book.id === "lessons-of-the-heart") {
+      return [...displaySynopsis].reverse();
+    }
+    return displaySynopsis;
+  })();
+  const reorderedThemes = (() => {
+    if (book.id === "the-untold-stories") {
+      return [...displayThemes].filter((theme) =>
+        ["Behind the Story", "Reflection", "Memory", "Relationships", "Healing", "कहानी के पीछे", "चिंतन", "स्मृति", "रिश्ते", "उपचार"].includes(theme)
+      );
+    }
+    if (book.id === "lessons-of-the-heart") {
+      return [...displayThemes].filter((theme) =>
+        ["Life Lessons", "Wisdom", "Purpose", "Forgiveness", "Healing", "जीवन के सबक", "बुद्धिमत्ता", "उद्देश्य", "क्षमा", "उपचार"].includes(theme)
+      );
+    }
+    return displayThemes;
+  })();
+  const reorderedQuotes = (() => {
+    if (book.id === "the-untold-stories") {
+      return [...displayFavoriteQuotes].reverse();
+    }
+    return displayFavoriteQuotes;
+  })();
   const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
   const availabilityLabel = isHindi ? "शीघ्र" : "Coming Soon";
   const pageUrl = `${siteConfig.url}/library/${book.id}${selectedEditionKey ? `?edition=${selectedEditionKey}` : ""}`;
@@ -407,12 +465,19 @@ function BookDetails() {
 
           <BookSynopsis
             longDescription={displayLongDescription}
-            synopsis={displaySynopsis}
-            themes={displayThemes}
+            synopsis={reorderedSynopsis}
+            themes={reorderedThemes.length > 0 ? reorderedThemes : displayThemes}
             whoThisBookIsFor={displayWhoFor}
             readingTime={displayReadingTime}
-            favoriteQuotes={displayFavoriteQuotes}
+            favoriteQuotes={reorderedQuotes}
             isHindi={isHindi}
+            labels={{
+              synopsis: emphasis.synopsisLabel,
+              themes: emphasis.themesLabel,
+              whoThisBookIsFor: emphasis.whoForLabel,
+              readingTime: emphasis.readingLabel,
+              favoriteQuotes: emphasis.quotesLabel,
+            }}
           />
 
           <section className="book-synopsis" aria-label="Book metadata">
@@ -492,6 +557,12 @@ function BookDetails() {
           )}
 
           <RelatedBooks books={relatedBooks} />
+
+          <p className="book-details__copyright-note">
+            Copyright © 2026 Anurag Verma.
+            <br />
+            All Rights Reserved.
+          </p>
         </Container>
       </section>
 
