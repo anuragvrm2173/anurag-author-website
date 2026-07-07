@@ -123,10 +123,11 @@
 }
 
 .author-profile__portrait {
+  display: block;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  height: auto;
   object-fit: cover;
-  object-position: center top;
+  object-position: top center;
   border-radius: 0.8rem;
   border: 1px solid rgba(17, 17, 17, 0.12);
   box-shadow: 0 20px 40px rgba(17, 17, 17, 0.16);
@@ -166,6 +167,11 @@
   font-family: var(--font-heading);
   font-size: 1.4rem;
   color: var(--color-primary);
+}
+
+.author-profile__bio-block p {
+  max-width: 72ch;
+  line-height: 1.78;
 }
 
 .author-profile__themes {
