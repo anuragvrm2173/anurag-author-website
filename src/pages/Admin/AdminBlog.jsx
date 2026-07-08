@@ -128,6 +128,26 @@ function BlogEditorForm({ initialForm, selectedPost, onSaved, onError, onReset }
         <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save Post"}</Button>
         <Button type="button" variant="outline" onClick={onReset}>Reset</Button>
       </div>
+
+      {selectedPost ? (
+        <div className="admin-card admin-audit-card">
+          <p className="admin-card__label">Audit Info</p>
+          <div className="admin-audit-grid">
+            {[
+              ["Created", selectedPost.createdAt],
+              ["Updated", selectedPost.updatedAt],
+              ["Published", selectedPost.publishedAt],
+              ["Last Edited", selectedPost.lastEdited],
+              ["Archived", selectedPost.deletedAt],
+            ].map(([label, value]) => (
+              <div key={label} className="admin-audit-item">
+                <span>{label}</span>
+                <strong>{value ? new Date(value).toLocaleString() : "—"}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }

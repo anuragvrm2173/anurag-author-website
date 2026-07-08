@@ -190,6 +190,25 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
         <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save Book"}</Button>
         <Button type="button" variant="outline" onClick={onReset}>Reset</Button>
       </div>
+
+      {selectedBook ? (
+        <div className="admin-card admin-audit-card">
+          <p className="admin-card__label">Audit Info</p>
+          <div className="admin-audit-grid">
+            {[
+              ["Created", selectedBook.createdAt],
+              ["Updated", selectedBook.updatedAt],
+              ["Published", selectedBook.publishedAt],
+              ["Archived", selectedBook.deletedAt],
+            ].map(([label, value]) => (
+              <div key={label} className="admin-audit-item">
+                <span>{label}</span>
+                <strong>{value ? new Date(value).toLocaleString() : "—"}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }

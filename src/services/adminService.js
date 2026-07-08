@@ -158,6 +158,7 @@ function normalizeBookRow(row) {
     readingTime: row.reading_time,
     favoriteQuotes: row.favorite_quotes || [],
     editions: row.editions || {},
+    createdAt: row.created_at || null,
     updatedAt: row.updated_at,
     deletedAt: row.deleted_at || null,
   };
@@ -183,6 +184,7 @@ function normalizeBlogRow(row) {
     seoTitle: row.seo_title || "",
     seoDescription: row.seo_description || "",
     revisionHistory: row.revision_history || [],
+    createdAt: row.created_at || null,
     lastEdited: row.last_edited || row.updated_at || null,
     updatedAt: row.updated_at,
     deletedAt: row.deleted_at || null,

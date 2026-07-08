@@ -396,6 +396,37 @@
   gap: 0.75rem;
 }
 
+.admin-audit-card {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.admin-audit-item {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.9rem;
+  border-radius: 1rem;
+  background: rgba(247, 243, 235, 0.72);
+  border: 1px solid rgba(17, 17, 17, 0.06);
+}
+
+.admin-audit-item span {
+  font-size: 0.82rem;
+  letter-spacing: 0.04rem;
+  text-transform: uppercase;
+  color: rgba(43, 43, 43, 0.68);
+}
+
+.admin-audit-item strong {
+  color: var(--color-primary);
+}
+
 .admin-revisions {
   display: grid;
   gap: 1rem;

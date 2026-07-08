@@ -89,14 +89,22 @@ function AdminMessages() {
                   <td><span className={`admin-status-pill admin-status-pill--${message.status}`}>{message.status}</span></td>
                   <td>
                     <div className="admin-table__actions">
-                      {message.status !== "read" ? <button type="button" className="admin-inline-button" onClick={async () => {
+                      {message.status === "unread" ? <button type="button" className="admin-inline-button" onClick={async () => {
                         await updateAdminMessage(message.id, { status: "read" });
                         setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "read" } : item));
                       }}>Mark Read</button> : null}
+                      {message.status === "read" ? <button type="button" className="admin-inline-button" onClick={async () => {
+                        await updateAdminMessage(message.id, { status: "unread" });
+                        setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "unread" } : item));
+                      }}>Mark Unread</button> : null}
                       {message.status !== "archived" ? <button type="button" className="admin-inline-button" onClick={async () => {
                         await updateAdminMessage(message.id, { status: "archived" });
                         setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "archived" } : item));
                       }}>Archive</button> : null}
+                      {message.status === "archived" ? <button type="button" className="admin-inline-button" onClick={async () => {
+                        await updateAdminMessage(message.id, { status: "read" });
+                        setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "read" } : item));
+                      }}>Restore</button> : null}
                     </div>
                   </td>
                 </tr>
