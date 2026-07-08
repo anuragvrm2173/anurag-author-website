@@ -1,0 +1,56 @@
+.rich-text-editor {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.rich-text-editor__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.rich-text-editor__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.rich-text-editor__button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.rich-text-editor__content {
+  min-height: 14rem;
+  padding: 0.95rem 1rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-text);
+}
+
+.rich-text-editor__content:focus {
+  outline: 2px solid rgba(201, 163, 78, 0.45);
+  outline-offset: 2px;
+}
+
+.rich-text-editor__content p {
+  margin: 0 0 0.9rem;
+}
+
+.rich-text-editor__content h2 {
+  margin: 1.25rem 0 0.7rem;
+  font-family: var(--font-heading);
+}
+
+.rich-text-editor__helper {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(43, 43, 43, 0.72);
+}

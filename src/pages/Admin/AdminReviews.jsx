@@ -4,6 +4,19 @@ import { useEffect, useState } from "react";
 
 import { deleteAdminReview, fetchAdminReviews, updateAdminReview } from "../../services/adminService";
 
+const REVIEW_FLOW = {
+  submitted: "Move to Pending",
+  pending: "Approve",
+  approved: "Publish",
+};
+
+function getNextReviewStatus(status) {
+  if (status === "submitted") return "pending";
+  if (status === "pending") return "approved";
+  if (status === "approved") return "published";
+  return null;
+}
+
 function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState("");
@@ -47,11 +60,12 @@ function AdminReviews() {
                 <td><span className={`admin-status-pill admin-status-pill--${review.status}`}>{review.status}</span></td>
                 <td>
                   <div className="admin-table__actions">
-                    {review.status !== "approved" ? (
+                    {getNextReviewStatus(review.status) ? (
                       <button type="button" className="admin-inline-button" onClick={async () => {
-                        await updateAdminReview(review.id, { status: "approved" });
-                        setReviews((current) => current.map((item) => item.id === review.id ? { ...item, status: "approved" } : item));
-                      }}>Approve</button>
+                        const nextStatus = getNextReviewStatus(review.status);
+                        await updateAdminReview(review.id, { status: nextStatus });
+                        setReviews((current) => current.map((item) => item.id === review.id ? { ...item, status: nextStatus } : item));
+                      }}>{REVIEW_FLOW[review.status]}</button>
                     ) : null}
                     {review.status !== "rejected" ? (
                       <button type="button" className="admin-inline-button" onClick={async () => {

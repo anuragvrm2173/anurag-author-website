@@ -168,10 +168,87 @@
   resize: vertical;
 }
 
+.admin-media-upload-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-cover-upload-row {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.admin-cover-upload-row input[type="file"] {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  min-height: auto;
+}
+
+.admin-meta-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(43, 43, 43, 0.72);
+}
+
 .admin-form__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.admin-revisions {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-revisions__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.admin-revisions__title {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  color: var(--color-primary);
+}
+
+.admin-revisions__list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.admin-revision {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(247, 243, 235, 0.7);
+}
+
+.admin-revision__content {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.admin-revision__content h3,
+.admin-revision__content p {
+  margin: 0;
+}
+
+.admin-revision__time {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.04rem;
+  text-transform: uppercase;
+  color: rgba(43, 43, 43, 0.72);
 }
 
 .admin-status-pill {

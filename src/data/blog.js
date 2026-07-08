@@ -279,8 +279,9 @@ function getBlogCorpus(post) {
 	const sectionText = (post.contentSections || [])
 		.flatMap((section) => [section.heading, ...(section.paragraphs || [])])
 		.join(" ");
+	const htmlText = String(post.bodyHtml || "").replace(/<[^>]+>/g, " ");
 
-	return [post.title, post.excerpt, ...(post.content || []), sectionText].join(" ");
+	return [post.title, post.excerpt, ...(post.content || []), sectionText, htmlText].join(" ");
 }
 
 export function getBlogPostById(postId) {

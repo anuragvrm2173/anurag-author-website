@@ -63,6 +63,7 @@ function AdminMedia() {
                 <th>Name</th>
                 <th>Updated</th>
                 <th>Size</th>
+                <th>Public URL</th>
               </tr>
             </thead>
             <tbody>
@@ -71,6 +72,7 @@ function AdminMedia() {
                   <td>{file.name}</td>
                   <td>{file.updated_at ? new Date(file.updated_at).toLocaleString() : "—"}</td>
                   <td>{file.metadata?.size ? `${Math.round(file.metadata.size / 1024)} KB` : "—"}</td>
+                  <td>{file.publicUrl ? <a href={file.publicUrl} target="_blank" rel="noreferrer">Open</a> : "—"}</td>
                 </tr>
               ))}
             </tbody>

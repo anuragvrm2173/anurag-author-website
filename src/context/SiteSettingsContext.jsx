@@ -32,13 +32,21 @@ async function fetchPublicSiteSettings() {
   const { data, error } = await supabase
     .from("site_settings")
     .select("id, value")
-    .in("id", ["site", "socialLinks"]);
+    .in("id", ["global", "site", "socialLinks"]);
 
   if (error) {
     throw error;
   }
 
   const rows = data || [];
+  const globalRow = rows.find((row) => row.id === "global");
+  if (globalRow?.value && typeof globalRow.value === "object") {
+    return {
+      siteConfig: mergeSiteConfig(globalRow.value.site),
+      socialLinks: resolveSocialLinks(globalRow.value.socialLinks),
+    };
+  }
+
   const siteRow = rows.find((row) => row.id === "site");
   const socialLinksRow = rows.find((row) => row.id === "socialLinks");
 
@@ -78,6 +86,8 @@ export function SiteSettingsProvider({ children }) {
           return;
         }
 
+        setSiteConfig(fallbackSiteConfig);
+        setSocialLinks(fallbackSocialLinks);
         setError(nextError);
       } finally {
         if (isActive) {

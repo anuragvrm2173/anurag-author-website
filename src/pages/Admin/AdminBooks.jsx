@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import Button from "../../components/ui/Button/Button";
-import { deleteAdminBook, fetchAdminBooks, getDefaultBookForm, upsertAdminBook } from "../../services/adminService";
+import { deleteAdminBook, fetchAdminBooks, generateSlug, getDefaultBookForm, upsertAdminBook, uploadAdminMediaFile } from "../../services/adminService";
 
 function buildBookForm(book) {
   if (!book) {
@@ -23,7 +23,9 @@ function buildBookForm(book) {
     genres: (book.genres || []).join("\n"),
     themes: (book.themes || []).join("\n"),
     status: String(book.status || "Draft").toLowerCase().replace(/\s+/g, "_"),
+    displayOrder: book.displayOrder ?? 0,
     publicationDate: book.publicationDate || "",
+    publishedAt: book.publishedAt || "",
     pages: book.pages || "",
     language: book.language || "",
     isbn: book.isbn || "",
@@ -46,6 +48,23 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
   const [saving, setSaving] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(Boolean(initialForm.slug));
+
+  function updateEditionCover(editionKey, coverKey, publicUrl) {
+    const editions = JSON.parse(form.editionsJson || "{}");
+    const nextEditions = {
+      ...editions,
+      [editionKey]: {
+        ...(editions[editionKey] || {}),
+        cover: {
+          ...((editions[editionKey] || {}).cover || {}),
+          [coverKey]: publicUrl,
+        },
+      },
+    };
+
+    setForm((current) => ({ ...current, editionsJson: JSON.stringify(nextEditions, null, 2) }));
+  }
 
   return (
     <form
@@ -76,12 +95,14 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
           ["slug", "Slug"],
           ["title", "Title"],
           ["subtitle", "Subtitle"],
+          ["displayOrder", "Display Order"],
           ["shortDescription", "Short Description", true],
           ["longDescription", "Long Description", true],
           ["description", "SEO Description", true],
           ["genres", "Genres (one per line)", true],
           ["themes", "Themes (one per line)", true],
           ["publicationDate", "Publication Date"],
+          ["publishedAt", "Published At"],
           ["pages", "Pages"],
           ["language", "Language"],
           ["isbn", "ISBN"],
@@ -102,7 +123,23 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
             <label htmlFor={`book-${key}`}>{label}</label>
             {String(key).endsWith("Json") || ["shortDescription", "longDescription", "description", "genres", "themes", "relatedBooks", "relatedBlogIds", "synopsis", "discoveries", "whoThisBookIsFor", "favoriteQuotes"].includes(key)
               ? <textarea id={`book-${key}`} value={form[key]} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} />
-              : <input id={`book-${key}`} value={form[key]} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} />}
+              : <input id={`book-${key}`} value={form[key]} onChange={(event) => {
+                const nextValue = event.target.value;
+                if (key === "title") {
+                  setForm((current) => ({
+                    ...current,
+                    title: nextValue,
+                    slug: slugTouched ? current.slug : generateSlug(nextValue),
+                  }));
+                  return;
+                }
+
+                if (key === "slug") {
+                  setSlugTouched(true);
+                }
+
+                setForm((current) => ({ ...current, [key]: nextValue }));
+              }} />}
           </div>
         ))}
         <div className="admin-form__field">
@@ -113,6 +150,40 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
             <option value="draft">Draft</option>
           </select>
         </div>
+      </div>
+
+      <div className="admin-card admin-media-upload-grid">
+        <p className="admin-card__label">Cover Uploads</p>
+        <p className="admin-meta-note">Uploading here updates the matching edition cover URLs inside the editions JSON automatically.</p>
+        {[
+          ["english", "frontCover", "English Front Cover"],
+          ["english", "fullCover", "English Full Cover"],
+          ["hindi", "frontCover", "Hindi Front Cover"],
+          ["hindi", "fullCover", "Hindi Full Cover"],
+        ].map(([editionKey, coverKey, label]) => (
+          <div key={`${editionKey}-${coverKey}`} className="admin-cover-upload-row">
+            <label>{label}</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) {
+                  return;
+                }
+
+                try {
+                  const uploaded = await uploadAdminMediaFile(file, `covers/${form.id || generateSlug(form.title) || "book"}`);
+                  updateEditionCover(editionKey, coverKey, uploaded.publicUrl);
+                } catch (nextError) {
+                  onError(nextError.message);
+                } finally {
+                  event.target.value = "";
+                }
+              }}
+            />
+          </div>
+        ))}
       </div>
 
       <div className="admin-form__actions">

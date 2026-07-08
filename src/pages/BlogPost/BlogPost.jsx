@@ -55,6 +55,7 @@ function BlogPost() {
 	}
 
 	const visual = getBlogVisual(post);
+	const bodyHtml = String(post.bodyHtml || "").trim();
 	const contentSections = post.contentSections || [];
 	const relatedBooks = (post.relatedBookIds || []).map((bookId) => getBookByIdFromList(books, bookId)).filter(Boolean);
 	const structuredData = {
@@ -121,7 +122,9 @@ function BlogPost() {
 					</section>
 
 					<article className="blog-post-page__article">
-						{contentSections.length > 0
+						{bodyHtml ? (
+							<div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+						) : contentSections.length > 0
 							? contentSections.map((section) => (
 								<section key={section.heading} className="blog-post-page__section">
 									<h2 className="blog-post-page__section-title">{section.heading}</h2>

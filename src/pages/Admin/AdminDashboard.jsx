@@ -16,7 +16,7 @@ function AdminDashboard() {
       <header className="admin-page__header">
         <div>
           <p className="admin-page__eyebrow">Dashboard</p>
-          <h1 className="admin-page__title">Publishing control room</h1>
+          <h1 className="admin-page__title">Welcome back, Anurag</h1>
           <p className="admin-page__description">Monitor content, moderation, and reader activity from one place.</p>
         </div>
       </header>
@@ -25,7 +25,9 @@ function AdminDashboard() {
         <div className="admin-stats">
           {[
             ["Books", stats.books],
+            ["Draft Books", stats.draftBooks],
             ["Blog Posts", stats.blogPosts],
+            ["Draft Posts", stats.draftPosts],
             ["Pending Reviews", stats.pendingReviews],
             ["Published Reviews", stats.publishedReviews],
             ["Newsletter Subscribers", stats.newsletterSubscribers],
@@ -41,19 +43,22 @@ function AdminDashboard() {
 
       <div className="admin-grid">
         <article className="admin-card">
-          <p className="admin-card__label">Last Updated</p>
-          <h2>{stats?.lastUpdated ? new Date(stats.lastUpdated).toLocaleString() : "Not available yet"}</h2>
-          <p>Once Supabase content tables are populated, this dashboard will reflect live editorial activity and moderation volume.</p>
+          <p className="admin-card__label">Latest Blog</p>
+          <h2>{stats?.latestBlogTitle || "No posts yet"}</h2>
+          <p>{stats?.lastUpdated ? `Last settings update: ${new Date(stats.lastUpdated).toLocaleString()}` : "Not available yet"}</p>
         </article>
 
         <article className="admin-card">
-          <p className="admin-card__label">Launch Checklist</p>
-          <ul>
-            <li>Add your admin user to `admin_users` in Supabase.</li>
-            <li>Create a `media` storage bucket for uploads.</li>
-            <li>Configure Vercel environment variables for Supabase and analytics.</li>
-            <li>Seed books and blog posts into Supabase before switching the public site.</li>
-          </ul>
+          <p className="admin-card__label">Recent Activity</p>
+          {stats?.recentActivity?.length ? (
+            <ul>
+              {stats.recentActivity.map((item) => (
+                <li key={item.id}>{item.label}{item.timestamp ? ` • ${new Date(item.timestamp).toLocaleString()}` : ""}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No activity recorded yet.</p>
+          )}
         </article>
       </div>
     </section>

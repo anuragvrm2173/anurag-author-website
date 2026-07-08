@@ -9,11 +9,16 @@ create table if not exists public.reviews (
   rating int not null check (rating between 1 and 5),
   source text,
   featured boolean not null default false,
-  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  status text not null default 'submitted' check (status in ('submitted', 'pending', 'approved', 'published', 'rejected')),
   created_at timestamptz not null default now(),
   moderated_at timestamptz,
-  moderated_by uuid
+  moderated_by uuid,
+  deleted_at timestamptz
 );
+
+alter table public.reviews add column if not exists deleted_at timestamptz;
+alter table public.reviews drop constraint if exists reviews_status_check;
+alter table public.reviews add constraint reviews_status_check check (status in ('submitted', 'pending', 'approved', 'published', 'rejected'));
 
 create index if not exists reviews_status_created_idx on public.reviews(status, created_at desc);
 create index if not exists reviews_book_status_idx on public.reviews(book_id, status);
@@ -25,14 +30,14 @@ create policy if not exists "public_insert_pending_reviews"
 on public.reviews
 for insert
 to anon, authenticated
-with check (status = 'pending');
+with check (status = 'submitted');
 
 -- Public can only read approved reviews
 create policy if not exists "public_read_approved_reviews"
 on public.reviews
 for select
 to anon, authenticated
-using (status = 'approved');
+using (status = 'published' and deleted_at is null);
 
 -- Admin moderation policy placeholder (service role bypasses RLS by default)
 -- Add additional policies for authenticated moderators if needed.
@@ -78,7 +83,9 @@ create table if not exists public.books (
   genres jsonb not null default '[]'::jsonb,
   themes jsonb not null default '[]'::jsonb,
   status text not null default 'draft' check (status in ('published', 'coming_soon', 'draft')),
+  display_order integer not null default 0,
   publication_date date,
+  published_at timestamptz,
   pages integer,
   language text,
   isbn text,
@@ -96,8 +103,15 @@ create table if not exists public.books (
   favorite_quotes jsonb not null default '[]'::jsonb,
   editions jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz
 );
+
+alter table public.books add column if not exists display_order integer not null default 0;
+alter table public.books add column if not exists published_at timestamptz;
+alter table public.books add column if not exists deleted_at timestamptz;
+alter table public.books drop constraint if exists books_status_check;
+alter table public.books add constraint books_status_check check (status in ('draft', 'published', 'coming_soon', 'archived'));
 
 create table if not exists public.blog_posts (
   id text primary key,
@@ -105,18 +119,33 @@ create table if not exists public.blog_posts (
   title text not null,
   excerpt text,
   reading_time text,
+  status text not null default 'draft' check (status in ('draft', 'published', 'archived')),
+  display_order integer not null default 0,
   published_at text,
   category text,
   featured boolean not null default false,
   related_book_ids jsonb not null default '[]'::jsonb,
   visual jsonb not null default '{}'::jsonb,
+  body_html text,
   content jsonb not null default '[]'::jsonb,
   content_sections jsonb not null default '[]'::jsonb,
   seo_title text,
   seo_description text,
+  revision_history jsonb not null default '[]'::jsonb,
+  last_edited timestamptz,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz
 );
+
+alter table public.blog_posts add column if not exists status text not null default 'draft';
+alter table public.blog_posts add column if not exists display_order integer not null default 0;
+alter table public.blog_posts add column if not exists body_html text;
+alter table public.blog_posts add column if not exists revision_history jsonb not null default '[]'::jsonb;
+alter table public.blog_posts add column if not exists last_edited timestamptz;
+alter table public.blog_posts add column if not exists deleted_at timestamptz;
+alter table public.blog_posts drop constraint if exists blog_posts_status_check;
+alter table public.blog_posts add constraint blog_posts_status_check check (status in ('draft', 'published', 'archived'));
 
 create table if not exists public.messages (
   id uuid primary key default gen_random_uuid(),
@@ -124,8 +153,11 @@ create table if not exists public.messages (
   email text not null,
   message text not null,
   status text not null default 'unread' check (status in ('unread', 'read', 'archived')),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  deleted_at timestamptz
 );
+
+alter table public.messages add column if not exists deleted_at timestamptz;
 
 create table if not exists public.newsletter_subscribers (
   id uuid primary key default gen_random_uuid(),
@@ -133,8 +165,11 @@ create table if not exists public.newsletter_subscribers (
   source text,
   provider text,
   subscribed_at timestamptz not null default now(),
-  status text not null default 'active' check (status in ('active', 'deleted'))
+  status text not null default 'active' check (status in ('active', 'deleted')),
+  deleted_at timestamptz
 );
+
+alter table public.newsletter_subscribers add column if not exists deleted_at timestamptz;
 
 create table if not exists public.site_settings (
   id text primary key,
@@ -152,13 +187,13 @@ create policy if not exists "public_read_books"
 on public.books
 for select
 to anon, authenticated
-using (true);
+using (deleted_at is null and status in ('published', 'coming_soon'));
 
 create policy if not exists "public_read_blog_posts"
 on public.blog_posts
 for select
 to anon, authenticated
-using (true);
+using (deleted_at is null and status = 'published');
 
 create policy if not exists "public_insert_messages"
 on public.messages

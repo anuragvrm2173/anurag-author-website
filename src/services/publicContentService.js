@@ -6,6 +6,13 @@ function sortByFallbackOrder(items, fallbackItems) {
   const orderMap = new Map(fallbackItems.map((item, index) => [item.id, index]));
 
   return [...items].sort((left, right) => {
+    const leftDisplayOrder = Number(left.displayOrder ?? Number.MAX_SAFE_INTEGER);
+    const rightDisplayOrder = Number(right.displayOrder ?? Number.MAX_SAFE_INTEGER);
+
+    if (leftDisplayOrder !== rightDisplayOrder) {
+      return leftDisplayOrder - rightDisplayOrder;
+    }
+
     const leftIndex = orderMap.has(left.id) ? orderMap.get(left.id) : Number.MAX_SAFE_INTEGER;
     const rightIndex = orderMap.has(right.id) ? orderMap.get(right.id) : Number.MAX_SAFE_INTEGER;
 
@@ -29,7 +36,9 @@ function normalizeBookRow(row) {
     genres: row.genres || [],
     themes: row.themes || [],
     status: String(row.status || "draft").replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
+    displayOrder: row.display_order ?? 0,
     publicationDate: row.publication_date,
+    publishedAt: row.published_at,
     pages: row.pages,
     language: row.language,
     isbn: row.isbn,
@@ -46,6 +55,7 @@ function normalizeBookRow(row) {
     readingTime: row.reading_time,
     favoriteQuotes: row.favorite_quotes || [],
     editions: row.editions || {},
+    deletedAt: row.deleted_at || null,
   };
 }
 
@@ -55,16 +65,22 @@ function normalizeBlogPostRow(row) {
     slug: row.slug || row.id,
     title: row.title,
     excerpt: row.excerpt,
+    status: row.status || "draft",
+    displayOrder: row.display_order ?? 0,
     readingTime: row.reading_time,
     publishedAt: row.published_at,
     category: row.category,
     featured: Boolean(row.featured),
     relatedBookIds: row.related_book_ids || [],
     visual: row.visual || {},
+    bodyHtml: row.body_html || "",
     content: row.content || [],
     contentSections: row.content_sections || [],
     seoTitle: row.seo_title || "",
     seoDescription: row.seo_description || "",
+    lastEdited: row.last_edited || row.updated_at || null,
+    revisionHistory: row.revision_history || [],
+    deletedAt: row.deleted_at || null,
   };
 }
 
@@ -81,12 +97,21 @@ export async function fetchPublicBooks() {
     return fallbackBooks;
   }
 
-  const { data, error } = await supabase.from("books").select("*");
-  if (error) {
-    throw error;
-  }
+  try {
+    const { data, error } = await supabase
+      .from("books")
+      .select("*")
+      .is("deleted_at", null)
+      .in("status", ["published", "coming_soon"]);
 
-  return sortByFallbackOrder((data || []).map(normalizeBookRow), fallbackBooks);
+    if (error) {
+      throw error;
+    }
+
+    return sortByFallbackOrder((data || []).map(normalizeBookRow), fallbackBooks);
+  } catch {
+    return fallbackBooks;
+  }
 }
 
 export async function fetchPublicBlogPosts() {
@@ -94,12 +119,21 @@ export async function fetchPublicBlogPosts() {
     return fallbackBlogPosts;
   }
 
-  const { data, error } = await supabase.from("blog_posts").select("*");
-  if (error) {
-    throw error;
-  }
+  try {
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .is("deleted_at", null)
+      .eq("status", "published");
 
-  return sortByFallbackOrder((data || []).map(normalizeBlogPostRow), fallbackBlogPosts);
+    if (error) {
+      throw error;
+    }
+
+    return sortByFallbackOrder((data || []).map(normalizeBlogPostRow), fallbackBlogPosts);
+  } catch {
+    return fallbackBlogPosts;
+  }
 }
 
 export function getBookByIdFromList(books, bookId) {
