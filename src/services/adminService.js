@@ -294,12 +294,13 @@ export async function requestAdminPasswordOtp(email) {
     throw new Error("Admin email is required.");
   }
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email: normalizedEmail,
-    options: { shouldCreateUser: false },
-  });
+  const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail);
 
   if (error) {
+    const message = String(error.message || "");
+    if (/rate\s*limit|security purposes|too many/i.test(message)) {
+      throw new Error("Too many OTP requests. Please wait 60 seconds and try again.");
+    }
     throw error;
   }
 }
@@ -328,11 +329,41 @@ export async function verifyAdminOtpAndResetPassword(email, otp, nextPassword) {
   const { error: verifyError } = await supabase.auth.verifyOtp({
     email: normalizedEmail,
     token: normalizedOtp,
-    type: "email",
+    type: "recovery",
   });
 
   if (verifyError) {
     throw new Error("Invalid or expired OTP. Please request a new OTP.");
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: normalizedPassword,
+  });
+
+  if (updateError) {
+    throw updateError;
+  }
+
+  await supabase.auth.signOut();
+}
+
+export async function resetAdminPasswordWithRecoverySession(nextPassword) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is not configured for password reset.");
+  }
+
+  const normalizedPassword = String(nextPassword || "").trim();
+  if (normalizedPassword.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
+  }
+
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) {
+    throw sessionError;
+  }
+
+  if (!sessionData.session) {
+    throw new Error("Recovery session not found. Open the latest recovery email link again, then retry.");
   }
 
   const { error: updateError } = await supabase.auth.updateUser({

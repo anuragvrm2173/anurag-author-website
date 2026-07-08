@@ -9,9 +9,27 @@ import { adminAllowedEmail, getMissingSupabaseEnvVars, hasSupabase } from "../..
 import {
   getCurrentAdminSession,
   requestAdminPasswordOtp,
+  resetAdminPasswordWithRecoverySession,
   signInAdmin,
   verifyAdminOtpAndResetPassword,
 } from "../../services/adminService";
+
+const OTP_COOLDOWN_SECONDS = 60;
+
+function parseWaitSeconds(message) {
+  const text = String(message || "");
+  const match = text.match(/(\d+)\s*(second|sec|minute|min)/i);
+  if (!match) {
+    return 0;
+  }
+
+  const value = Number(match[1] || 0);
+  if (!value) {
+    return 0;
+  }
+
+  return /minute|min/i.test(match[2]) ? value * 60 : value;
+}
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -27,12 +45,17 @@ function AdminLogin() {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
+  const [otpSecondsLeft, setOtpSecondsLeft] = useState(0);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMessage, setResetMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const missingEnvVars = getMissingSupabaseEnvVars();
   const supabaseConfigured = hasSupabase();
+  const searchParams = new URLSearchParams(location.search || "");
+  const hashParams = new URLSearchParams((location.hash || "").replace(/^#/, ""));
+  const isRecoveryLinkMode = searchParams.get("type") === "recovery" || hashParams.get("type") === "recovery";
 
   useEffect(() => {
     let active = true;
@@ -46,6 +69,42 @@ function AdminLogin() {
       active = false;
     };
   }, [location.state?.from, navigate]);
+
+  useEffect(() => {
+    if (isRecoveryLinkMode) {
+      setShowForgotPassword(true);
+    }
+  }, [isRecoveryLinkMode]);
+
+  useEffect(() => {
+    if (!otpCooldownUntil) {
+      setOtpSecondsLeft(0);
+      return undefined;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((otpCooldownUntil - Date.now()) / 1000));
+      setOtpSecondsLeft(remaining);
+      if (remaining <= 0) {
+        setOtpCooldownUntil(0);
+      }
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [otpCooldownUntil]);
+
+  const sendOtp = async (targetEmail) => {
+    if (otpSecondsLeft > 0) {
+      throw new Error(`Please wait ${otpSecondsLeft}s before requesting another OTP.`);
+    }
+
+    await requestAdminPasswordOtp(targetEmail);
+    setOtpSent(true);
+    setOtpCooldownUntil(Date.now() + OTP_COOLDOWN_SECONDS * 1000);
+    setResetMessage("Password reset OTP sent to your email. Enter the code and set a new password.");
+  };
 
   return (
     <>
@@ -125,6 +184,7 @@ function AdminLogin() {
                 setResetPassword("");
                 setResetConfirmPassword("");
                 setOtpSent(false);
+                setOtpCooldownUntil(0);
               }}
             >
               {showForgotPassword ? "Close Reset" : "Forgot Password"}
@@ -143,10 +203,31 @@ function AdminLogin() {
               setResetMessage("");
 
               try {
+                if (isRecoveryLinkMode) {
+                  if (resetPassword.length < 8) {
+                    setError("Password must be at least 8 characters.");
+                    return;
+                  }
+
+                  if (resetPassword !== resetConfirmPassword) {
+                    setError("Password confirmation does not match.");
+                    return;
+                  }
+
+                  await resetAdminPasswordWithRecoverySession(resetPassword);
+                  setResetOtp("");
+                  setResetPassword("");
+                  setResetConfirmPassword("");
+                  setPassword("");
+                  setOtpSent(false);
+                  setOtpCooldownUntil(0);
+                  setShowForgotPassword(false);
+                  setResetMessage("Password reset successful. Sign in with your new password.");
+                  return;
+                }
+
                 if (!otpSent) {
-                  await requestAdminPasswordOtp(resetEmail);
-                  setOtpSent(true);
-                  setResetMessage("OTP sent to your email. Enter OTP and set a new password.");
+                  await sendOtp(resetEmail);
                   return;
                 }
 
@@ -166,10 +247,16 @@ function AdminLogin() {
                 setResetConfirmPassword("");
                 setPassword("");
                 setOtpSent(false);
+                setOtpCooldownUntil(0);
                 setShowForgotPassword(false);
                 setResetMessage("Password reset successful. Sign in with your new password.");
               } catch (nextError) {
-                setError(nextError.message || "Unable to reset password.");
+                const message = nextError.message || "Unable to reset password.";
+                const waitSeconds = parseWaitSeconds(message);
+                if (waitSeconds > 0) {
+                  setOtpCooldownUntil(Date.now() + waitSeconds * 1000);
+                }
+                setError(message);
               } finally {
                 setResetLoading(false);
               }
@@ -186,20 +273,22 @@ function AdminLogin() {
               />
             </div>
 
-            {otpSent ? (
+            {otpSent || isRecoveryLinkMode ? (
               <>
-                <div className="admin-form__field">
-                  <label htmlFor="admin-reset-otp">OTP</label>
-                  <input
-                    id="admin-reset-otp"
-                    type="text"
-                    inputMode="numeric"
-                    value={resetOtp}
-                    onChange={(event) => setResetOtp(event.target.value)}
-                    placeholder="Enter email OTP"
-                    required
-                  />
-                </div>
+                {!isRecoveryLinkMode ? (
+                  <div className="admin-form__field">
+                    <label htmlFor="admin-reset-otp">OTP</label>
+                    <input
+                      id="admin-reset-otp"
+                      type="text"
+                      inputMode="numeric"
+                      value={resetOtp}
+                      onChange={(event) => setResetOtp(event.target.value)}
+                      placeholder="Enter reset OTP code"
+                      required
+                    />
+                  </div>
+                ) : null}
 
                 <div className="admin-form__field">
                   <label htmlFor="admin-reset-password">New Password</label>
@@ -253,9 +342,42 @@ function AdminLogin() {
 
             <div className="admin-form__actions">
               <Button type="submit" disabled={resetLoading}>
-                {resetLoading ? "Processing…" : otpSent ? "Verify OTP & Reset" : "Send OTP"}
+                {resetLoading ? "Processing…" : isRecoveryLinkMode ? "Set New Password" : otpSent ? "Verify OTP & Reset" : "Send OTP"}
               </Button>
+              {otpSent ? (
+                <button
+                  type="button"
+                  className="admin-link-button"
+                  disabled={resetLoading || otpSecondsLeft > 0}
+                  onClick={async () => {
+                    setResetLoading(true);
+                    setError("");
+                    setResetMessage("");
+
+                    try {
+                      await sendOtp(resetEmail);
+                    } catch (nextError) {
+                      const message = nextError.message || "Unable to send OTP.";
+                      const waitSeconds = parseWaitSeconds(message);
+                      if (waitSeconds > 0) {
+                        setOtpCooldownUntil(Date.now() + waitSeconds * 1000);
+                      }
+                      setError(message);
+                    } finally {
+                      setResetLoading(false);
+                    }
+                  }}
+                >
+                  {otpSecondsLeft > 0 ? `Resend in ${otpSecondsLeft}s` : "Resend OTP"}
+                </button>
+              ) : null}
             </div>
+
+            {isRecoveryLinkMode ? (
+              <p className="admin-meta-note">
+                Recovery link detected. You can set a new password directly from this screen.
+              </p>
+            ) : null}
           </form>
         ) : null}
       </div>
