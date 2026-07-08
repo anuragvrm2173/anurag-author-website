@@ -105,11 +105,11 @@ function AdminMessages() {
             <tbody>
               {filteredMessages.map((message) => (
                 <tr key={message.id}>
-                  <td>{message.name}</td>
-                  <td>{message.email}</td>
-                  <td>{message.message}</td>
-                  <td><span className={`admin-status-pill admin-status-pill--${message.status}`}>{message.status}</span></td>
-                  <td>
+                  <td data-label="Name">{message.name}</td>
+                  <td data-label="Email">{message.email}</td>
+                  <td data-label="Message">{message.message}</td>
+                  <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${message.status}`}>{message.status}</span></td>
+                  <td data-label="Actions">
                     <div className="admin-table__actions">
                       {createReplyLink(message) ? (
                         <a className="admin-inline-button" href={createReplyLink(message)}>

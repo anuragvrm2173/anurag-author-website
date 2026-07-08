@@ -91,12 +91,12 @@ function AdminNewsletter() {
           <tbody>
             {subscribers.map((subscriber) => (
               <tr key={subscriber.id}>
-                <td>{subscriber.email}</td>
-                <td>{subscriber.source || "—"}</td>
-                <td>{subscriber.provider || "—"}</td>
-                <td>{subscriber.subscribed_at ? new Date(subscriber.subscribed_at).toLocaleString() : "—"}</td>
-                <td><span className={`admin-status-pill admin-status-pill--${subscriber.status || "active"}`}>{subscriber.status || "active"}</span></td>
-                <td>
+                <td data-label="Email">{subscriber.email}</td>
+                <td data-label="Source">{subscriber.source || "—"}</td>
+                <td data-label="Provider">{subscriber.provider || "—"}</td>
+                <td data-label="Subscribed">{subscriber.subscribed_at ? new Date(subscriber.subscribed_at).toLocaleString() : "—"}</td>
+                <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${subscriber.status || "active"}`}>{subscriber.status || "active"}</span></td>
+                <td data-label="Actions">
                   <div className="admin-table__actions">
                     {createSubscriberReplyLink(subscriber) ? (
                       <a className="admin-inline-button" href={createSubscriberReplyLink(subscriber)}>

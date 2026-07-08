@@ -305,8 +305,8 @@ function AdminMedia() {
             <tbody>
               {pagedFiles.map((file) => (
                 <tr key={file.id}>
-                  <td>{file.source}</td>
-                  <td>
+                  <td data-label="Source">{file.source}</td>
+                  <td data-label="Preview">
                     {isImage(file) && file.publicUrl ? (
                       <a href={file.publicUrl} target="_blank" rel="noreferrer">
                         <img className="admin-media-thumb" src={file.publicUrl} alt={file.name} loading="lazy" />
@@ -315,12 +315,12 @@ function AdminMedia() {
                       <span>—</span>
                     )}
                   </td>
-                  <td>{file.name}</td>
-                  <td>{file.path}</td>
-                  <td>{file.updated_at ? new Date(file.updated_at).toLocaleString() : "—"}</td>
-                  <td>{formatSize(file.size)}</td>
-                  <td>{file.publicUrl ? <a href={file.publicUrl} target="_blank" rel="noreferrer">Open</a> : "—"}</td>
-                  <td>
+                  <td data-label="Name">{file.name}</td>
+                  <td data-label="Path">{file.path}</td>
+                  <td data-label="Updated">{file.updated_at ? new Date(file.updated_at).toLocaleString() : "—"}</td>
+                  <td data-label="Size">{formatSize(file.size)}</td>
+                  <td data-label="Public URL">{file.publicUrl ? <a href={file.publicUrl} target="_blank" rel="noreferrer">Open</a> : "—"}</td>
+                  <td data-label="Actions">
                     <div className="admin-table__actions">
                       <button type="button" className="admin-inline-button" disabled={!file.publicUrl} onClick={() => {
                         handleCopyUrl(file);

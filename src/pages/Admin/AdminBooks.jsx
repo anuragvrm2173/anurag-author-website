@@ -351,13 +351,13 @@ function AdminBooks() {
             <tbody>
               {filteredBooks.map((book) => (
                 <tr key={book.id}>
-                  <td>
+                  <td data-label="Title">
                     <strong>{book.title}</strong>
                     <div>{book.subtitle}</div>
                   </td>
-                  <td><span className={`admin-status-pill admin-status-pill--${String(book.status || "draft").toLowerCase().replace(/\s+/g, "_")}`}>{book.status}</span></td>
-                  <td>{book.language || "—"}</td>
-                  <td>
+                  <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${String(book.status || "draft").toLowerCase().replace(/\s+/g, "_")}`}>{book.status}</span></td>
+                  <td data-label="Language">{book.language || "—"}</td>
+                  <td data-label="Actions">
                     <div className="admin-table__actions">
                       <Link to={`/admin/books/${book.id}`} className="admin-link-button">Edit</Link>
                       {book.deletedAt ? (

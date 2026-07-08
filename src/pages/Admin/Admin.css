@@ -644,18 +644,75 @@
     font-size: 0.88rem;
   }
 
-  .admin-table table {
-    min-width: 560px;
+  .admin-table {
+    overflow: visible;
+    padding: 0.85rem;
   }
 
+  .admin-table table,
+  .admin-table thead,
+  .admin-table tbody,
   .admin-table th,
-  .admin-table td {
-    padding: 0.65rem 0.55rem;
-    font-size: 0.88rem;
+  .admin-table td,
+  .admin-table tr {
+    display: block;
+    width: 100%;
   }
 
-  .admin-table th {
-    letter-spacing: 0.04rem;
+  .admin-table table {
+    min-width: 0;
+  }
+
+  .admin-table thead {
+    display: none;
+  }
+
+  .admin-table tbody {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .admin-table tr {
+    padding: 0.85rem;
+    border: 1px solid rgba(17, 17, 17, 0.08);
+    border-radius: 0.95rem;
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .admin-table td {
+    display: grid;
+    gap: 0.18rem;
+    padding: 0;
+    border-bottom: 0;
+    font-size: 0.9rem;
+  }
+
+  .admin-table td + td {
+    margin-top: 0.7rem;
+  }
+
+  .admin-table td::before {
+    content: attr(data-label);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.06rem;
+    text-transform: uppercase;
+    color: rgba(43, 43, 43, 0.64);
+  }
+
+  .admin-table td > div {
+    margin-top: 0;
+  }
+
+  .admin-table__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-table__actions .admin-inline-button,
+  .admin-table__actions .admin-link-button,
+  .admin-table__actions a.admin-inline-button {
+    width: 100%;
   }
 
   .admin-hero__highlights {
@@ -668,6 +725,21 @@
 
   .admin-media-controls {
     grid-template-columns: 1fr;
+  }
+
+  .admin-grid {
+    gap: 0.85rem;
+  }
+
+  .admin-stats,
+  .admin-action-grid,
+  .admin-audit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-hero__badge strong,
+  .admin-stat__value {
+    font-size: 1.7rem;
   }
 
   .admin-media-thumb {

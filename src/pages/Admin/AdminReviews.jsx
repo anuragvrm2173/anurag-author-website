@@ -96,14 +96,14 @@ function AdminReviews() {
           <tbody>
             {filteredReviews.map((review) => (
               <tr key={review.id}>
-                <td>
+                <td data-label="Reviewer">
                   <strong>{review.reviewerName}</strong>
                   <div>{review.reviewerEmail || review.reviewerRole}</div>
                 </td>
-                <td>{review.bookId}</td>
-                <td>{review.quote}</td>
-                <td><span className={`admin-status-pill admin-status-pill--${review.status}`}>{review.status}</span></td>
-                <td>
+                <td data-label="Book">{review.bookId}</td>
+                <td data-label="Quote">{review.quote}</td>
+                <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${review.status}`}>{review.status}</span></td>
+                <td data-label="Actions">
                   <div className="admin-table__actions">
                     {getNextReviewStatus(review.status) ? (
                       <button type="button" className="admin-inline-button" onClick={async () => {

@@ -303,14 +303,14 @@ function AdminBlog() {
             <tbody>
               {filteredPosts.map((post) => (
                 <tr key={post.id}>
-                  <td>
+                  <td data-label="Title">
                     <strong>{post.title}</strong>
                     <div>{post.excerpt}</div>
                   </td>
-                  <td>{post.category}</td>
-                  <td><span className={`admin-status-pill admin-status-pill--${String(post.status || "draft").toLowerCase().replace(/\s+/g, "_")}`}>{post.status}</span></td>
-                  <td>{post.publishedAt || "—"}</td>
-                  <td>
+                  <td data-label="Category">{post.category}</td>
+                  <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${String(post.status || "draft").toLowerCase().replace(/\s+/g, "_")}`}>{post.status}</span></td>
+                  <td data-label="Published">{post.publishedAt || "—"}</td>
+                  <td data-label="Actions">
                     <div className="admin-table__actions">
                       <Link to={`/admin/blog/${post.id}`} className="admin-link-button">Edit</Link>
                       {post.deletedAt ? (
