@@ -349,7 +349,10 @@ export async function verifyAdminOtpAndResetPassword(email, otp, nextPassword) {
   }
 
   const normalizedEmail = String(email || "").trim().toLowerCase();
-  const normalizedOtp = String(otp || "").trim();
+  const normalizedOtp = String(otp || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/^['\"]+|['\"]+$/g, "");
   const normalizedPassword = String(nextPassword || "").trim();
 
   if (!normalizedEmail) {
