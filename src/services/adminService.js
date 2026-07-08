@@ -330,16 +330,56 @@ export async function requestAdminPasswordOtp(email, options = {}) {
 
   const emailRedirectTo = String(options.emailRedirectTo || "").trim();
 
-  const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, emailRedirectTo ? {
-    redirectTo: emailRedirectTo,
-  } : undefined);
+  try {
+    const { error: withRedirectError } = await supabase.auth.resetPasswordForEmail(
+      normalizedEmail,
+      emailRedirectTo
+        ? {
+            redirectTo: emailRedirectTo,
+          }
+        : undefined
+    );
 
-  if (error) {
-    const message = normalizeAuthErrorMessage(error, "Unable to send OTP.");
+    if (!withRedirectError) {
+      return;
+    }
+
+    if (emailRedirectTo) {
+      // If redirect URL is not allowlisted in Supabase Auth settings, retry without it.
+      const { error: plainError } = await supabase.auth.resetPasswordForEmail(normalizedEmail);
+      if (!plainError) {
+        return;
+      }
+
+      const plainMessage = normalizeAuthErrorMessage(plainError, "");
+      if (/rate\s*limit|security purposes|too many/i.test(plainMessage)) {
+        throw new Error("Too many OTP requests. Please wait 60 seconds and try again.");
+      }
+
+      if (plainMessage) {
+        throw new Error(plainMessage);
+      }
+    }
+
+    const message = normalizeAuthErrorMessage(withRedirectError, "");
     if (/rate\s*limit|security purposes|too many/i.test(message)) {
       throw new Error("Too many OTP requests. Please wait 60 seconds and try again.");
     }
-    throw new Error(message);
+
+    if (message) {
+      throw new Error(message);
+    }
+
+    throw new Error("Unable to send OTP. Check Supabase SMTP config and Auth URL allow list, then try again.");
+  } catch (error) {
+    const message = normalizeAuthErrorMessage(error, "");
+    if (/rate\s*limit|security purposes|too many/i.test(message)) {
+      throw new Error("Too many OTP requests. Please wait 60 seconds and try again.");
+    }
+    if (message) {
+      throw new Error(message);
+    }
+    throw new Error("Unable to send OTP. Check Supabase SMTP config and Auth URL allow list, then try again.");
   }
 }
 
