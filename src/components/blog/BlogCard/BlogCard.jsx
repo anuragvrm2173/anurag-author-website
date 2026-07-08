@@ -1,8 +1,17 @@
+import { Link } from "react-router-dom";
+
+import { getBlogPostPath, getBlogVisual } from "../../../data/blog";
 import "./BlogCard.css";
 
-function BlogCard({ post }) {
+function BlogCard({ post, showReadLink = true }) {
+	const visual = getBlogVisual(post);
+
   return (
     <article className="blog-card" aria-label={post.title}>
+      <div className="blog-card__visual" style={{ background: visual.background }} aria-hidden="true">
+        <p className="blog-card__visual-eyebrow">{visual.eyebrow}</p>
+        <p className="blog-card__visual-motif">{visual.motif}</p>
+      </div>
       <p className="blog-card__meta">
         <span>{post.category}</span>
         <span>•</span>
@@ -12,12 +21,10 @@ function BlogCard({ post }) {
       </p>
       <h3 className="blog-card__title">{post.title}</h3>
       <p className="blog-card__excerpt">{post.excerpt}</p>
-      {post.content?.length ? (
-        <div className="blog-card__content">
-          {post.content.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
+      {showReadLink ? (
+        <Link to={getBlogPostPath(post.id)} className="blog-card__link">
+          Read article
+        </Link>
       ) : null}
     </article>
   );

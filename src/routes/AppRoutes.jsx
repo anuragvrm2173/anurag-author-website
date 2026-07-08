@@ -7,6 +7,7 @@ import BookDetails from "../pages/BookDetails/BookDetails";
 import Library from "../pages/Library/Library";
 import Reviews from "../pages/Reviews/Reviews";
 import Blog from "../pages/Blog/Blog";
+import BlogPost from "../pages/BlogPost/BlogPost";
 import Contact from "../pages/Contact/Contact";
 import Search from "../pages/Search/Search";
 import Privacy from "../pages/Privacy/Privacy";
@@ -23,6 +24,7 @@ function AppRoutes() {
         <Route path="/library/:bookId" element={<BookDetails />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:postId" element={<BlogPost />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/search" element={<Search />} />
         <Route path="/privacy" element={<Privacy />} />

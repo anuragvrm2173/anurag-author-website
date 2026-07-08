@@ -1,4 +1,118 @@
+import { getBookById } from "./books";
+
+const BLOG_VISUAL_THEMES = {
+	"Author Journey": {
+		eyebrow: "Author Journal",
+		motif: "Memory, loss, and the reasons stories remain",
+		background:
+			"radial-gradient(circle at top left, rgba(234, 204, 150, 0.9), transparent 38%), linear-gradient(135deg, #23170f 0%, #5b3921 48%, #d0a96c 100%)",
+	},
+	"Behind the Book": {
+		eyebrow: "Behind the Book",
+		motif: "The chapters behind the published page",
+		background:
+			"radial-gradient(circle at top right, rgba(244, 228, 193, 0.88), transparent 36%), linear-gradient(135deg, #1f2630 0%, #48566a 45%, #c59f68 100%)",
+	},
+	Writing: {
+		eyebrow: "Writing Notes",
+		motif: "How emotion becomes language",
+		background:
+			"radial-gradient(circle at 18% 16%, rgba(217, 233, 229, 0.88), transparent 30%), linear-gradient(135deg, #16353a 0%, #2e5f67 50%, #a4c5b6 100%)",
+	},
+	Storytelling: {
+		eyebrow: "Storycraft",
+		motif: "Meaning discovered through narrative",
+		background:
+			"radial-gradient(circle at 16% 14%, rgba(255, 222, 197, 0.85), transparent 28%), linear-gradient(135deg, #3a1f18 0%, #7c4e3e 50%, #d9ab8a 100%)",
+	},
+	Healing: {
+		eyebrow: "Healing Notes",
+		motif: "Learning what it means to carry memory",
+		background:
+			"radial-gradient(circle at top left, rgba(223, 235, 210, 0.88), transparent 34%), linear-gradient(135deg, #1d2f1a 0%, #466542 52%, #b8c9a0 100%)",
+	},
+	Reflection: {
+		eyebrow: "Reflections",
+		motif: "What readers keep after the final page",
+		background:
+			"radial-gradient(circle at top, rgba(225, 216, 249, 0.82), transparent 34%), linear-gradient(135deg, #26203b 0%, #564a7d 50%, #c1b4e8 100%)",
+	},
+	Personal: {
+		eyebrow: "Personal Notes",
+		motif: "Home, family, and the first language of feeling",
+		background:
+			"radial-gradient(circle at 14% 18%, rgba(255, 231, 210, 0.88), transparent 34%), linear-gradient(135deg, #3b281d 0%, #805943 50%, #ddb490 100%)",
+	},
+	Process: {
+		eyebrow: "Writing Process",
+		motif: "From raw drafts to finished form",
+		background:
+			"radial-gradient(circle at top right, rgba(233, 241, 245, 0.88), transparent 34%), linear-gradient(135deg, #1d2930 0%, #456371 50%, #b3c8d3 100%)",
+	},
+};
+
 export const blogPosts = [
+	{
+		id: "the-story-behind-the-words",
+		title: "The Story Behind the Words",
+		excerpt:
+			"Every book begins long before the first sentence. These are the moments, losses, and lessons that became the foundation of Anurag Verma's work.",
+		readingTime: "8 min read",
+		publishedAt: "July 2026",
+		category: "Author Journey",
+		visual: {
+			motif: "Every book begins before the first sentence.",
+		},
+		relatedBookIds: ["the-last-goodbye", "the-untold-stories", "lessons-of-the-heart"],
+		contentSections: [
+			{
+				heading: "Who I Am",
+				paragraphs: [
+					"I'm Anurag Verma, an Indian author who believes that stories have the power to stay with us long after we've finished reading them.",
+					"I don't write to escape life. I write to understand it. The moments that shaped me, the people I loved, the losses I carried, and the lessons I learned have all found their way into my work.",
+					"My books are deeply personal, but they are also about the emotions we all experience: love, grief, hope, regret, healing, and the quiet courage it takes to keep moving forward.",
+					"If my words help even one reader feel understood, then they have done what they were meant to do.",
+				],
+			},
+			{
+				heading: "Why I Write",
+				paragraphs: [
+					"Writing began as a way of making sense of experiences I could not explain.",
+					"Some stories are too important to remain memories. They deserve to become words, because somewhere, someone else may be living through the same chapter.",
+					"I don't write to offer perfect advice or easy answers. I write because stories have a unique way of reaching places that advice never can.",
+					"If a reader closes one of my books feeling a little less alone, a little more hopeful, or simply understood, then every page has served its purpose.",
+				],
+			},
+			{
+				heading: "The Books",
+				paragraphs: [
+					"Every book I write builds upon the one before it.",
+					"The Last Goodbye I Never Got is where the journey begins, a deeply personal story of love, loss, and the echoes that remain long after goodbye.",
+					"The Untold Stories Behind The Last Goodbye I Never Got goes beyond the pages of that first book, revealing the experiences, emotions, and reflections that shaped its creation.",
+					"With Lessons of the Heart, those experiences grow into something larger: a collection of reflections on love, healing, resilience, and the quiet wisdom that often emerges only after life changes us.",
+					"Together, these books form a continuing journey, not separate stories, but different chapters of the same conversation.",
+				],
+			},
+			{
+				heading: "A Few Chapters of My Journey",
+				paragraphs: [
+					"2026: Published my debut book, The Last Goodbye I Never Got, transforming deeply personal experiences into a story shared with readers.",
+					"Later in 2026: Released The Untold Stories Behind The Last Goodbye I Never Got, offering a closer look at the memories, emotions, and creative journey behind the first book.",
+					"Today: Continuing to write stories that explore love, loss, healing, and the lessons that shape us, while building a body of work that grows with every new book.",
+				],
+			},
+			{
+				heading: "What's Next",
+				paragraphs: [
+					"I'm still writing.",
+					"Not because every story has been told, but because every new season of life reveals something worth understanding.",
+					"The books ahead will continue exploring the emotions that connect us all: love, loss, resilience, hope, and the quiet moments that often change us the most.",
+					"My hope is simple: to create stories that readers return to, recommend to others, and carry with them long after the final page.",
+					"Because sometimes a book does not change your life all at once. Sometimes, it simply stays with you until you're ready to change your own.",
+				],
+			},
+		],
+	},
 	{
 		id: "why-i-wrote-the-last-goodbye",
 		title: "Why I Wrote The Last Goodbye I Never Got",
@@ -160,3 +274,56 @@ export const blogPosts = [
 		],
 	},
 ];
+
+function normalizeText(value) {
+	return String(value || "")
+		.toLowerCase()
+		.replace(/[^a-z0-9\u0900-\u097f]+/g, " ")
+		.trim();
+}
+
+function getBlogCorpus(post) {
+	const sectionText = (post.contentSections || [])
+		.flatMap((section) => [section.heading, ...(section.paragraphs || [])])
+		.join(" ");
+
+	return [post.title, post.excerpt, ...(post.content || []), sectionText].join(" ");
+}
+
+export function getBlogPostById(postId) {
+	return blogPosts.find((post) => post.id === postId) || null;
+}
+
+export function getBlogPostPath(postId) {
+	return `/blog/${postId}`;
+}
+
+export function getBlogSearchText(post) {
+	return [post.title, post.excerpt, post.category, getBlogCorpus(post)].join(" ").toLowerCase();
+}
+
+export function getBlogVisual(post) {
+	const baseTheme = BLOG_VISUAL_THEMES[post.category] || {
+		eyebrow: "Essay",
+		motif: "Reflections from the writing life",
+		background:
+			"radial-gradient(circle at top left, rgba(232, 218, 190, 0.88), transparent 34%), linear-gradient(135deg, #2d241a 0%, #6a5238 52%, #d1b38b 100%)",
+	};
+
+	return {
+		...baseTheme,
+		...post.visual,
+	};
+}
+
+export function getBlogPostsByBookId(bookId) {
+	const book = getBookById(bookId);
+
+	if (!book?.relatedBlogIds?.length) {
+		return [];
+	}
+
+	return book.relatedBlogIds
+		.map((postId) => getBlogPostById(postId))
+		.filter(Boolean);
+}

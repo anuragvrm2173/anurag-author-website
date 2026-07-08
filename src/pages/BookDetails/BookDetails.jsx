@@ -3,6 +3,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { FaFacebookF, FaLink, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 
+import BlogGrid from "../../components/blog/BlogGrid/BlogGrid";
 import BookHero from "../../components/books/BookHero";
 import BookSynopsis from "../../components/books/BookSynopsis";
 import EditionSelector from "../../components/books/EditionSelector";
@@ -12,6 +13,7 @@ import ReviewForm from "../../components/forms/ReviewForm/ReviewForm";
 import BookReader from "../../components/reader/BookReader";
 import ReaderModal from "../../components/reader/ReaderModal";
 import Container from "../../components/ui/Container/Container";
+import { getBlogPostsByBookId } from "../../data/blog";
 import { sampleMap } from "../../data/samples";
 import booksData, { getBookById, getRelatedBooks } from "../../data/books";
 import { getReviewsByBookId } from "../../data/reviews";
@@ -60,6 +62,7 @@ function BookDetails() {
 
   const book = getBookById(bookId);
   const relatedBooks = book ? getRelatedBooks(book.id) : booksData.slice(0, 2);
+  const relatedBlogPosts = book ? getBlogPostsByBookId(book.id) : [];
   const editionEntries = useMemo(() => Object.entries(book?.editions || {}), [book]);
   const requestedEditionKey = useMemo(() => {
     const requested = new URLSearchParams(location.search).get("edition");
@@ -550,6 +553,18 @@ function BookDetails() {
               <ReviewForm books={booksData} defaultBookId={book.id} source="book-page" onSubmitted={refresh} />
             </section>
           )}
+
+          {relatedBlogPosts.length > 0 ? (
+        <section className="book-related-blogs" aria-labelledby="book-related-blogs-title">
+          <div className="book-related-blogs__header">
+            <p className="book-related-blogs__eyebrow">From the Blog</p>
+            <h2 id="book-related-blogs-title" className="book-related-blogs__title">
+              Stories connected to {book.title}
+            </h2>
+          </div>
+          <BlogGrid posts={relatedBlogPosts} compact={relatedBlogPosts.length === 1} />
+        </section>
+      ) : null}
 
           <RelatedBooks books={relatedBooks} />
 

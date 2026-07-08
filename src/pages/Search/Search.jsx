@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
-import { blogPosts } from "../../data/blog";
+import { blogPosts, getBlogPostPath, getBlogSearchText } from "../../data/blog";
 import books from "../../data/books";
 import siteConfig from "../../data/siteConfig";
 
@@ -99,11 +99,7 @@ function Search() {
     }
 
     return blogPosts.filter((post) => {
-      return (
-        post.title.toLowerCase().includes(normalizedQuery) ||
-        post.excerpt.toLowerCase().includes(normalizedQuery) ||
-        post.category.toLowerCase().includes(normalizedQuery)
-      );
+      return getBlogSearchText(post).includes(normalizedQuery);
     });
   }, [normalizedQuery]);
 
@@ -233,7 +229,7 @@ function Search() {
                     <p className="search-page__meta">{post.category}</p>
                     <h3>{highlightText(post.title, normalizedQuery)}</h3>
                     <p>{highlightText(post.excerpt, normalizedQuery)}</p>
-                    <Link to="/blog" className="search-page__link">
+                    <Link to={getBlogPostPath(post.id)} className="search-page__link">
                       Read in Blog
                     </Link>
                   </article>
@@ -273,7 +269,7 @@ function Search() {
                     <p className="search-page__meta">{post.category}</p>
                     <h3>{post.title}</h3>
                     <p>{post.excerpt}</p>
-                    <Link to="/blog" className="search-page__link">Read in Blog</Link>
+                    <Link to={getBlogPostPath(post.id)} className="search-page__link">Read in Blog</Link>
                   </article>
                 ))}
               </div>

@@ -2,6 +2,49 @@ import { useEffect, useMemo, useState } from "react";
 
 const READER_OPEN_DELAY = 400;
 
+function renderRichText(text) {
+  const parts = String(text).split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={`${part}-${index}`}>{part.slice(2, -2)}</strong>;
+    }
+
+    return <span key={`${part}-${index}`}>{part}</span>;
+  });
+}
+
+function renderPageBlock(block, index) {
+  switch (block.type) {
+    case "eyebrow":
+      return (
+        <p key={`${block.type}-${index}`} className="reader-page__eyebrow">
+          {renderRichText(block.text)}
+        </p>
+      );
+    case "heading":
+      return (
+        <h3 key={`${block.type}-${index}`} className="reader-page__heading">
+          {renderRichText(block.text)}
+        </h3>
+      );
+    case "subheading":
+      return (
+        <p key={`${block.type}-${index}`} className="reader-page__subheading">
+          {renderRichText(block.text)}
+        </p>
+      );
+    case "divider":
+      return <div key={`${block.type}-${index}`} className="reader-page__divider" aria-hidden="true" />;
+    default:
+      return (
+        <p key={`${block.type || "paragraph"}-${index}`} className="reader-page__content">
+          {renderRichText(block.text)}
+        </p>
+      );
+  }
+}
+
 function BookReader({ sample, onClose, buyLink }) {
   const [pageIndex, setPageIndex] = useState(0);
   const [isOpening, setIsOpening] = useState(true);
@@ -59,6 +102,7 @@ function BookReader({ sample, onClose, buyLink }) {
 
   const currentPage = pages[pageIndex];
   const isLastPage = pageIndex === pages.length - 1;
+  const pageBlocks = currentPage?.blocks || currentPage?.content?.map((text) => ({ type: "paragraph", text })) || [];
 
   const handleTouchStart = (event) => {
     setTouchStartX(event.changedTouches[0]?.clientX || null);
@@ -111,11 +155,9 @@ function BookReader({ sample, onClose, buyLink }) {
           >
             <p className="reader-page__label">{sample.previewLabel || "Sample Preview"}</p>
             <h2 className="reader-page__title">{currentPage.title}</h2>
-            {currentPage.content.map((paragraph, index) => (
-              <p key={`${currentPage.number}-${index}`} className="reader-page__content">
-                {paragraph}
-              </p>
-            ))}
+            <div className="reader-page__body">
+              {pageBlocks.map((block, index) => renderPageBlock(block, index))}
+            </div>
             {isLastPage && buyLink ? (
               <a href={buyLink} target="_blank" rel="noreferrer" className="reader-buy-cta">
                 {ui.buy}

@@ -70,6 +70,7 @@
 }
 
 .book-synopsis__eyebrow,
+.book-related-blogs__eyebrow,
 .related-books__eyebrow,
 .book-reviews__eyebrow,
 .edition-selector__legend {
@@ -86,6 +87,7 @@
 }
 
 .book-hero__title,
+.book-related-blogs__title,
 .related-books__title,
 .book-reviews__title {
   margin: 0;
@@ -500,6 +502,7 @@
 }
 
 .book-synopsis,
+.book-related-blogs,
 .related-books,
 .book-reviews,
 .book-details__missing {
@@ -548,9 +551,21 @@
   color: var(--color-text);
 }
 
+.book-related-blogs__header,
 .related-books__header,
 .book-reviews {
   margin-bottom: 1.5rem;
+}
+
+.book-related-blogs__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--color-primary);
+}
+
+.book-related-blogs :is(.blog-card) {
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(17, 17, 17, 0.08);
 }
 
 .related-books__grid,

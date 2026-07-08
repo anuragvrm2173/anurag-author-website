@@ -44,6 +44,7 @@ const books = [
     },
     sampleId: "lastGoodbye-en",
     relatedBooks: ["the-untold-stories", "lessons-of-the-heart"],
+    relatedBlogIds: ["the-story-behind-the-words", "why-i-wrote-the-last-goodbye"],
     seo: {
       title: "The Last Goodbye I Never Got | Anurag Verma",
       description:
@@ -217,6 +218,7 @@ const books = [
     purchaseLinks: {},
     sampleId: "untold-en",
     relatedBooks: ["the-last-goodbye", "lessons-of-the-heart"],
+    relatedBlogIds: ["the-story-behind-the-words", "behind-the-book-untold-stories"],
     seo: {
       title: "The Untold Stories Behind The Last Goodbye I Never Got | Anurag Verma",
       description:
@@ -365,6 +367,7 @@ const books = [
     purchaseLinks: {},
     sampleId: "lessons-en",
     relatedBooks: ["the-last-goodbye", "the-untold-stories"],
+    relatedBlogIds: ["the-story-behind-the-words", "difference-between-healing-and-moving-on", "what-readers-carry-from-stories"],
     seo: {
       title: "Lessons of the Heart | Anurag Verma",
       description:
