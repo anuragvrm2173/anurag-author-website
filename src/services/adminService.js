@@ -652,22 +652,31 @@ export async function upsertAdminSetting(id, value) {
 
 export async function listAdminMediaFiles() {
   if (!hasSupabase()) {
-    return [];
+    return {
+      files: [],
+      bucketMissing: true,
+    };
   }
 
   const { data, error } = await supabase.storage.from("media").list("", { limit: 100, offset: 0, sortBy: { column: "name", order: "asc" } });
   if (error) {
     if (error.message?.includes("Bucket not found")) {
-      return [];
+      return {
+        files: [],
+        bucketMissing: true,
+      };
     }
 
     throw error;
   }
 
-  return (data || []).map((file) => ({
-    ...file,
-    publicUrl: supabase.storage.from("media").getPublicUrl(file.name).data.publicUrl,
-  }));
+  return {
+    files: (data || []).map((file) => ({
+      ...file,
+      publicUrl: supabase.storage.from("media").getPublicUrl(file.name).data.publicUrl,
+    })),
+    bucketMissing: false,
+  };
 }
 
 export async function uploadAdminMediaFile(file, folder = "uploads") {

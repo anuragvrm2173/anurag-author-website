@@ -7,11 +7,18 @@ import { listAdminMediaFiles, uploadAdminMediaFile } from "../../services/adminS
 
 function AdminMedia() {
   const [files, setFiles] = useState([]);
+  const [bucketMissing, setBucketMissing] = useState(false);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  async function loadMedia() {
+    const { files: nextFiles, bucketMissing: isBucketMissing } = await listAdminMediaFiles();
+    setFiles(nextFiles);
+    setBucketMissing(isBucketMissing);
+  }
+
   useEffect(() => {
-    listAdminMediaFiles().then(setFiles).catch((nextError) => setError(nextError.message));
+    loadMedia().catch((nextError) => setError(nextError.message));
   }, []);
 
   return (
@@ -40,7 +47,7 @@ function AdminMedia() {
               setError("");
               try {
                 await uploadAdminMediaFile(file);
-                setFiles(await listAdminMediaFiles());
+                await loadMedia();
               } catch (nextError) {
                 setError(nextError.message);
               } finally {
@@ -53,7 +60,8 @@ function AdminMedia() {
         </div>
       </div>
 
-      {files.length === 0 ? <div className="admin-empty">No media files found. Create a `media` bucket in Supabase Storage to start uploading assets.</div> : null}
+      {bucketMissing ? <div className="admin-empty">Media bucket is missing. Create a `media` bucket in Supabase Storage, then refresh this page.</div> : null}
+      {!bucketMissing && files.length === 0 ? <div className="admin-empty">No media files found yet. Upload your first image to start populating the media library.</div> : null}
 
       {files.length > 0 ? (
         <div className="admin-table">

@@ -51,16 +51,18 @@ export async function submitContactMessage(payload) {
     try {
       await submitToSupabase(payload);
       return;
-    } catch (error) {
-      if (!CONTACT_ENDPOINT) {
-        throw error;
-      }
+    } catch {
+      // Continue to endpoint/local fallback when Supabase is unavailable or table is not ready.
     }
   }
 
   if (CONTACT_ENDPOINT) {
-    await submitToEndpoint(payload);
-    return;
+    try {
+      await submitToEndpoint(payload);
+      return;
+    } catch {
+      // Continue to local fallback when endpoint is temporarily unavailable.
+    }
   }
 
   storeMessageLocally(payload);

@@ -136,8 +136,15 @@ async function syncWithExternalProvider(email, source) {
 }
 
 export async function subscribeToNewsletter(email, source) {
+  let storedInSupabase = false;
+
   if (hasSupabase()) {
-    await storeSignupInSupabase(email, source);
+    try {
+      await storeSignupInSupabase(email, source);
+      storedInSupabase = true;
+    } catch {
+      // Continue with provider/local fallback when Supabase table is missing or unavailable.
+    }
 
     try {
       await syncWithExternalProvider(email, source);
@@ -145,12 +152,18 @@ export async function subscribeToNewsletter(email, source) {
       console.error("Newsletter provider sync failed", error);
     }
 
-    return;
+    if (storedInSupabase) {
+      return;
+    }
   }
 
-  const synced = await syncWithExternalProvider(email, source);
-  if (synced) {
-    return;
+  try {
+    const synced = await syncWithExternalProvider(email, source);
+    if (synced) {
+      return;
+    }
+  } catch (error) {
+    console.error("Newsletter fallback provider sync failed", error);
   }
 
   storeSignupLocally(email, source);
