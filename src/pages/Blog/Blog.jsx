@@ -6,10 +6,12 @@ import BlogGrid from "../../components/blog/BlogGrid/BlogGrid";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
-import { blogPosts } from "../../data/blog";
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
+import usePublicContent from "../../hooks/usePublicContent";
 
 function Blog() {
+  const { blogPosts } = usePublicContent({ includeBooks: false, includeBlogPosts: true });
+  const { siteConfig } = useSiteSettings();
   const [featuredArticle, ...latestArticles] = blogPosts;
   const categoryMap = blogPosts.reduce((acc, post) => {
     if (!acc[post.category]) {

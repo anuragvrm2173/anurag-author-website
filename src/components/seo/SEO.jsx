@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
 
 function SEO({
   title,
@@ -10,6 +10,7 @@ function SEO({
   structuredData,
   noindex = false,
 }) {
+  const { siteConfig } = useSiteSettings();
   const resolvedTitle = title || siteConfig.defaultTitle;
   const resolvedDescription = description || siteConfig.defaultDescription;
   const resolvedUrl = canonicalUrl || siteConfig.url;

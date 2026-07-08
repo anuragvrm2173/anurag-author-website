@@ -1,0 +1,217 @@
+import "./Admin.css";
+
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
+import Button from "../../components/ui/Button/Button";
+import { deleteAdminBook, fetchAdminBooks, getDefaultBookForm, upsertAdminBook } from "../../services/adminService";
+
+function buildBookForm(book) {
+  if (!book) {
+    return getDefaultBookForm();
+  }
+
+  return {
+    ...getDefaultBookForm(),
+    id: book.id || "",
+    slug: book.slug || "",
+    title: book.title || "",
+    subtitle: book.subtitle || "",
+    shortDescription: book.shortDescription || "",
+    longDescription: book.longDescription || "",
+    description: book.description || "",
+    genres: (book.genres || []).join("\n"),
+    themes: (book.themes || []).join("\n"),
+    status: String(book.status || "Draft").toLowerCase().replace(/\s+/g, "_"),
+    publicationDate: book.publicationDate || "",
+    pages: book.pages || "",
+    language: book.language || "",
+    isbn: book.isbn || "",
+    publisher: book.publisher || "",
+    readingTime: book.readingTime || "",
+    synopsis: (book.synopsis || []).join("\n"),
+    discoveries: (book.discoveries || []).join("\n"),
+    whoThisBookIsFor: (book.whoThisBookIsFor || []).join("\n"),
+    favoriteQuotes: (book.favoriteQuotes || []).join("\n"),
+    relatedBooks: (book.relatedBooks || []).join("\n"),
+    relatedBlogIds: (book.relatedBlogIds || []).join("\n"),
+    formatsJson: JSON.stringify(book.formats || {}, null, 2),
+    purchaseLinksJson: JSON.stringify(book.purchaseLinks || {}, null, 2),
+    seoJson: JSON.stringify(book.seo || {}, null, 2),
+    editionsJson: JSON.stringify(book.editions || {}, null, 2),
+  };
+}
+
+function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }) {
+  const navigate = useNavigate();
+  const [form, setForm] = useState(initialForm);
+  const [saving, setSaving] = useState(false);
+
+  return (
+    <form
+      className="admin-form"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        setSaving(true);
+        onError("");
+        try {
+          await upsertAdminBook(form);
+          await onSaved(form);
+          navigate(`/admin/books/${form.id || form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+        } catch (nextError) {
+          onError(nextError.message);
+        } finally {
+          setSaving(false);
+        }
+      }}
+    >
+      <div>
+        <p className="admin-page__eyebrow">Editor</p>
+        <h2 className="admin-page__title" style={{ fontSize: "2rem" }}>{selectedBook ? "Edit Book" : "Create Book"}</h2>
+      </div>
+
+      <div className="admin-form__grid">
+        {[
+          ["id", "ID"],
+          ["slug", "Slug"],
+          ["title", "Title"],
+          ["subtitle", "Subtitle"],
+          ["shortDescription", "Short Description", true],
+          ["longDescription", "Long Description", true],
+          ["description", "SEO Description", true],
+          ["genres", "Genres (one per line)", true],
+          ["themes", "Themes (one per line)", true],
+          ["publicationDate", "Publication Date"],
+          ["pages", "Pages"],
+          ["language", "Language"],
+          ["isbn", "ISBN"],
+          ["publisher", "Publisher"],
+          ["readingTime", "Reading Time"],
+          ["relatedBooks", "Related Books IDs", true],
+          ["relatedBlogIds", "Related Blog IDs", true],
+          ["synopsis", "Synopsis (one per line)", true],
+          ["discoveries", "Discoveries (one per line)", true],
+          ["whoThisBookIsFor", "Who This Book Is For", true],
+          ["favoriteQuotes", "Favorite Quotes", true],
+          ["formatsJson", "Formats JSON", true],
+          ["purchaseLinksJson", "Purchase Links JSON", true],
+          ["seoJson", "SEO JSON", true],
+          ["editionsJson", "Editions JSON", true],
+        ].map(([key, label, isFull]) => (
+          <div key={key} className={`admin-form__field ${isFull ? "admin-form__field--full" : ""}`.trim()}>
+            <label htmlFor={`book-${key}`}>{label}</label>
+            {String(key).endsWith("Json") || ["shortDescription", "longDescription", "description", "genres", "themes", "relatedBooks", "relatedBlogIds", "synopsis", "discoveries", "whoThisBookIsFor", "favoriteQuotes"].includes(key)
+              ? <textarea id={`book-${key}`} value={form[key]} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} />
+              : <input id={`book-${key}`} value={form[key]} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} />}
+          </div>
+        ))}
+        <div className="admin-form__field">
+          <label htmlFor="book-status">Status</label>
+          <select id="book-status" value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}>
+            <option value="published">Published</option>
+            <option value="coming_soon">Coming Soon</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="admin-form__actions">
+        <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save Book"}</Button>
+        <Button type="button" variant="outline" onClick={onReset}>Reset</Button>
+      </div>
+    </form>
+  );
+}
+
+function AdminBooks() {
+  const navigate = useNavigate();
+  const { bookId } = useParams();
+  const isCreating = window.location.pathname.endsWith("/new");
+  const [books, setBooks] = useState([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchAdminBooks().then(setBooks).catch((nextError) => setError(nextError.message));
+  }, []);
+
+  const selectedBook = useMemo(() => books.find((item) => item.id === bookId || item.slug === bookId) || null, [bookId, books]);
+  const initialForm = useMemo(() => buildBookForm(selectedBook), [selectedBook]);
+  const formKey = isCreating ? "book-new" : selectedBook?.id || bookId || "book-default";
+
+  return (
+    <section className="admin-page">
+      <header className="admin-page__header">
+        <div>
+          <p className="admin-page__eyebrow">Books</p>
+          <h1 className="admin-page__title">Manage books and editions</h1>
+          <p className="admin-page__description">Create, update, and archive titles without editing source files.</p>
+        </div>
+        <Link to="/admin/books/new" className="admin-link-button">Create Book</Link>
+      </header>
+
+      {error ? <p className="admin-auth__error">{error}</p> : null}
+
+      <div className="admin-grid">
+        <div className="admin-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Language</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {books.map((book) => (
+                <tr key={book.id}>
+                  <td>
+                    <strong>{book.title}</strong>
+                    <div>{book.subtitle}</div>
+                  </td>
+                  <td><span className={`admin-status-pill admin-status-pill--${String(book.status || "draft").toLowerCase().replace(/\s+/g, "_")}`}>{book.status}</span></td>
+                  <td>{book.language || "—"}</td>
+                  <td>
+                    <div className="admin-table__actions">
+                      <Link to={`/admin/books/${book.id}`} className="admin-link-button">Edit</Link>
+                      <button
+                        type="button"
+                        className="admin-inline-button admin-inline-button--danger"
+                        onClick={async () => {
+                          if (!window.confirm(`Delete ${book.title}?`)) {
+                            return;
+                          }
+
+                          await deleteAdminBook(book.id);
+                          setBooks((current) => current.filter((item) => item.id !== book.id));
+                          if (bookId === book.id) {
+                            navigate("/admin/books");
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <BookEditorForm
+          key={formKey}
+          initialForm={initialForm}
+          selectedBook={selectedBook}
+          onError={setError}
+          onSaved={async () => {
+            setBooks(await fetchAdminBooks());
+          }}
+          onReset={() => navigate("/admin/books")}
+        />
+      </div>
+    </section>
+  );
+}
+
+export default AdminBooks;

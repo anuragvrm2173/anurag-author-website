@@ -7,9 +7,9 @@ import { Link } from "react-router-dom";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
-import { blogPosts, getBlogPostPath, getBlogSearchText } from "../../data/blog";
-import books from "../../data/books";
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
+import { getBlogPostPath, getBlogSearchText } from "../../data/blog";
+import usePublicContent from "../../hooks/usePublicContent";
 
 const RECENT_SEARCHES_KEY = "recent_searches";
 
@@ -30,6 +30,8 @@ function highlightText(text, query) {
 }
 
 function Search() {
+  const { books, blogPosts } = usePublicContent({ includeBooks: true, includeBlogPosts: true });
+  const { siteConfig } = useSiteSettings();
   const [query, setQuery] = useState("");
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [recentSearches, setRecentSearches] = useState(() => {
@@ -86,12 +88,12 @@ function Search() {
     return books.filter((book) => {
       return (
         book.title.toLowerCase().includes(normalizedQuery) ||
-        book.subtitle.toLowerCase().includes(normalizedQuery) ||
-        book.themes.join(" ").toLowerCase().includes(normalizedQuery) ||
-        book.genres.join(" ").toLowerCase().includes(normalizedQuery)
+        String(book.subtitle || "").toLowerCase().includes(normalizedQuery) ||
+        (book.themes || []).join(" ").toLowerCase().includes(normalizedQuery) ||
+        (book.genres || []).join(" ").toLowerCase().includes(normalizedQuery)
       );
     });
-  }, [normalizedQuery]);
+  }, [books, normalizedQuery]);
 
   const filteredPosts = useMemo(() => {
     if (!normalizedQuery) {
@@ -101,7 +103,7 @@ function Search() {
     return blogPosts.filter((post) => {
       return getBlogSearchText(post).includes(normalizedQuery);
     });
-  }, [normalizedQuery]);
+  }, [blogPosts, normalizedQuery]);
 
   const recentBooks = books.slice(0, 3);
   const recentBlogs = blogPosts.slice(0, 3);

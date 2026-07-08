@@ -10,21 +10,22 @@ import Timeline from "../../sections/Timeline/Timeline";
 import Reviews from "../../sections/Reviews/Reviews";
 import Newsletter from "../../sections/Newsletter/Newsletter";
 import SEO from "../../components/seo/SEO";
-import siteConfig from "../../data/siteConfig";
-
-const websiteStructuredData = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: siteConfig.siteName,
-  url: siteConfig.url,
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${siteConfig.url}/search?q={search_term_string}`,
-    "query-input": "required name=search_term_string",
-  },
-};
+import useSiteSettings from "../../hooks/useSiteSettings";
 
 function Home() {
+  const { siteConfig } = useSiteSettings();
+  const websiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.siteName,
+    url: siteConfig.url,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteConfig.url}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <HelmetProvider>
       <SEO

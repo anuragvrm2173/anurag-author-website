@@ -8,10 +8,10 @@ import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
 import authorImage from "../../assets/images/author/author.jpg";
-import siteConfig from "../../data/siteConfig";
-import socialLinks from "../../data/socialLinks";
+import useSiteSettings from "../../hooks/useSiteSettings";
 
 function Contact() {
+  const { siteConfig, socialLinks } = useSiteSettings();
   const contactChannels = socialLinks.filter((link) => link.active !== false);
   const inquiries = ["Media", "Collaborations", "Speaking", "General Questions"];
   const channelMeta = {

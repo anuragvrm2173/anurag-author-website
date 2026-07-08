@@ -13,12 +13,12 @@ import ReviewForm from "../../components/forms/ReviewForm/ReviewForm";
 import BookReader from "../../components/reader/BookReader";
 import ReaderModal from "../../components/reader/ReaderModal";
 import Container from "../../components/ui/Container/Container";
-import { getBlogPostsByBookId } from "../../data/blog";
+import useSiteSettings from "../../hooks/useSiteSettings";
 import { sampleMap } from "../../data/samples";
-import booksData, { getBookById, getRelatedBooks } from "../../data/books";
 import { getReviewsByBookId } from "../../data/reviews";
+import usePublicContent from "../../hooks/usePublicContent";
+import { getBlogPostsByBookIdFromList, getBookByIdFromList, getFallbackBooks, getRelatedBooksFromList } from "../../services/publicContentService";
 import useApprovedReviews from "../../hooks/useApprovedReviews";
-import siteConfig from "../../data/siteConfig";
 
 import "./BookDetails.css";
 
@@ -59,10 +59,13 @@ function BookDetails() {
   const [isCoverZoomed, setIsCoverZoomed] = useState(false);
   const closeButtonRef = useRef(null);
   const { reviews, refresh } = useApprovedReviews();
+  const { books, blogPosts, loading } = usePublicContent({ includeBooks: true, includeBlogPosts: true });
+  const { siteConfig } = useSiteSettings();
 
-  const book = getBookById(bookId);
-  const relatedBooks = book ? getRelatedBooks(book.id) : booksData.slice(0, 2);
-  const relatedBlogPosts = book ? getBlogPostsByBookId(book.id) : [];
+  const book = getBookByIdFromList(books, bookId);
+  const fallbackBooks = getFallbackBooks();
+  const relatedBooks = book ? getRelatedBooksFromList(books, book.id) : fallbackBooks.slice(0, 2);
+  const relatedBlogPosts = book ? getBlogPostsByBookIdFromList(blogPosts, books, book.id) : [];
   const editionEntries = useMemo(() => Object.entries(book?.editions || {}), [book]);
   const requestedEditionKey = useMemo(() => {
     const requested = new URLSearchParams(location.search).get("edition");
@@ -102,6 +105,25 @@ function BookDetails() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isCoverOpen]);
+
+  if (!book && loading) {
+    return (
+      <HelmetProvider>
+        <Helmet>
+          <title>Loading Book | Anurag Verma</title>
+          <meta name="robots" content="noindex" />
+        </Helmet>
+
+        <section className="book-details book-details--not-found">
+          <Container>
+            <div className="book-details__missing">
+              <h1>Loading book…</h1>
+            </div>
+          </Container>
+        </section>
+      </HelmetProvider>
+    );
+  }
 
   if (!book) {
     return (
@@ -536,7 +558,7 @@ function BookDetails() {
                 {isHindi ? "अपनी समीक्षा साझा करें" : "Share Your Review"}
               </Link>
 
-              <ReviewForm books={booksData} defaultBookId={book.id} source="book-page" onSubmitted={refresh} />
+              <ReviewForm books={books} defaultBookId={book.id} source="book-page" onSubmitted={refresh} />
             </section>
           ) : (
             <section className="book-reviews" aria-labelledby="book-reviews-title">
@@ -550,7 +572,7 @@ function BookDetails() {
                 {isHindi ? "पहली समीक्षा लिखें" : "Write the First Review"}
               </Link>
 
-              <ReviewForm books={booksData} defaultBookId={book.id} source="book-page" onSubmitted={refresh} />
+              <ReviewForm books={books} defaultBookId={book.id} source="book-page" onSubmitted={refresh} />
             </section>
           )}
 

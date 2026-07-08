@@ -7,10 +7,13 @@ import BookCoverArt from "../../components/books/BookCoverArt";
 import UpcomingBookCover from "../../components/books/UpcomingBookCover";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import Container from "../../components/ui/Container/Container";
-import books from "../../data/books";
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
+import usePublicContent from "../../hooks/usePublicContent";
 
 function Library() {
+  const { books } = usePublicContent({ includeBooks: true, includeBlogPosts: false });
+  const { siteConfig } = useSiteSettings();
+
   return (
     <HelmetProvider>
       <Helmet>

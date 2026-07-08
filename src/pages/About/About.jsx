@@ -7,8 +7,7 @@ import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
 import authorImage from "../../assets/images/author/author.jpg";
-import siteConfig from "../../data/siteConfig";
-import socialLinks from "../../data/socialLinks";
+import useSiteSettings from "../../hooks/useSiteSettings";
 import Newsletter from "../../sections/Newsletter/Newsletter";
 import Timeline from "../../sections/Timeline/Timeline";
 
@@ -44,22 +43,23 @@ const readerConnectionParagraphs = [
   "It's to leave you with something you'll carry long after you've turned the final page.",
 ];
 
-const personStructuredData = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Anurag Verma",
-  jobTitle: "Author",
-  nationality: "Indian",
-  description:
-    "Anurag Verma is an Indian author whose books explore love, loss, healing, and personal growth through deeply human stories.",
-  homeLocation: {
-    "@type": "Country",
-    name: "India",
-  },
-  sameAs: socialLinks.filter((link) => link.active !== false).map((link) => link.url),
-};
-
 function About() {
+  const { siteConfig, socialLinks } = useSiteSettings();
+  const personStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Anurag Verma",
+    jobTitle: "Author",
+    nationality: "Indian",
+    description:
+      "Anurag Verma is an Indian author whose books explore love, loss, healing, and personal growth through deeply human stories.",
+    homeLocation: {
+      "@type": "Country",
+      name: "India",
+    },
+    sameAs: socialLinks.filter((link) => link.active !== false).map((link) => link.url),
+  };
+
   return (
     <HelmetProvider>
       <SEO

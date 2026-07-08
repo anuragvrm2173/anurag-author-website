@@ -8,13 +8,15 @@ import ReviewCard from "../../components/reviews/ReviewCard/ReviewCard";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
-import books from "../../data/books";
+import useSiteSettings from "../../hooks/useSiteSettings";
 import { getFeaturedReviews, getReviewGroupsByBook } from "../../data/reviews";
 import useApprovedReviews from "../../hooks/useApprovedReviews";
-import siteConfig from "../../data/siteConfig";
+import usePublicContent from "../../hooks/usePublicContent";
 
 function Reviews() {
   const { reviews, refresh } = useApprovedReviews();
+  const { books } = usePublicContent({ includeBooks: true, includeBlogPosts: false });
+  const { siteConfig } = useSiteSettings();
   const [sortBy, setSortBy] = useState("newest");
   const sortedReviews = useMemo(() => {
     const sorted = [...reviews];

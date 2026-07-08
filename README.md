@@ -75,8 +75,14 @@ Each book in `src/data/books.js` follows a complete launch schema:
 - Edition-specific sample previews
 
 ## Contact
-- Form submission to FormSubmit endpoint
+- Supabase-backed message storage when configured
+- FormSubmit endpoint fallback when Supabase is unavailable
 - Success and error feedback states
+
+## Admin
+- Protected `/admin` route tree for dashboard, books, blog, reviews, messages, newsletter, media, and settings
+- Supabase Auth session-based access
+- `admin_users` role table controls admin/editor access
 
 ## Run
 ```bash
@@ -89,6 +95,39 @@ npm run dev
 npm run build
 ```
 
+## Seed Content
+Generate SQL to seed the current JS books, blog content, site config, and social links into Supabase:
+
+```bash
+npm run seed:content
+```
+
+This writes [supabase/seed-content.sql](/workspaces/anurag-author-website/supabase/seed-content.sql).
+
+## Supabase Bootstrap
+Recommended order:
+
+```bash
+npm run seed:content
+```
+
+1. Run [supabase/schema.sql](/workspaces/anurag-author-website/supabase/schema.sql) in Supabase SQL Editor.
+2. Run [supabase/seed-content.sql](/workspaces/anurag-author-website/supabase/seed-content.sql).
+3. Create a `media` storage bucket.
+4. Add your admin auth user to `public.admin_users`.
+
+Example admin insert after the user exists in `auth.users`:
+
+```sql
+insert into public.admin_users (id, email, role)
+select id, email, 'admin'
+from auth.users
+where email = 'Vanuragverma2173@gmail.com'
+on conflict (id) do update set
+  email = excluded.email,
+  role = excluded.role;
+```
+
 ## Environment
 Copy `.env.example` to `.env.local` and fill in the values needed for production.
 
@@ -96,6 +135,7 @@ Core values:
 - `VITE_SITE_URL`
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
+- `VITE_ADMIN_ALLOWED_EMAIL`
 - `VITE_CONTACT_FORM_ENDPOINT`
 - newsletter provider env vars for your chosen provider
 - `VITE_GOOGLE_SITE_VERIFICATION`

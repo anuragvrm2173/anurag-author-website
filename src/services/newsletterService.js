@@ -1,3 +1,5 @@
+import { hasSupabase, supabase } from "./supabaseClient";
+
 const PROVIDER = (import.meta.env.VITE_NEWSLETTER_PROVIDER || "").toLowerCase();
 const PROXY_ENDPOINT = import.meta.env.VITE_NEWSLETTER_PROXY_ENDPOINT;
 
@@ -87,28 +89,67 @@ async function subscribeBrevo(email, source) {
 
 function storeSignupLocally(email, source) {
   const list = JSON.parse(window.localStorage.getItem("newsletter_signups") || "[]");
-  list.push({ email, source, signupDate: new Date().toISOString() });
+  list.push({ email, source, provider: PROVIDER || "local", signupDate: new Date().toISOString() });
   window.localStorage.setItem("newsletter_signups", JSON.stringify(list));
 }
 
-export async function subscribeToNewsletter(email, source) {
+async function storeSignupInSupabase(email, source) {
+  const { error } = await supabase.from("newsletter_subscribers").upsert([
+    {
+      email,
+      source,
+      provider: PROVIDER || (PROXY_ENDPOINT ? "proxy" : "supabase"),
+      subscribed_at: new Date().toISOString(),
+      status: "active",
+    },
+  ], {
+    onConflict: "email",
+  });
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function syncWithExternalProvider(email, source) {
   if (PROXY_ENDPOINT) {
     await subscribeThroughProxy(email, source);
-    return;
+    return true;
   }
 
   if (PROVIDER === "convertkit") {
     await subscribeConvertKit(email, source);
-    return;
+    return true;
   }
 
   if (PROVIDER === "mailerlite") {
     await subscribeMailerLite(email, source);
-    return;
+    return true;
   }
 
   if (PROVIDER === "brevo") {
     await subscribeBrevo(email, source);
+    return true;
+  }
+
+  return false;
+}
+
+export async function subscribeToNewsletter(email, source) {
+  if (hasSupabase()) {
+    await storeSignupInSupabase(email, source);
+
+    try {
+      await syncWithExternalProvider(email, source);
+    } catch (error) {
+      console.error("Newsletter provider sync failed", error);
+    }
+
+    return;
+  }
+
+  const synced = await syncWithExternalProvider(email, source);
+  if (synced) {
     return;
   }
 

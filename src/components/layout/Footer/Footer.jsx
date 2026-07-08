@@ -1,7 +1,7 @@
 import "./Footer.css";
 
 import { Link } from "react-router-dom";
-import socialLinks from "../../../data/socialLinks";
+import useSiteSettings from "../../../hooks/useSiteSettings";
 
 const pages = [
   { label: "Books", path: "/library" },
@@ -11,9 +11,10 @@ const pages = [
   { label: "Contact", path: "/contact" },
 ];
 
-const social = socialLinks.filter((item) => item.active !== false);
-
 function Footer() {
+  const { socialLinks } = useSiteSettings();
+  const social = socialLinks.filter((item) => item.active !== false);
+
   return (
     <footer className="footer">
       <div className="footer__container">

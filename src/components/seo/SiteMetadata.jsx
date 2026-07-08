@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
 
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
 
 function SiteMetadata() {
   const location = useLocation();
+  const { siteConfig } = useSiteSettings();
   const googleVerification = import.meta.env.VITE_GOOGLE_SITE_VERIFICATION;
   const bingVerification = import.meta.env.VITE_BING_SITE_VERIFICATION;
   const gaMeasurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;

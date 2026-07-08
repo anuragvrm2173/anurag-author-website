@@ -5,13 +5,31 @@ import { Link, useParams } from "react-router-dom";
 
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
-import { getBlogPostById, getBlogPostPath, getBlogVisual } from "../../data/blog";
-import { getBookById } from "../../data/books";
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
+import { getBlogPostPath, getBlogVisual } from "../../data/blog";
+import usePublicContent from "../../hooks/usePublicContent";
+import { getBlogPostByIdFromList, getBookByIdFromList } from "../../services/publicContentService";
 
 function BlogPost() {
 	const { postId } = useParams();
-	const post = getBlogPostById(postId);
+	const { books, blogPosts, loading } = usePublicContent({ includeBooks: true, includeBlogPosts: true });
+	const { siteConfig } = useSiteSettings();
+	const post = getBlogPostByIdFromList(blogPosts, postId);
+
+	if (!post && loading) {
+		return (
+			<HelmetProvider>
+				<main className="blog-post-page">
+					<Container>
+						<section className="blog-post-page__missing">
+							<p className="blog-post-page__eyebrow">Blog</p>
+							<h1 className="blog-post-page__title">Loading article…</h1>
+						</section>
+					</Container>
+				</main>
+			</HelmetProvider>
+		);
+	}
 
 	if (!post) {
 		return (
@@ -38,7 +56,7 @@ function BlogPost() {
 
 	const visual = getBlogVisual(post);
 	const contentSections = post.contentSections || [];
-	const relatedBooks = (post.relatedBookIds || []).map((bookId) => getBookById(bookId)).filter(Boolean);
+	const relatedBooks = (post.relatedBookIds || []).map((bookId) => getBookByIdFromList(books, bookId)).filter(Boolean);
 	const structuredData = {
 		"@context": "https://schema.org",
 		"@type": "BlogPosting",

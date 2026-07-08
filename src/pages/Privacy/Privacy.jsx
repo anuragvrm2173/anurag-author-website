@@ -5,9 +5,11 @@ import { HelmetProvider } from "react-helmet-async";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
 
 function Privacy() {
+  const { siteConfig } = useSiteSettings();
+
   return (
     <HelmetProvider>
       <SEO

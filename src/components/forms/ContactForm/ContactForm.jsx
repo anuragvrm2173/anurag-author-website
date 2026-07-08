@@ -1,9 +1,8 @@
 import { useState } from "react";
 
+import { submitContactMessage } from "../../../services/contactService";
 import Button from "../../ui/Button/Button";
 import "./ContactForm.css";
-
-const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
 
 function ContactForm() {
   const [status, setStatus] = useState("idle");
@@ -17,23 +16,10 @@ function ContactForm() {
       name: formData.get("name"),
       email: formData.get("email"),
       message: formData.get("message"),
-      _subject: "Contact Form Submission",
     };
 
     try {
-      const response = await fetch(CONTACT_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error("Submission failed");
-      }
-
+      await submitContactMessage(payload);
       event.currentTarget.reset();
       setStatus("success");
     } catch {

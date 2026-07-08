@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import authorImage from "../../assets/images/author/author.jpg";
-import books from "../../data/books";
+import usePublicContent from "../../hooks/usePublicContent";
 
 const EDITION_OPTIMIZED_BASE = {
   en: "/images/optimized/books/(eng)lgb",
@@ -19,7 +19,12 @@ function buildSrcSet(base, format) {
 }
 
 function HeroBook() {
+  const { books } = usePublicContent({ includeBooks: true, includeBlogPosts: false });
   const featuredBook = books[0];
+  if (!featuredBook) {
+    return null;
+  }
+
   const englishEdition = featuredBook.editions?.english;
   const hindiEdition = featuredBook.editions?.hindi;
   const editionRouteByLanguage = {

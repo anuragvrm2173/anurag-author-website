@@ -5,9 +5,10 @@ import { Link } from "react-router-dom";
 import BookCoverArt from "../../components/books/BookCoverArt";
 import UpcomingBookCover from "../../components/books/UpcomingBookCover";
 import Container from "../../components/ui/Container/Container";
-import books from "../../data/books";
+import usePublicContent from "../../hooks/usePublicContent";
 
 function FeaturedBooks() {
+  const { books } = usePublicContent({ includeBooks: true, includeBlogPosts: false });
   const publishedBook = books.find((book) => book.id === "the-last-goodbye");
   const untoldBook = books.find((book) => book.id === "the-untold-stories");
   const lessonsBook = books.find((book) => book.id === "lessons-of-the-heart");

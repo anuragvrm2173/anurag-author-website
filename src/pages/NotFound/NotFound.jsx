@@ -5,9 +5,11 @@ import { Link } from "react-router-dom";
 
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
-import siteConfig from "../../data/siteConfig";
+import useSiteSettings from "../../hooks/useSiteSettings";
 
 function NotFound() {
+  const { siteConfig } = useSiteSettings();
+
   return (
     <HelmetProvider>
       <SEO
