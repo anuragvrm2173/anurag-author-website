@@ -13,7 +13,8 @@ function Newsletter({ source = "Homepage" }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const formData = new FormData(formElement);
     const email = String(formData.get("email") || "").trim();
     if (!email) {
       return;
@@ -23,7 +24,7 @@ function Newsletter({ source = "Homepage" }) {
     setStatusMessage("");
     try {
       const result = await subscribeToNewsletter(email, source);
-      event.currentTarget.reset();
+      formElement.reset();
       setStatus("success");
       if (result.delivered) {
         setStatusMessage("You are subscribed successfully. Welcome.");

@@ -1,4 +1,5 @@
 import { reviews as localReviews } from "../data/reviews";
+import { notifyReviewSubmission } from "./notificationsService";
 import { hasSupabase, supabase } from "./supabaseClient";
 
 function normalizeReview(row) {
@@ -55,6 +56,7 @@ export async function submitPendingReview(payload) {
     const queued = JSON.parse(window.localStorage.getItem("pending_reviews") || "[]");
     queued.push({ ...row, created_at: new Date().toISOString() });
     window.localStorage.setItem("pending_reviews", JSON.stringify(queued));
+    await notifyReviewSubmission(row, true);
     return { queued: true };
   }
 
@@ -64,11 +66,14 @@ export async function submitPendingReview(payload) {
       throw error;
     }
 
+    await notifyReviewSubmission(row, false);
+
     return { queued: false };
   } catch {
     const queued = JSON.parse(window.localStorage.getItem("pending_reviews") || "[]");
     queued.push({ ...row, created_at: new Date().toISOString() });
     window.localStorage.setItem("pending_reviews", JSON.stringify(queued));
+    await notifyReviewSubmission(row, true);
     return { queued: true };
   }
 }

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { notifyBuyLinkClick } from "../../services/notificationsService";
+
 const READER_OPEN_DELAY = 400;
 
 function renderRichText(text) {
@@ -159,7 +161,21 @@ function BookReader({ sample, onClose, buyLink }) {
               {pageBlocks.map((block, index) => renderPageBlock(block, index))}
             </div>
             {isLastPage && buyLink ? (
-              <a href={buyLink} target="_blank" rel="noreferrer" className="reader-buy-cta">
+              <a
+                href={buyLink}
+                target="_blank"
+                rel="noreferrer"
+                className="reader-buy-cta"
+                onClick={() => {
+                  notifyBuyLinkClick({
+                    bookTitle: sample?.title,
+                    editionLabel: sample?.language || sample?.previewLabel,
+                    retailer: "Primary Buy Link",
+                    url: buyLink,
+                    source: "reader-cta",
+                  });
+                }}
+              >
                 {ui.buy}
               </a>
             ) : null}

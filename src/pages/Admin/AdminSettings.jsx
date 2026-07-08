@@ -10,7 +10,8 @@ function AdminSettings() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [passwordState, setPasswordState] = useState({ nextPassword: "", confirmPassword: "" });
+  const [passwordState, setPasswordState] = useState({ currentPassword: "", nextPassword: "", confirmPassword: "" });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
@@ -54,6 +55,12 @@ function AdminSettings() {
             setPasswordMessage("");
             setError("");
 
+            if (!passwordState.currentPassword) {
+              setError("Current password is required.");
+              setPasswordSaving(false);
+              return;
+            }
+
             if (passwordState.nextPassword.length < 8) {
               setError("Password must be at least 8 characters.");
               setPasswordSaving(false);
@@ -67,8 +74,8 @@ function AdminSettings() {
             }
 
             try {
-              await changeAdminPassword(passwordState.nextPassword);
-              setPasswordState({ nextPassword: "", confirmPassword: "" });
+              await changeAdminPassword(passwordState.currentPassword, passwordState.nextPassword);
+              setPasswordState({ currentPassword: "", nextPassword: "", confirmPassword: "" });
               setPasswordMessage("Password changed successfully.");
             } catch (nextError) {
               setError(nextError.message || "Could not change password.");
@@ -78,6 +85,27 @@ function AdminSettings() {
           }}
         >
           <div className="admin-form__grid">
+            <div className="admin-form__field">
+              <label htmlFor="settings-current-password">Current Password</label>
+              <div className="admin-password-field">
+                <input
+                  id="settings-current-password"
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={passwordState.currentPassword}
+                  onChange={(event) => setPasswordState((current) => ({ ...current, currentPassword: event.target.value }))}
+                  required
+                />
+                <button
+                  type="button"
+                  className="admin-password-toggle"
+                  onClick={() => setShowCurrentPassword((current) => !current)}
+                  aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showCurrentPassword}
+                >
+                  {showCurrentPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
             <div className="admin-form__field">
               <label htmlFor="settings-next-password">New Password</label>
               <div className="admin-password-field">

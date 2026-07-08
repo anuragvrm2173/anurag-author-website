@@ -284,17 +284,38 @@ export async function signOutAdmin() {
   await supabase.auth.signOut();
 }
 
-export async function changeAdminPassword(nextPassword) {
+export async function changeAdminPassword(currentPassword, nextPassword) {
   if (!hasSupabase()) {
     throw new Error("Supabase is required to change password.");
   }
 
-  const password = String(nextPassword || "").trim();
-  if (password.length < 8) {
+  const oldPassword = String(currentPassword || "");
+  const newPassword = String(nextPassword || "").trim();
+
+  if (!oldPassword) {
+    throw new Error("Current password is required.");
+  }
+
+  if (newPassword.length < 8) {
     throw new Error("Password must be at least 8 characters.");
   }
 
-  const { error } = await supabase.auth.updateUser({ password });
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    throw userError;
+  }
+
+  const email = userData.user?.email;
+  if (!email) {
+    throw new Error("Could not verify current admin account.");
+  }
+
+  const { error: verifyError } = await supabase.auth.signInWithPassword({ email, password: oldPassword });
+  if (verifyError) {
+    throw new Error("Current password is incorrect.");
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
   if (error) {
     throw error;
   }

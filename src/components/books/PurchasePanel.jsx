@@ -1,3 +1,5 @@
+import { notifyBuyLinkClick } from "../../services/notificationsService";
+
 const STORE_LOGOS = {
   amazon: "/store-logos/amazon.svg",
   notionPress: "/store-logos/notion-press.svg",
@@ -204,6 +206,15 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                     target="_blank"
                     rel="noreferrer"
                     aria-label={retailer.actionLabel}
+                    onClick={() => {
+                      notifyBuyLinkClick({
+                        bookTitle: book?.title,
+                        editionLabel: activeEdition?.label || activeEdition?.formatLabel,
+                        retailer: retailer.name,
+                        url: retailer.url,
+                        source: "purchase-panel",
+                      });
+                    }}
                   >
                     {content}
                   </a>

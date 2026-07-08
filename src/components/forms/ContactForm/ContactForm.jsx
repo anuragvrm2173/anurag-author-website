@@ -13,7 +13,8 @@ function ContactForm() {
     setStatus("loading");
     setStatusMessage("");
 
-    const formData = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const formData = new FormData(formElement);
     const payload = {
       name: formData.get("name"),
       email: formData.get("email"),
@@ -22,7 +23,7 @@ function ContactForm() {
 
     try {
       const result = await submitContactMessage(payload);
-      event.currentTarget.reset();
+      formElement.reset();
       setStatus("success");
       if (result.delivered) {
         setStatusMessage("Your message was sent successfully. Thank you for reaching out.");
