@@ -310,13 +310,47 @@ export async function changeAdminPassword(currentPassword, nextPassword) {
     throw new Error("Could not verify current admin account.");
   }
 
-  const { error: verifyError } = await supabase.auth.signInWithPassword({ email, password: oldPassword });
-  if (verifyError) {
-    throw new Error("Current password is incorrect.");
-  }
-
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+    current_password: oldPassword,
+  });
   if (error) {
+    const message = String(error.message || "").toLowerCase();
+
+    if (message.includes("current password") && message.includes("incorrect")) {
+      throw new Error("Current password is incorrect.");
+    }
+
+    if (message.includes("current password") && message.includes("required")) {
+      throw new Error("Current password is required by your Supabase Auth settings. Please enter your current password and try again.");
+    }
+
+    if (message.includes("reauth") || message.includes("nonce")) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: oldPassword });
+      if (!signInError) {
+        const { error: retryError } = await supabase.auth.updateUser({
+          password: newPassword,
+          current_password: oldPassword,
+        });
+        if (!retryError) {
+          await supabase.auth.signOut();
+          const { error: verifyNewPasswordError } = await supabase.auth.signInWithPassword({
+            email,
+            password: newPassword,
+          });
+
+          if (verifyNewPasswordError) {
+            await supabase.auth.signInWithPassword({ email, password: oldPassword });
+            throw new Error("Password update could not be verified. Please try again.");
+          }
+
+          return;
+        }
+      }
+
+      throw new Error("Supabase requires reauthentication for password updates. Sign out, sign in again, and retry. If it still fails, disable Secure password change in Supabase Auth settings.");
+    }
+
     throw error;
   }
 
