@@ -8,6 +8,7 @@ import { subscribeToNewsletter } from "../../services/newsletterService";
 
 function Newsletter({ source = "Homepage" }) {
   const [status, setStatus] = useState("idle");
+  const isLoading = status === "loading";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -45,8 +46,8 @@ function Newsletter({ source = "Homepage" }) {
             <label className="visually-hidden" htmlFor="newsletter-email">
               Email address
             </label>
-            <input id="newsletter-email" name="email" type="email" placeholder="Email address" required />
-            <Button type="submit">{status === "loading" ? "Joining..." : "Join my readers"}</Button>
+            <input id="newsletter-email" name="email" type="email" placeholder="Email address" required disabled={isLoading} aria-describedby={status === "error" ? "newsletter-status" : undefined} />
+            <Button type="submit" disabled={isLoading}>{isLoading ? "Joining..." : "Join my readers"}</Button>
           </form>
 
           {status === "success" ? (
@@ -56,8 +57,8 @@ function Newsletter({ source = "Homepage" }) {
           ) : null}
 
           {status === "error" ? (
-            <p className="newsletter__status newsletter__status--error" role="alert">
-              Subscription failed. Please try again.
+            <p id="newsletter-status" className="newsletter__status newsletter__status--error" role="status">
+              We couldn't subscribe you right now. This is usually a temporary issue. Please try again in a few moments, or contact me directly if the problem continues.
             </p>
           ) : null}
         </div>

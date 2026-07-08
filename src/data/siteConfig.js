@@ -1,4 +1,4 @@
-const configuredSiteUrl = (import.meta.env.VITE_SITE_URL || "https://anurag-author-website.vercel.app/").trim();
+const configuredSiteUrl = (import.meta.env.VITE_SITE_URL || "https://anuragverma-author.vercel.app/").trim();
 
 const siteConfig = {
   siteName: "Anurag Verma",

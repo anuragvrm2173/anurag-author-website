@@ -10,13 +10,20 @@
   transition: all 0.3s ease;
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: none;
+}
+
 .button--primary {
   background: var(--color-accent);
   color: var(--color-primary);
   box-shadow: 0 10px 24px rgba(201, 163, 78, 0.2);
 }
 
-.button--primary:hover {
+.button--primary:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 12px 28px rgba(201, 163, 78, 0.25);
 }
@@ -27,7 +34,7 @@
   border: 1px solid rgba(17, 17, 17, 0.16);
 }
 
-.button--outline:hover {
+.button--outline:hover:not(:disabled) {
   background: rgba(17, 17, 17, 0.04);
   color: var(--color-primary);
 }

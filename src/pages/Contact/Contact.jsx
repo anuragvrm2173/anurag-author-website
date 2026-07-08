@@ -1,6 +1,7 @@
 import "./Contact.css";
 
 import { HelmetProvider } from "react-helmet-async";
+import { FaAmazon, FaEnvelope, FaGoodreadsG, FaInstagram, FaYoutube } from "react-icons/fa6";
 
 import ContactForm from "../../components/forms/ContactForm/ContactForm";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
@@ -13,6 +14,28 @@ import socialLinks from "../../data/socialLinks";
 function Contact() {
   const contactChannels = socialLinks.filter((link) => link.active !== false);
   const inquiries = ["Media", "Collaborations", "Speaking", "General Questions"];
+  const channelMeta = {
+    instagram: {
+      icon: FaInstagram,
+      label: "@anuragvrm2173",
+    },
+    youtube: {
+      icon: FaYoutube,
+      label: "Anurag Verma Vlog",
+    },
+    "amazon-author": {
+      icon: FaAmazon,
+      label: "Author profile and book listings",
+    },
+    goodreads: {
+      icon: FaGoodreadsG,
+      label: "Reviews, shelves, and reading community",
+    },
+    email: {
+      icon: FaEnvelope,
+      label: "vanuragverma2173@gmail.com",
+    },
+  };
 
   return (
     <HelmetProvider>
@@ -84,16 +107,30 @@ function Contact() {
                   Other Ways to Connect
                 </h2>
 
+                <p className="contact-page__channels-copy">
+                  If the form isn't working right now, you can still reach me through any of these platforms.
+                </p>
+
                 <ul className="contact-page__channels">
                   {contactChannels.map((channel) => (
-                    <li key={channel.id}>
+                    <li key={channel.id} className="contact-page__channel-item">
                       <a
+                        className="contact-page__channel-link"
                         href={channel.url}
                         target={channel.external ? "_blank" : undefined}
                         rel={channel.external ? "noreferrer noopener" : undefined}
                         aria-label={`${channel.name} link`}
                       >
-                        {channel.name}
+                        <span className="contact-page__channel-icon" aria-hidden="true">
+                          {(() => {
+                            const Icon = channelMeta[channel.id]?.icon;
+                            return Icon ? <Icon /> : null;
+                          })()}
+                        </span>
+                        <span className="contact-page__channel-copy">
+                          <span className="contact-page__channel-name">{channel.name}</span>
+                          <span className="contact-page__channel-handle">{channelMeta[channel.id]?.label || channel.url}</span>
+                        </span>
                       </a>
                     </li>
                   ))}

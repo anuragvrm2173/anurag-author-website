@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const publicDir = path.join(rootDir, "public");
 
-const siteUrl = (process.env.VITE_SITE_URL || "https://anurag-author-website.vercel.app/").trim().replace(/\/+$/, "");
+const siteUrl = (process.env.VITE_SITE_URL || "https://anuragverma-author.vercel.app/").trim().replace(/\/+$/, "");
 
 async function extractMatches(filePath, regex) {
   const source = await readFile(filePath, "utf8");

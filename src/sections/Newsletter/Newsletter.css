@@ -50,6 +50,11 @@
   color: white;
 }
 
+.newsletter__form input:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
 .newsletter__form input::placeholder {
   color: rgba(255,255,255,0.7);
 }
@@ -57,6 +62,10 @@
 .newsletter__status {
   margin: 0.25rem 0 0;
   line-height: 1.6;
+  max-width: 40rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .newsletter__status--success {
@@ -64,7 +73,9 @@
 }
 
 .newsletter__status--error {
-  color: #ffd2d2;
+  color: rgba(255,255,255,0.84);
+  background: rgba(255, 244, 224, 0.08);
+  border: 1px solid rgba(201, 163, 78, 0.2);
 }
 
 .visually-hidden {
