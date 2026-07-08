@@ -284,7 +284,7 @@ export async function signOutAdmin() {
   await supabase.auth.signOut();
 }
 
-export async function requestAdminPasswordOtp(email) {
+export async function requestAdminPasswordOtp(email, options = {}) {
   if (!hasSupabase()) {
     throw new Error("Supabase is not configured for password reset.");
   }
@@ -294,7 +294,11 @@ export async function requestAdminPasswordOtp(email) {
     throw new Error("Admin email is required.");
   }
 
-  const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail);
+  const emailRedirectTo = String(options.emailRedirectTo || "").trim();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, emailRedirectTo ? {
+    redirectTo: emailRedirectTo,
+  } : undefined);
 
   if (error) {
     const message = String(error.message || "");

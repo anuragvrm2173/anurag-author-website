@@ -60,7 +60,7 @@ function AdminLogin() {
   useEffect(() => {
     let active = true;
     getCurrentAdminSession().then((session) => {
-      if (active && session.authorized) {
+      if (active && session.authorized && !isRecoveryLinkMode) {
         navigate(location.state?.from || "/admin", { replace: true });
       }
     }).catch(() => {});
@@ -68,7 +68,7 @@ function AdminLogin() {
     return () => {
       active = false;
     };
-  }, [location.state?.from, navigate]);
+  }, [isRecoveryLinkMode, location.state?.from, navigate]);
 
   useEffect(() => {
     if (isRecoveryLinkMode) {
@@ -100,7 +100,8 @@ function AdminLogin() {
       throw new Error(`Please wait ${otpSecondsLeft}s before requesting another OTP.`);
     }
 
-    await requestAdminPasswordOtp(targetEmail);
+    const redirectTo = `${window.location.origin}/admin/login`;
+    await requestAdminPasswordOtp(targetEmail, { emailRedirectTo: redirectTo });
     setOtpSent(true);
     setOtpCooldownUntil(Date.now() + OTP_COOLDOWN_SECONDS * 1000);
     setResetMessage("Password reset OTP sent to your email. Enter the code and set a new password.");
@@ -262,16 +263,18 @@ function AdminLogin() {
               }
             }}
           >
-            <div className="admin-form__field">
-              <label htmlFor="admin-reset-email">Admin email</label>
-              <input
-                id="admin-reset-email"
-                type="email"
-                value={resetEmail}
-                onChange={(event) => setResetEmail(event.target.value)}
-                required
-              />
-            </div>
+            {!isRecoveryLinkMode ? (
+              <div className="admin-form__field">
+                <label htmlFor="admin-reset-email">Admin email</label>
+                <input
+                  id="admin-reset-email"
+                  type="email"
+                  value={resetEmail}
+                  onChange={(event) => setResetEmail(event.target.value)}
+                  required
+                />
+              </div>
+            ) : null}
 
             {otpSent || isRecoveryLinkMode ? (
               <>
@@ -344,7 +347,7 @@ function AdminLogin() {
               <Button type="submit" disabled={resetLoading}>
                 {resetLoading ? "Processing…" : isRecoveryLinkMode ? "Set New Password" : otpSent ? "Verify OTP & Reset" : "Send OTP"}
               </Button>
-              {otpSent ? (
+              {otpSent && !isRecoveryLinkMode ? (
                 <button
                   type="button"
                   className="admin-link-button"
