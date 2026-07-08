@@ -152,13 +152,16 @@ export async function submitContactMessage(payload, options = {}) {
 }
 
 export async function submitBuyNowLead(payload) {
+  const normalizedName = String(payload?.name || "").trim() || "Website Reader";
+  const normalizedEmail = String(payload?.email || "").trim() || "not-provided@no-email.local";
+
   const leadPayload = {
-    name: String(payload?.name || "").trim(),
-    email: String(payload?.email || "").trim(),
+    name: normalizedName,
+    email: normalizedEmail,
     message: [
       "[BUY_NOW_LEAD]",
       "Book purchase intent",
-      `Reader Contact Email: ${String(payload?.email || "").trim()}`,
+      `Reader Contact Email: ${String(payload?.email || "").trim() || "Not provided"}`,
       `Book: ${String(payload?.bookTitle || "Unknown").trim() || "Unknown"}`,
       `Edition: ${String(payload?.editionLabel || "Unknown").trim() || "Unknown"}`,
       `Retailer: ${String(payload?.retailerName || "Unknown").trim() || "Unknown"}`,

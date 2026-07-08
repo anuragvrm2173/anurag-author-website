@@ -294,8 +294,8 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
             </h3>
             <p className="purchase-panel__lead-description">
               {isHindi
-                ? "कृपया अपना नाम और ईमेल दर्ज करें। इसके बाद आप खरीद लिंक पर भेजे जाएंगे।"
-                : "Please enter your name and email. You will then be redirected to the buy link."}
+                ? "आप चाहें तो नाम और ईमेल भरें। इसके बाद आप खरीद लिंक पर भेजे जाएंगे।"
+                : "Name and email are optional. You will then be redirected to the buy link."}
             </p>
 
             <form
@@ -331,7 +331,7 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
               }}
             >
               <label className="purchase-panel__lead-label" htmlFor="purchase-lead-name">
-                {isHindi ? "नाम" : "Name"}
+                {isHindi ? "नाम (वैकल्पिक)" : "Name (optional)"}
               </label>
               <input
                 id="purchase-lead-name"
@@ -339,11 +339,10 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                 className="purchase-panel__lead-input"
                 value={readerName}
                 onChange={(event) => setReaderName(event.target.value)}
-                required
               />
 
               <label className="purchase-panel__lead-label" htmlFor="purchase-lead-email">
-                {isHindi ? "ईमेल" : "Email"}
+                {isHindi ? "ईमेल (वैकल्पिक)" : "Email (optional)"}
               </label>
               <input
                 id="purchase-lead-email"
@@ -351,7 +350,6 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                 className="purchase-panel__lead-input"
                 value={readerEmail}
                 onChange={(event) => setReaderEmail(event.target.value)}
-                required
               />
 
               {leadError ? <p className="purchase-panel__lead-error">{leadError}</p> : null}
