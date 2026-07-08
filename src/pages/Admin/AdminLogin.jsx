@@ -31,6 +31,29 @@ function parseWaitSeconds(message) {
   return /minute|min/i.test(match[2]) ? value * 60 : value;
 }
 
+function normalizeUiErrorMessage(error, fallback) {
+  if (!error) {
+    return fallback;
+  }
+
+  if (typeof error === "string") {
+    const text = error.trim();
+    return text && text !== "{}" ? text : fallback;
+  }
+
+  if (error instanceof Error) {
+    const text = String(error.message || "").trim();
+    return text && text !== "{}" ? text : fallback;
+  }
+
+  const message = String(error.message || error.error_description || error.msg || "").trim();
+  if (message && message !== "{}" && message !== "[object Object]") {
+    return message;
+  }
+
+  return fallback;
+}
+
 function AdminLogin() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,7 +154,7 @@ function AdminLogin() {
               await signInAdmin(email, password);
               navigate(location.state?.from || "/admin", { replace: true });
             } catch (nextError) {
-              setError(nextError.message || "Unable to sign in.");
+              setError(normalizeUiErrorMessage(nextError, "Unable to sign in."));
             } finally {
               setLoading(false);
             }
@@ -252,7 +275,7 @@ function AdminLogin() {
                 setShowForgotPassword(false);
                 setResetMessage("Password reset successful. Sign in with your new password.");
               } catch (nextError) {
-                const message = nextError.message || "Unable to reset password.";
+                const message = normalizeUiErrorMessage(nextError, "Unable to reset password.");
                 const waitSeconds = parseWaitSeconds(message);
                 if (waitSeconds > 0) {
                   setOtpCooldownUntil(Date.now() + waitSeconds * 1000);
@@ -360,7 +383,7 @@ function AdminLogin() {
                     try {
                       await sendOtp(resetEmail);
                     } catch (nextError) {
-                      const message = nextError.message || "Unable to send OTP.";
+                      const message = normalizeUiErrorMessage(nextError, "Unable to send OTP.");
                       const waitSeconds = parseWaitSeconds(message);
                       if (waitSeconds > 0) {
                         setOtpCooldownUntil(Date.now() + waitSeconds * 1000);

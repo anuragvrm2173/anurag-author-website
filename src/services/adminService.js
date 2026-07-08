@@ -272,8 +272,42 @@ export async function signInAdmin(email, password) {
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    throw error;
+    throw new Error(normalizeAuthErrorMessage(error, "Unable to sign in."));
   }
+}
+
+function normalizeAuthErrorMessage(error, fallback) {
+  if (!error) {
+    return fallback;
+  }
+
+  if (typeof error === "string") {
+    const text = error.trim();
+    return text && text !== "{}" ? text : fallback;
+  }
+
+  if (error instanceof Error) {
+    const text = String(error.message || "").trim();
+    return text && text !== "{}" ? text : fallback;
+  }
+
+  const messageCandidates = [
+    error.message,
+    error.error_description,
+    error.msg,
+    error.description,
+    error.details,
+    error.hint,
+  ];
+
+  for (const candidate of messageCandidates) {
+    const text = String(candidate || "").trim();
+    if (text && text !== "{}" && text !== "[object Object]") {
+      return text;
+    }
+  }
+
+  return fallback;
 }
 
 export async function signOutAdmin() {
@@ -301,11 +335,11 @@ export async function requestAdminPasswordOtp(email, options = {}) {
   } : undefined);
 
   if (error) {
-    const message = String(error.message || "");
+    const message = normalizeAuthErrorMessage(error, "Unable to send OTP.");
     if (/rate\s*limit|security purposes|too many/i.test(message)) {
       throw new Error("Too many OTP requests. Please wait 60 seconds and try again.");
     }
-    throw error;
+    throw new Error(message);
   }
 }
 
@@ -337,7 +371,7 @@ export async function verifyAdminOtpAndResetPassword(email, otp, nextPassword) {
   });
 
   if (verifyError) {
-    throw new Error("Invalid or expired OTP. Please request a new OTP.");
+    throw new Error(normalizeAuthErrorMessage(verifyError, "Invalid or expired OTP. Please request a new OTP."));
   }
 
   const { error: updateError } = await supabase.auth.updateUser({
@@ -345,7 +379,7 @@ export async function verifyAdminOtpAndResetPassword(email, otp, nextPassword) {
   });
 
   if (updateError) {
-    throw updateError;
+    throw new Error(normalizeAuthErrorMessage(updateError, "Unable to reset password."));
   }
 
   await supabase.auth.signOut();
@@ -363,7 +397,7 @@ export async function resetAdminPasswordWithRecoverySession(nextPassword) {
 
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
   if (sessionError) {
-    throw sessionError;
+    throw new Error(normalizeAuthErrorMessage(sessionError, "Could not validate recovery session."));
   }
 
   if (!sessionData.session) {
@@ -375,7 +409,7 @@ export async function resetAdminPasswordWithRecoverySession(nextPassword) {
   });
 
   if (updateError) {
-    throw updateError;
+    throw new Error(normalizeAuthErrorMessage(updateError, "Unable to reset password from recovery link."));
   }
 
   await supabase.auth.signOut();
