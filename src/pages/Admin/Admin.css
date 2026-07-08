@@ -168,6 +168,31 @@
   resize: vertical;
 }
 
+.admin-password-field {
+  position: relative;
+}
+
+.admin-password-field input {
+  padding-right: 5.5rem;
+}
+
+.admin-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.55rem;
+  transform: translateY(-50%);
+  min-height: 2.1rem;
+  padding: 0.35rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.07);
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .admin-media-upload-grid {
   display: grid;
   gap: 0.75rem;

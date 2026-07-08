@@ -13,6 +13,7 @@ function AdminLogin() {
   const location = useLocation();
   const [email, setEmail] = useState(adminAllowedEmail);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -66,7 +67,24 @@ function AdminLogin() {
 
           <div className="admin-form__field">
             <label htmlFor="admin-password">Password</label>
-            <input id="admin-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+            <div className="admin-password-field">
+              <input
+                id="admin-password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="admin-password-toggle"
+                onClick={() => setShowPassword((current) => !current)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
 
           {location.state?.reason === "missing-supabase" ? (

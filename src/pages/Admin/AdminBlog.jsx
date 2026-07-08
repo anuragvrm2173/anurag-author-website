@@ -38,11 +38,6 @@ function BlogEditorForm({ initialForm, selectedPost, onSaved, onError, onReset }
   const [saving, setSaving] = useState(false);
   const [slugTouched, setSlugTouched] = useState(Boolean(initialForm.slug));
 
-  useEffect(() => {
-    setForm(initialForm);
-    setSlugTouched(Boolean(initialForm.slug));
-  }, [initialForm]);
-
   return (
     <form
       className="admin-form"
@@ -150,18 +145,23 @@ function AdminBlog() {
   }, []);
 
   const selectedPost = useMemo(() => posts.find((item) => item.id === postId || item.slug === postId) || null, [postId, posts]);
+  const activeRevisionDraft = useMemo(() => {
+    if (!revisionDraft || !selectedPost || revisionDraft.sourceId !== selectedPost.id) {
+      return null;
+    }
+
+    return revisionDraft;
+  }, [revisionDraft, selectedPost]);
   const initialForm = useMemo(() => {
-    if (revisionDraft) {
-      return revisionDraft;
+    if (activeRevisionDraft) {
+      return activeRevisionDraft.form;
     }
 
     return buildBlogForm(selectedPost);
-  }, [revisionDraft, selectedPost]);
-  const formKey = isCreating ? "blog-new" : selectedPost?.id || postId || "blog-default";
-
-  useEffect(() => {
-    setRevisionDraft(null);
-  }, [postId, isCreating]);
+  }, [activeRevisionDraft, selectedPost]);
+  const formKey = isCreating
+    ? "blog-new"
+    : `${selectedPost?.id || postId || "blog-default"}-${activeRevisionDraft?.key || "live"}`;
 
   return (
     <section className="admin-page">
@@ -268,7 +268,11 @@ function AdminBlog() {
                       type="button"
                       className="admin-inline-button"
                       onClick={() => {
-                        setRevisionDraft(nextForm);
+                        setRevisionDraft({
+                          sourceId: selectedPost.id,
+                          key: `${revision.edited_at || "revision"}-${index}`,
+                          form: nextForm,
+                        });
                         setError("");
                       }}
                     >
