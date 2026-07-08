@@ -107,6 +107,20 @@
   padding: 1.25rem;
   border: 1px solid rgba(17, 17, 17, 0.1);
   background: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.search-page__card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201, 163, 78, 0.44);
+  box-shadow: 0 16px 26px rgba(17, 17, 17, 0.08);
+}
+
+.search-page__card:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
 }
 
 .search-page__card h3 {
@@ -131,7 +145,7 @@
   color: var(--color-primary);
 }
 
-.search-page__link:hover {
+.search-page__card:hover .search-page__link {
   color: var(--color-accent);
 }
 

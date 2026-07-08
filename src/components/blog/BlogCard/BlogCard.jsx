@@ -7,7 +7,7 @@ function BlogCard({ post, showReadLink = true }) {
 	const visual = getBlogVisual(post);
 
   return (
-    <article className="blog-card" aria-label={post.title}>
+    <Link to={getBlogPostPath(post.id)} className="blog-card" aria-label={post.title}>
       <div className="blog-card__visual" style={{ background: visual.background }} aria-hidden="true">
         <p className="blog-card__visual-eyebrow">{visual.eyebrow}</p>
         <p className="blog-card__visual-motif">{visual.motif}</p>
@@ -22,11 +22,11 @@ function BlogCard({ post, showReadLink = true }) {
       <h3 className="blog-card__title">{post.title}</h3>
       <p className="blog-card__excerpt">{post.excerpt}</p>
       {showReadLink ? (
-        <Link to={getBlogPostPath(post.id)} className="blog-card__link">
+        <span className="blog-card__link">
           Read article
-        </Link>
+        </span>
       ) : null}
-    </article>
+    </Link>
   );
 }
 

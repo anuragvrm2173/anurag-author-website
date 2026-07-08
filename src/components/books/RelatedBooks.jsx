@@ -17,7 +17,7 @@ function RelatedBooks({ books }) {
 
       <div className="related-books__grid">
         {books.map((book) => (
-          <article key={book.id} className="related-books__card">
+          <Link key={book.id} to={`/library/${book.id}`} className="related-books__card">
             <BookCoverArt
               title={book.title}
               subtitle={book.editions?.english?.cover?.subtitle || book.subtitle}
@@ -33,10 +33,10 @@ function RelatedBooks({ books }) {
             <p className="related-books__status">{book.status}</p>
             <h3 className="related-books__card-title">{book.title}</h3>
             <p className="related-books__card-copy">{book.shortDescription || book.description}</p>
-            <Link to={`/library/${book.id}`} className="related-books__link">
+            <span className="related-books__link">
               View Book
-            </Link>
-          </article>
+            </span>
+          </Link>
         ))}
       </div>
     </section>

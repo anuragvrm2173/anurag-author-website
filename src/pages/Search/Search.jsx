@@ -201,14 +201,14 @@ function Search() {
             <div className="search-page__grid" role="list" aria-label="Search books results">
               {filteredBooks.length > 0 ? (
                 filteredBooks.map((book) => (
-                  <article key={book.id} className="search-page__card" role="listitem">
+                  <Link key={book.id} to={`/library/${book.id}`} className="search-page__card" role="listitem">
                     <p className="search-page__meta">{book.status}</p>
                     <h3>{highlightText(book.title, normalizedQuery)}</h3>
                     <p>{highlightText(book.shortDescription, normalizedQuery)}</p>
-                    <Link to={`/library/${book.id}`} className="search-page__link">
+                    <span className="search-page__link">
                       Open Book
-                    </Link>
-                  </article>
+                    </span>
+                  </Link>
                 ))
               ) : (
                 <p className="search-page__empty">No books matched your search.</p>
@@ -225,14 +225,14 @@ function Search() {
             <div className="search-page__grid" role="list" aria-label="Search blog results">
               {filteredPosts.length > 0 ? (
                 filteredPosts.map((post) => (
-                  <article key={post.id} className="search-page__card" role="listitem">
+                  <Link key={post.id} to={getBlogPostPath(post.id)} className="search-page__card" role="listitem">
                     <p className="search-page__meta">{post.category}</p>
                     <h3>{highlightText(post.title, normalizedQuery)}</h3>
                     <p>{highlightText(post.excerpt, normalizedQuery)}</p>
-                    <Link to={getBlogPostPath(post.id)} className="search-page__link">
+                    <span className="search-page__link">
                       Read in Blog
-                    </Link>
-                  </article>
+                    </span>
+                  </Link>
                 ))
               ) : (
                 <p className="search-page__empty">No blog posts matched your search.</p>
@@ -247,12 +247,12 @@ function Search() {
               <h2 id="search-recent-books-title" className="search-page__section-title">Recent Books</h2>
               <div className="search-page__grid" role="list" aria-label="Recent books">
                 {recentBooks.map((book) => (
-                  <article key={book.id} className="search-page__card" role="listitem">
+                  <Link key={book.id} to={`/library/${book.id}`} className="search-page__card" role="listitem">
                     <p className="search-page__meta">{book.status}</p>
                     <h3>{book.title}</h3>
                     <p>{book.shortDescription}</p>
-                    <Link to={`/library/${book.id}`} className="search-page__link">Open Book</Link>
-                  </article>
+                    <span className="search-page__link">Open Book</span>
+                  </Link>
                 ))}
               </div>
             </Container>
@@ -265,12 +265,12 @@ function Search() {
               <h2 id="search-recent-blog-title" className="search-page__section-title">Recent Blogs</h2>
               <div className="search-page__grid" role="list" aria-label="Recent blogs">
                 {recentBlogs.map((post) => (
-                  <article key={post.id} className="search-page__card" role="listitem">
+                  <Link key={post.id} to={getBlogPostPath(post.id)} className="search-page__card" role="listitem">
                     <p className="search-page__meta">{post.category}</p>
                     <h3>{post.title}</h3>
                     <p>{post.excerpt}</p>
-                    <Link to={getBlogPostPath(post.id)} className="search-page__link">Read in Blog</Link>
-                  </article>
+                    <span className="search-page__link">Read in Blog</span>
+                  </Link>
                 ))}
               </div>
             </Container>

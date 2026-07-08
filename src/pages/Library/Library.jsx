@@ -60,7 +60,7 @@ function Library() {
                     {Object.entries(book.editions || {})
                       .filter(([, edition]) => edition?.available)
                       .map(([editionKey, edition]) => (
-                        <article key={edition.languageCode} className="library-page__edition-block">
+                        <Link key={edition.languageCode} to={`/library/${book.id}?edition=${editionKey}`} className="library-page__edition-block">
                           <BookCoverArt
                             title={book.title}
                             subtitle={edition.cover?.subtitle || edition.formatLabel}
@@ -77,15 +77,15 @@ function Library() {
                           <div className="library-page__edition-meta">
                             <p className="library-page__edition-language">{edition.label}</p>
                             <span className="library-page__edition-status library-page__edition-status--published">Published</span>
-                            <Link to={`/library/${book.id}?edition=${editionKey}`} className="library-page__edition-link">
+                            <span className="library-page__edition-link">
                               Explore Book
-                            </Link>
+                            </span>
                           </div>
-                        </article>
+                        </Link>
                       ))}
                   </div>
                 ) : (
-                  <div className="library-page__upcoming" aria-label={`${book.title} status`}>
+                  <Link to={`/library/${book.id}`} className="library-page__upcoming" aria-label={`${book.title} status`}>
                     <UpcomingBookCover
                       title={book.title}
                       subtitle={book.subtitle}
@@ -96,11 +96,9 @@ function Library() {
 
                     <div className="library-page__upcoming-meta">
                       <span className="library-page__upcoming-badge library-page__upcoming-badge--coming-soon">Coming Soon</span>
-                      <Link to="/contact" className="library-page__notify-link">
-                        Notify Me
-                      </Link>
+                      <span className="library-page__notify-link">View Book</span>
                     </div>
-                  </div>
+                  </Link>
                 )}
               </article>
             ))}

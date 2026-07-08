@@ -52,6 +52,21 @@
   border-radius: 1rem;
   border: 1px solid rgba(17, 17, 17, 0.08);
   background: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.library-page__edition-block:hover,
+.library-page__upcoming:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201, 163, 78, 0.44);
+  box-shadow: 0 14px 24px rgba(17, 17, 17, 0.08);
+}
+
+.library-page__edition-block:focus-visible,
+.library-page__upcoming:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
 }
 
 .library-page__edition-cover {
@@ -113,6 +128,11 @@
 .library-page__upcoming {
   display: grid;
   gap: 1rem;
+  padding: 0.85rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
 }
 
 .library-page__upcoming-cover {
