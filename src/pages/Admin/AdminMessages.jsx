@@ -5,13 +5,31 @@ import { useSearchParams } from "react-router-dom";
 
 import { fetchAdminMessages, updateAdminMessage } from "../../services/adminService";
 
+function getMessageType(message) {
+  const text = String(message?.message || "");
+  if (/\[BUY_NOW_LEAD\]|Book purchase intent/i.test(text)) {
+    return "buy_now";
+  }
+
+  return "contact";
+}
+
+function getDisplayMessageBody(message) {
+  return String(message?.message || "")
+    .replace(/^\[BUY_NOW_LEAD\]\s*/i, "")
+    .trim();
+}
+
 function createReplyLink(message) {
   const recipient = String(message.email || "").trim();
   if (!recipient) {
     return "";
   }
 
-  const subject = encodeURIComponent(`Re: Your message to Anurag Verma`);
+  const messageType = getMessageType(message);
+  const subjectText = messageType === "buy_now" ? "Re: Your book purchase inquiry" : "Re: Your message to Anurag Verma";
+
+  const subject = encodeURIComponent(subjectText);
   const body = encodeURIComponent([
     `Hi ${message.name || "there"},`,
     "",
@@ -21,7 +39,7 @@ function createReplyLink(message) {
     "Anurag Verma",
     "",
     "--- Original Message ---",
-    message.message || "",
+    getDisplayMessageBody(message),
   ].join("\n"));
 
   return `mailto:${recipient}?subject=${subject}&body=${body}`;
@@ -95,6 +113,7 @@ function AdminMessages() {
           <table>
             <thead>
               <tr>
+                <th>Type</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Message</th>
@@ -105,9 +124,16 @@ function AdminMessages() {
             <tbody>
               {filteredMessages.map((message) => (
                 <tr key={message.id}>
+                  <td data-label="Type">
+                    <span className={`admin-status-pill admin-status-pill--${getMessageType(message)}`}>
+                      {getMessageType(message) === "buy_now" ? "Buy Now" : "Contact"}
+                    </span>
+                  </td>
                   <td data-label="Name">{message.name}</td>
                   <td data-label="Email">{message.email}</td>
-                  <td data-label="Message">{message.message}</td>
+                  <td data-label="Message">
+                    <div className="admin-message-content">{getDisplayMessageBody(message)}</div>
+                  </td>
                   <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${message.status}`}>{message.status}</span></td>
                   <td data-label="Actions">
                     <div className="admin-table__actions">

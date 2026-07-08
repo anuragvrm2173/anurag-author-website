@@ -1,3 +1,6 @@
+import { useState } from "react";
+
+import { submitBuyNowLead } from "../../services/contactService";
 import { notifyBuyLinkClick } from "../../services/notificationsService";
 
 const STORE_LOGOS = {
@@ -102,6 +105,12 @@ function RetailerMark({ retailerKey }) {
 }
 
 function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi = false }) {
+  const [leadModalOpen, setLeadModalOpen] = useState(false);
+  const [selectedRetailer, setSelectedRetailer] = useState(null);
+  const [readerName, setReaderName] = useState("");
+  const [readerEmail, setReaderEmail] = useState("");
+  const [leadError, setLeadError] = useState("");
+  const [leadSubmitting, setLeadSubmitting] = useState(false);
   const isPublished = bookStatus === "Published";
   const retailers = normalizeRetailers(activeEdition);
   const retailerByKey = retailers.reduce((acc, item) => {
@@ -165,8 +174,31 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     return retailer.actionLabel || (isHindi ? "उपलब्ध" : "Available");
   };
 
+  const resetLeadModal = () => {
+    setLeadModalOpen(false);
+    setSelectedRetailer(null);
+    setReaderName("");
+    setReaderEmail("");
+    setLeadError("");
+    setLeadSubmitting(false);
+  };
+
+  const openLeadModal = (retailer) => {
+    setSelectedRetailer(retailer);
+    setLeadModalOpen(true);
+    setLeadError("");
+  };
+
+  const proceedToRetailer = (url) => {
+    const nextWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (!nextWindow) {
+      window.location.href = url;
+    }
+  };
+
   return (
-    <aside className="purchase-panel">
+    <>
+      <aside className="purchase-panel">
       <div className="purchase-panel__header">
         <h2 className="purchase-panel__title">{isPublished ? (isHindi ? "यहां उपलब्ध" : "Available At") : (isHindi ? "उपलब्धता" : "Availability")}</h2>
         <p className="purchase-panel__status">{isPublished ? availabilityLabel : (isHindi ? "शीघ्र" : "Coming Soon")}</p>
@@ -199,12 +231,10 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
 
               if (retailer.available && retailer.url) {
                 return (
-                  <a
+                  <button
+                    type="button"
                     key={retailer.key}
-                    href={retailer.url}
                     className="purchase-panel__button purchase-panel__button--secondary"
-                    target="_blank"
-                    rel="noreferrer"
                     aria-label={retailer.actionLabel}
                     onClick={() => {
                       notifyBuyLinkClick({
@@ -214,10 +244,11 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                         url: retailer.url,
                         source: "purchase-panel",
                       });
+                      openLeadModal(retailer);
                     }}
                   >
                     {content}
-                  </a>
+                  </button>
                 );
               }
 
@@ -247,7 +278,97 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
         </a>
       )}
 
-    </aside>
+      </aside>
+
+      {leadModalOpen ? (
+        <div className="purchase-panel__lead-backdrop" onClick={resetLeadModal}>
+          <div
+            className="purchase-panel__lead-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={isHindi ? "खरीदने से पहले विवरण" : "Details before purchase"}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 className="purchase-panel__lead-title">
+              {isHindi ? "आगे बढ़ने से पहले" : "Before You Continue"}
+            </h3>
+            <p className="purchase-panel__lead-description">
+              {isHindi
+                ? "कृपया अपना नाम और ईमेल दर्ज करें। इसके बाद आप खरीद लिंक पर भेजे जाएंगे।"
+                : "Please enter your name and email. You will then be redirected to the buy link."}
+            </p>
+
+            <form
+              className="purchase-panel__lead-form"
+              onSubmit={async (event) => {
+                event.preventDefault();
+                if (!selectedRetailer?.url) {
+                  setLeadError(isHindi ? "खरीद लिंक उपलब्ध नहीं है।" : "Buy link is not available.");
+                  return;
+                }
+
+                setLeadSubmitting(true);
+                setLeadError("");
+
+                try {
+                  await submitBuyNowLead({
+                    name: readerName,
+                    email: readerEmail,
+                    bookTitle: book?.title || "Unknown",
+                    editionLabel: activeEdition?.label || activeEdition?.formatLabel || "Unknown",
+                    retailerName: selectedRetailer.name,
+                    buyUrl: selectedRetailer.url,
+                  });
+
+                  proceedToRetailer(selectedRetailer.url);
+                  resetLeadModal();
+                } catch (error) {
+                  setLeadError(error?.message || (isHindi
+                    ? "विवरण भेजने में समस्या हुई। फिर से प्रयास करें।"
+                    : "Could not send details. Please try again."));
+                  setLeadSubmitting(false);
+                }
+              }}
+            >
+              <label className="purchase-panel__lead-label" htmlFor="purchase-lead-name">
+                {isHindi ? "नाम" : "Name"}
+              </label>
+              <input
+                id="purchase-lead-name"
+                type="text"
+                className="purchase-panel__lead-input"
+                value={readerName}
+                onChange={(event) => setReaderName(event.target.value)}
+                required
+              />
+
+              <label className="purchase-panel__lead-label" htmlFor="purchase-lead-email">
+                {isHindi ? "ईमेल" : "Email"}
+              </label>
+              <input
+                id="purchase-lead-email"
+                type="email"
+                className="purchase-panel__lead-input"
+                value={readerEmail}
+                onChange={(event) => setReaderEmail(event.target.value)}
+                required
+              />
+
+              {leadError ? <p className="purchase-panel__lead-error">{leadError}</p> : null}
+
+              <div className="purchase-panel__lead-actions">
+                <button type="button" className="purchase-panel__button purchase-panel__button--ghost" onClick={resetLeadModal}>
+                  {isHindi ? "रद्द करें" : "Cancel"}
+                </button>
+                <button type="submit" className="purchase-panel__button purchase-panel__button--secondary" disabled={leadSubmitting}>
+                  {leadSubmitting ? (isHindi ? "भेज रहा है..." : "Submitting...") : (isHindi ? "जारी रखें" : "Continue to Buy")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
 

@@ -7,7 +7,7 @@ function canUseLocalStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
 }
 
-async function sendAdminContactCopy(payload, deliveryChannel) {
+async function sendAdminContactCopy(payload, deliveryChannel, subject = "New Contact Message (Website)") {
   if (!ADMIN_NOTIFICATION_ENDPOINT) {
     return false;
   }
@@ -31,7 +31,7 @@ async function sendAdminContactCopy(payload, deliveryChannel) {
       name: payload.name,
       email: payload.email,
       message: messageBody,
-      _subject: "New Contact Message (Website)",
+      _subject: subject,
     }),
   });
 
@@ -72,7 +72,7 @@ async function submitToSupabase(payload) {
   }
 }
 
-async function submitToEndpoint(payload) {
+async function submitToEndpoint(payload, subject = "Contact Form Submission") {
   if (!CONTACT_ENDPOINT) {
     throw new Error("Contact endpoint is not configured");
   }
@@ -85,7 +85,7 @@ async function submitToEndpoint(payload) {
     },
     body: JSON.stringify({
       ...payload,
-      _subject: "Contact Form Submission",
+      _subject: subject,
     }),
   });
 
@@ -94,7 +94,9 @@ async function submitToEndpoint(payload) {
   }
 }
 
-export async function submitContactMessage(payload) {
+export async function submitContactMessage(payload, options = {}) {
+  const subject = String(options?.subject || "Contact Form Submission").trim() || "Contact Form Submission";
+
   const normalizedPayload = {
     name: String(payload?.name || "").trim(),
     email: String(payload?.email || "").trim(),
@@ -118,7 +120,7 @@ export async function submitContactMessage(payload) {
 
   if (deliveryChannel === "none") {
     try {
-      await submitToEndpoint(normalizedPayload);
+      await submitToEndpoint(normalizedPayload, subject);
       deliveryChannel = "endpoint";
     } catch {
       // Continue to local fallback when endpoint is temporarily unavailable.
@@ -136,7 +138,7 @@ export async function submitContactMessage(payload) {
 
   let copySent = false;
   try {
-    copySent = await sendAdminContactCopy(normalizedPayload, deliveryChannel);
+    copySent = await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject);
   } catch {
     // The user submission has already succeeded through at least one channel.
   }
@@ -147,4 +149,24 @@ export async function submitContactMessage(payload) {
     copySent,
     delivered: deliveryChannel !== "local",
   };
+}
+
+export async function submitBuyNowLead(payload) {
+  const leadPayload = {
+    name: String(payload?.name || "").trim(),
+    email: String(payload?.email || "").trim(),
+    message: [
+      "[BUY_NOW_LEAD]",
+      "Book purchase intent",
+      `Reader Contact Email: ${String(payload?.email || "").trim()}`,
+      `Book: ${String(payload?.bookTitle || "Unknown").trim() || "Unknown"}`,
+      `Edition: ${String(payload?.editionLabel || "Unknown").trim() || "Unknown"}`,
+      `Retailer: ${String(payload?.retailerName || "Unknown").trim() || "Unknown"}`,
+      `Buy URL: ${String(payload?.buyUrl || "").trim()}`,
+    ].join("\n"),
+  };
+
+  return submitContactMessage(leadPayload, {
+    subject: "New Buy Now Lead (Website)",
+  });
 }
