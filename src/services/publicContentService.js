@@ -2,6 +2,42 @@ import fallbackBooks from "../data/books";
 import { blogPosts as fallbackBlogPosts } from "../data/blog";
 import { hasSupabase, supabase } from "./supabaseClient";
 
+function getFallbackBookForRow(row) {
+  return fallbackBooks.find((book) => book.id === row.id || book.slug === row.slug) || null;
+}
+
+function mergeEditionCover(fallbackEdition = {}, rowEdition = {}) {
+  const fallbackCover = fallbackEdition.cover || {};
+  const rowCover = rowEdition.cover || {};
+
+  return {
+    ...rowEdition,
+    cover: {
+      ...fallbackCover,
+      ...rowCover,
+      frontCover: rowCover.frontCover || fallbackCover.frontCover || null,
+      fullCover: rowCover.fullCover || fallbackCover.fullCover || null,
+    },
+  };
+}
+
+function mergeBookEditions(fallbackBook, rowEditions = {}) {
+  const fallbackEditions = fallbackBook?.editions || {};
+  const languageKeys = new Set([...Object.keys(fallbackEditions), ...Object.keys(rowEditions || {})]);
+
+  const merged = {};
+  for (const key of languageKeys) {
+    merged[key] = {
+      ...(fallbackEditions[key] || {}),
+      ...(rowEditions?.[key] || {}),
+    };
+
+    merged[key] = mergeEditionCover(fallbackEditions[key], merged[key]);
+  }
+
+  return merged;
+}
+
 function sortByFallbackOrder(items, fallbackItems) {
   const orderMap = new Map(fallbackItems.map((item, index) => [item.id, index]));
 
@@ -25,6 +61,8 @@ function sortByFallbackOrder(items, fallbackItems) {
 }
 
 function normalizeBookRow(row) {
+  const fallbackBook = getFallbackBookForRow(row);
+
   return {
     id: row.id,
     slug: row.slug,
@@ -54,7 +92,7 @@ function normalizeBookRow(row) {
     whoThisBookIsFor: row.who_this_book_is_for || [],
     readingTime: row.reading_time,
     favoriteQuotes: row.favorite_quotes || [],
-    editions: row.editions || {},
+    editions: mergeBookEditions(fallbackBook, row.editions || {}),
     deletedAt: row.deleted_at || null,
   };
 }
