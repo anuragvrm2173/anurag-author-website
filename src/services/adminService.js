@@ -319,6 +319,18 @@ export async function changeAdminPassword(currentPassword, nextPassword) {
   if (error) {
     throw error;
   }
+
+  await supabase.auth.signOut();
+
+  const { error: verifyNewPasswordError } = await supabase.auth.signInWithPassword({
+    email,
+    password: newPassword,
+  });
+
+  if (verifyNewPasswordError) {
+    await supabase.auth.signInWithPassword({ email, password: oldPassword });
+    throw new Error("Password was not confirmed by Supabase. Check Auth password-change security settings, then try again.");
+  }
 }
 
 export async function getCurrentAdminSession() {
