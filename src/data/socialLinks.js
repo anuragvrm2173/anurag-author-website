@@ -1,9 +1,13 @@
+function envOrFallback(key, fallback) {
+  return (import.meta.env[key] || fallback).trim();
+}
+
 const socialLinks = [
   {
     id: "instagram",
     name: "Instagram",
     icon: "instagram",
-    url: "https://instagram.com/anuragvrm2173",
+    url: envOrFallback("VITE_SOCIAL_INSTAGRAM_URL", "https://instagram.com/anuragvrm2173"),
     external: true,
     active: true,
   },
@@ -11,7 +15,7 @@ const socialLinks = [
     id: "youtube",
     name: "YouTube",
     icon: "youtube",
-    url: "https://youtube.com/@anuragvermavlog",
+    url: envOrFallback("VITE_SOCIAL_YOUTUBE_URL", "https://youtube.com/@anuragvermavlog"),
     external: true,
     active: true,
   },
@@ -19,7 +23,7 @@ const socialLinks = [
     id: "amazon-author",
     name: "Amazon Author",
     icon: "amazon",
-    url: "https://amazon.in/stores/Anurag-Verma/author/B0H7PH8QW4",
+    url: envOrFallback("VITE_SOCIAL_AMAZON_AUTHOR_URL", "https://amazon.in/stores/Anurag-Verma/author/B0H7PH8QW4"),
     external: true,
     active: true,
   },
@@ -27,7 +31,7 @@ const socialLinks = [
     id: "goodreads",
     name: "Goodreads",
     icon: "goodreads",
-    url: "https://goodreads.com/anuragvrm2173",
+    url: envOrFallback("VITE_SOCIAL_GOODREADS_URL", "https://goodreads.com/anuragvrm2173"),
     external: true,
     active: true,
   },
@@ -35,7 +39,7 @@ const socialLinks = [
     id: "email",
     name: "Email",
     icon: "email",
-    url: "mailto:vanuragverma2173@gmail.com",
+    url: envOrFallback("VITE_CONTACT_EMAIL_URL", "mailto:vanuragverma2173@gmail.com"),
     external: false,
     active: true,
   },

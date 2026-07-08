@@ -1,39 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://example.com/</loc>
+    <loc>https://anurag-author-website.vercel.app/</loc>
   </url>
   <url>
-    <loc>https://example.com/about</loc>
+    <loc>https://anurag-author-website.vercel.app/about</loc>
   </url>
   <url>
-    <loc>https://example.com/library</loc>
+    <loc>https://anurag-author-website.vercel.app/library</loc>
   </url>
   <url>
-    <loc>https://example.com/library/the-last-goodbye</loc>
+    <loc>https://anurag-author-website.vercel.app/reviews</loc>
   </url>
   <url>
-    <loc>https://example.com/library/the-untold-stories</loc>
+    <loc>https://anurag-author-website.vercel.app/blog</loc>
   </url>
   <url>
-    <loc>https://example.com/library/lessons-of-the-heart</loc>
+    <loc>https://anurag-author-website.vercel.app/contact</loc>
   </url>
   <url>
-    <loc>https://example.com/reviews</loc>
+    <loc>https://anurag-author-website.vercel.app/search</loc>
   </url>
   <url>
-    <loc>https://example.com/blog</loc>
+    <loc>https://anurag-author-website.vercel.app/privacy</loc>
   </url>
   <url>
-    <loc>https://example.com/contact</loc>
+    <loc>https://anurag-author-website.vercel.app/terms</loc>
   </url>
   <url>
-    <loc>https://example.com/search</loc>
+    <loc>https://anurag-author-website.vercel.app/library/the-last-goodbye-i-never-got</loc>
   </url>
   <url>
-    <loc>https://example.com/privacy</loc>
+    <loc>https://anurag-author-website.vercel.app/library/the-untold-stories</loc>
   </url>
   <url>
-    <loc>https://example.com/terms</loc>
+    <loc>https://anurag-author-website.vercel.app/library/lessons-of-the-heart</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/the-story-behind-the-words</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/why-i-wrote-the-last-goodbye</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/how-personal-loss-changed-my-writing</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/why-stories-matter-more-than-advice</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/difference-between-healing-and-moving-on</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/behind-the-book-untold-stories</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/what-readers-carry-from-stories</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/writing-with-emotional-honesty</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/family-memory-and-language</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/from-draft-to-book</loc>
+  </url>
+  <url>
+    <loc>https://anurag-author-website.vercel.app/blog/why-books-still-matter</loc>
   </url>
 </urlset>

@@ -88,3 +88,32 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## Environment
+Copy `.env.example` to `.env.local` and fill in the values needed for production.
+
+Core values:
+- `VITE_SITE_URL`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_CONTACT_FORM_ENDPOINT`
+- newsletter provider env vars for your chosen provider
+- `VITE_GOOGLE_SITE_VERIFICATION`
+- `VITE_BING_SITE_VERIFICATION`
+- `VITE_GA_MEASUREMENT_ID`
+- `VITE_CLARITY_PROJECT_ID`
+
+## Deployment
+The project is prepared for Vercel with:
+- SPA rewrites in `vercel.json`
+- build-time `robots.txt` and `sitemap.xml` generation
+- environment-driven production domain and analytics configuration
+
+Recommended deployment flow:
+
+```bash
+npm install
+npm run build
+```
+
+Then add the same environment variables in the Vercel project settings before deploying.

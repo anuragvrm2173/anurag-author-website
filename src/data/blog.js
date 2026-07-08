@@ -275,13 +275,6 @@ export const blogPosts = [
 	},
 ];
 
-function normalizeText(value) {
-	return String(value || "")
-		.toLowerCase()
-		.replace(/[^a-z0-9\u0900-\u097f]+/g, " ")
-		.trim();
-}
-
 function getBlogCorpus(post) {
 	const sectionText = (post.contentSections || [])
 		.flatMap((section) => [section.heading, ...(section.paragraphs || [])])
