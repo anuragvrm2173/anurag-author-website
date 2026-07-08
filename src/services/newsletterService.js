@@ -2,6 +2,39 @@ import { hasSupabase, supabase } from "./supabaseClient";
 
 const PROVIDER = (import.meta.env.VITE_NEWSLETTER_PROVIDER || "").toLowerCase();
 const PROXY_ENDPOINT = import.meta.env.VITE_NEWSLETTER_PROXY_ENDPOINT;
+const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT
+  || import.meta.env.VITE_CONTACT_FORM_ENDPOINT
+  || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
+
+function canUseLocalStorage() {
+  return typeof window !== "undefined" && Boolean(window.localStorage);
+}
+
+async function sendAdminNewsletterCopy(email, source, deliveryChannel) {
+  if (!ADMIN_NOTIFICATION_ENDPOINT) {
+    return false;
+  }
+
+  const response = await fetch(ADMIN_NOTIFICATION_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      name: "Newsletter Signup",
+      email,
+      message: `A new newsletter subscription was received.\n\nEmail: ${email}\nSource: ${source || "unknown"}\nDelivery: ${deliveryChannel}`,
+      _subject: "New Newsletter Signup (Website)",
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Newsletter admin notification failed");
+  }
+
+  return true;
+}
 
 async function subscribeThroughProxy(email, source) {
   const response = await fetch(PROXY_ENDPOINT, {
@@ -88,6 +121,10 @@ async function subscribeBrevo(email, source) {
 }
 
 function storeSignupLocally(email, source) {
+  if (!canUseLocalStorage()) {
+    throw new Error("Local storage is unavailable");
+  }
+
   const list = JSON.parse(window.localStorage.getItem("newsletter_signups") || "[]");
   list.push({ email, source, provider: PROVIDER || "local", signupDate: new Date().toISOString() });
   window.localStorage.setItem("newsletter_signups", JSON.stringify(list));
@@ -136,35 +173,64 @@ async function syncWithExternalProvider(email, source) {
 }
 
 export async function subscribeToNewsletter(email, source) {
-  let storedInSupabase = false;
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const normalizedSource = String(source || "Website").trim();
+
+  if (!normalizedEmail) {
+    throw new Error("Please enter your email address.");
+  }
+
+  let deliveryChannel = "none";
 
   if (hasSupabase()) {
     try {
-      await storeSignupInSupabase(email, source);
-      storedInSupabase = true;
+      await storeSignupInSupabase(normalizedEmail, normalizedSource);
+      deliveryChannel = "supabase";
     } catch {
       // Continue with provider/local fallback when Supabase table is missing or unavailable.
     }
 
     try {
-      await syncWithExternalProvider(email, source);
+      const synced = await syncWithExternalProvider(normalizedEmail, normalizedSource);
+      if (synced) {
+        deliveryChannel = deliveryChannel === "none" ? "provider" : `${deliveryChannel}+provider`;
+      }
     } catch (error) {
       console.error("Newsletter provider sync failed", error);
     }
+  }
 
-    if (storedInSupabase) {
-      return;
+  if (deliveryChannel === "none") {
+    try {
+      const synced = await syncWithExternalProvider(normalizedEmail, normalizedSource);
+      if (synced) {
+        deliveryChannel = "provider";
+      }
+    } catch (error) {
+      console.error("Newsletter fallback provider sync failed", error);
     }
   }
 
+  if (deliveryChannel === "none") {
+    try {
+      storeSignupLocally(normalizedEmail, normalizedSource);
+      deliveryChannel = "local";
+    } catch {
+      throw new Error("We could not complete your subscription right now. Please try again.");
+    }
+  }
+
+  let copySent = false;
   try {
-    const synced = await syncWithExternalProvider(email, source);
-    if (synced) {
-      return;
-    }
-  } catch (error) {
-    console.error("Newsletter fallback provider sync failed", error);
+    copySent = await sendAdminNewsletterCopy(normalizedEmail, normalizedSource, deliveryChannel);
+  } catch {
+    // Subscription already succeeded through at least one channel.
   }
 
-  storeSignupLocally(email, source);
+  return {
+    ok: true,
+    deliveryChannel,
+    copySent,
+    delivered: deliveryChannel !== "local",
+  };
 }

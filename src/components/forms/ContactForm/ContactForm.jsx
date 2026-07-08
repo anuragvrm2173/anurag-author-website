@@ -6,10 +6,12 @@ import "./ContactForm.css";
 
 function ContactForm() {
   const [status, setStatus] = useState("idle");
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus("loading");
+    setStatusMessage("");
 
     const formData = new FormData(event.currentTarget);
     const payload = {
@@ -19,11 +21,17 @@ function ContactForm() {
     };
 
     try {
-      await submitContactMessage(payload);
+      const result = await submitContactMessage(payload);
       event.currentTarget.reset();
       setStatus("success");
-    } catch {
+      if (result.delivered) {
+        setStatusMessage("Your message was sent successfully. Thank you for reaching out.");
+      } else {
+        setStatusMessage("Your message was saved successfully. Delivery will retry shortly.");
+      }
+    } catch (error) {
       setStatus("error");
+      setStatusMessage(error.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -48,12 +56,12 @@ function ContactForm() {
 
       {status === "success" ? (
         <p className="contact-form__status contact-form__status--success" role="status">
-          Your message was sent successfully.
+          {statusMessage || "Your message was sent successfully."}
         </p>
       ) : null}
       {status === "error" ? (
         <p className="contact-form__status contact-form__status--error" role="alert">
-          Something went wrong. Please try again.
+          {statusMessage || "Something went wrong. Please try again."}
         </p>
       ) : null}
     </form>

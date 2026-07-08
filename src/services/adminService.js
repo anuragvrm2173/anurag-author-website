@@ -284,6 +284,22 @@ export async function signOutAdmin() {
   await supabase.auth.signOut();
 }
 
+export async function changeAdminPassword(nextPassword) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is required to change password.");
+  }
+
+  const password = String(nextPassword || "").trim();
+  if (password.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    throw error;
+  }
+}
+
 export async function getCurrentAdminSession() {
   if (!hasSupabase()) {
     return { session: null, user: null, authorized: false, reason: "missing-supabase" };

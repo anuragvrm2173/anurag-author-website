@@ -8,6 +8,7 @@ import { subscribeToNewsletter } from "../../services/newsletterService";
 
 function Newsletter({ source = "Homepage" }) {
   const [status, setStatus] = useState("idle");
+  const [statusMessage, setStatusMessage] = useState("");
   const isLoading = status === "loading";
 
   const handleSubmit = async (event) => {
@@ -19,12 +20,19 @@ function Newsletter({ source = "Homepage" }) {
     }
 
     setStatus("loading");
+    setStatusMessage("");
     try {
-      await subscribeToNewsletter(email, source);
+      const result = await subscribeToNewsletter(email, source);
       event.currentTarget.reset();
       setStatus("success");
-    } catch {
+      if (result.delivered) {
+        setStatusMessage("You are subscribed successfully. Welcome.");
+      } else {
+        setStatusMessage("You are on the list. We will finalize delivery as services recover.");
+      }
+    } catch (error) {
       setStatus("error");
+      setStatusMessage(error.message || "We couldn't subscribe you right now. Please try again.");
     }
   };
 
@@ -52,13 +60,13 @@ function Newsletter({ source = "Homepage" }) {
 
           {status === "success" ? (
             <p className="newsletter__status newsletter__status--success" role="status">
-              You are subscribed. Welcome.
+              {statusMessage || "You are subscribed. Welcome."}
             </p>
           ) : null}
 
           {status === "error" ? (
             <p id="newsletter-status" className="newsletter__status newsletter__status--error" role="status">
-              We couldn't subscribe you right now. This is usually a temporary issue. Please try again in a few moments, or contact me directly if the problem continues.
+              {statusMessage || "We couldn't subscribe you right now. This is usually a temporary issue. Please try again in a few moments, or contact me directly if the problem continues."}
             </p>
           ) : null}
         </div>

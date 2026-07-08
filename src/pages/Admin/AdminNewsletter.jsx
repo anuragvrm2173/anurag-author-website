@@ -4,6 +4,26 @@ import { useEffect, useState } from "react";
 
 import { deleteAdminNewsletterSubscriber, fetchAdminNewsletterSubscribers } from "../../services/adminService";
 
+function createSubscriberReplyLink(subscriber) {
+  const recipient = String(subscriber.email || "").trim();
+  if (!recipient) {
+    return "";
+  }
+
+  const subject = encodeURIComponent("Thanks for subscribing");
+  const body = encodeURIComponent([
+    "Hi,",
+    "",
+    "Thank you for subscribing to my newsletter.",
+    "I appreciate your support and look forward to sharing new writing updates with you.",
+    "",
+    "Warmly,",
+    "Anurag Verma",
+  ].join("\n"));
+
+  return `mailto:${recipient}?subject=${subject}&body=${body}`;
+}
+
 function AdminNewsletter() {
   const [subscribers, setSubscribers] = useState([]);
   const [error, setError] = useState("");
@@ -78,6 +98,11 @@ function AdminNewsletter() {
                 <td><span className={`admin-status-pill admin-status-pill--${subscriber.status || "active"}`}>{subscriber.status || "active"}</span></td>
                 <td>
                   <div className="admin-table__actions">
+                    {createSubscriberReplyLink(subscriber) ? (
+                      <a className="admin-inline-button" href={createSubscriberReplyLink(subscriber)}>
+                        Email
+                      </a>
+                    ) : null}
                     <button type="button" className="admin-inline-button admin-inline-button--danger" onClick={async () => {
                       await deleteAdminNewsletterSubscriber(subscriber.id);
                       setSubscribers((current) => current.map((item) => item.id === subscriber.id ? { ...item, status: "deleted" } : item));

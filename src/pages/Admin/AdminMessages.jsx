@@ -5,6 +5,28 @@ import { useSearchParams } from "react-router-dom";
 
 import { fetchAdminMessages, updateAdminMessage } from "../../services/adminService";
 
+function createReplyLink(message) {
+  const recipient = String(message.email || "").trim();
+  if (!recipient) {
+    return "";
+  }
+
+  const subject = encodeURIComponent(`Re: Your message to Anurag Verma`);
+  const body = encodeURIComponent([
+    `Hi ${message.name || "there"},`,
+    "",
+    "Thank you for your message.",
+    "",
+    "Best regards,",
+    "Anurag Verma",
+    "",
+    "--- Original Message ---",
+    message.message || "",
+  ].join("\n"));
+
+  return `mailto:${recipient}?subject=${subject}&body=${body}`;
+}
+
 function AdminMessages() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [messages, setMessages] = useState([]);
@@ -89,6 +111,11 @@ function AdminMessages() {
                   <td><span className={`admin-status-pill admin-status-pill--${message.status}`}>{message.status}</span></td>
                   <td>
                     <div className="admin-table__actions">
+                      {createReplyLink(message) ? (
+                        <a className="admin-inline-button" href={createReplyLink(message)}>
+                          Reply
+                        </a>
+                      ) : null}
                       {message.status === "unread" ? <button type="button" className="admin-inline-button" onClick={async () => {
                         await updateAdminMessage(message.id, { status: "read" });
                         setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "read" } : item));
