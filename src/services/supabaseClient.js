@@ -11,7 +11,7 @@ export const adminAllowedEmail = (import.meta.env.VITE_ADMIN_ALLOWED_EMAIL || "V
 
 export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey, {
-    auth: { persistSession: true, autoRefreshToken: true },
+    auth: { persistSession: false, autoRefreshToken: true },
   })
   : null;
 
