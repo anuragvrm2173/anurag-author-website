@@ -92,3 +92,30 @@
   border-color: rgba(201, 163, 78, 0.56);
   background: rgba(252, 247, 239, 0.98);
 }
+
+@media (max-width: 640px) {
+  .blog-card {
+    padding: 1.15rem;
+    gap: 0.8rem;
+  }
+
+  .blog-card__visual {
+    min-height: 11.25rem;
+    padding: 1rem;
+  }
+
+  .blog-card__title {
+    font-size: 1.35rem;
+  }
+
+  .blog-card__excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-card__link {
+    width: 100%;
+  }
+}

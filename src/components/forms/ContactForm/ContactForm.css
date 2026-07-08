@@ -46,3 +46,25 @@
 .contact-form__status--error {
   color: #8b1e1e;
 }
+
+@media (max-width: 640px) {
+  .contact-form {
+    gap: 0.9rem;
+  }
+
+  .contact-form__field input,
+  .contact-form__field textarea {
+    min-height: 3.1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+  }
+
+  .contact-form__field textarea {
+    min-height: 8rem;
+  }
+
+  .contact-form .button {
+    width: 100%;
+    min-height: 3.1rem;
+  }
+}

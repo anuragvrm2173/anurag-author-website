@@ -238,25 +238,70 @@
 
 @media (max-width: 767px) {
   .hero {
-    padding: 5.5rem 0 4.5rem;
+    padding: 4.7rem 0 3.8rem;
   }
 
   .hero__text {
-    gap: 1.25rem;
+    gap: 1.1rem;
+  }
+
+  .hero__title {
+    font-size: clamp(2.45rem, 11vw, 3.5rem);
+    line-height: 1.02;
+  }
+
+  .hero__description {
+    font-size: 1rem;
+    line-height: 1.75;
   }
 
   .hero__buttons {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+
+  .hero__buttons > * {
+    width: 100%;
   }
 
   .hero__spotlight {
     min-height: auto;
-    padding: 1.45rem;
+    gap: 1rem;
+    padding: 1.25rem;
+    width: 100%;
+  }
+
+  .hero__spotlight-title {
+    font-size: clamp(1.65rem, 7vw, 2.2rem);
+  }
+
+  .hero__spotlight-copy {
+    font-size: 0.96rem;
+    line-height: 1.68;
+  }
+
+  .hero__spotlight-author {
+    padding: 0.65rem 0.7rem;
+  }
+
+  .hero__spotlight-cta {
+    width: 100%;
+    text-align: center;
   }
 
   .hero__spotlight-edition-cover {
     width: min(100%, 6.8rem);
+  }
+}
+
+@media (max-width: 430px) {
+  .hero__spotlight-editions {
+    gap: 0.65rem;
+  }
+
+  .hero__spotlight-edition-cover {
+    width: min(100%, 5.8rem);
   }
 }
 
