@@ -284,6 +284,68 @@ export async function signOutAdmin() {
   await supabase.auth.signOut();
 }
 
+export async function requestAdminPasswordOtp(email) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is not configured for password reset.");
+  }
+
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) {
+    throw new Error("Admin email is required.");
+  }
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email: normalizedEmail,
+    options: { shouldCreateUser: false },
+  });
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function verifyAdminOtpAndResetPassword(email, otp, nextPassword) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is not configured for password reset.");
+  }
+
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const normalizedOtp = String(otp || "").trim();
+  const normalizedPassword = String(nextPassword || "").trim();
+
+  if (!normalizedEmail) {
+    throw new Error("Admin email is required.");
+  }
+
+  if (!normalizedOtp) {
+    throw new Error("OTP is required.");
+  }
+
+  if (normalizedPassword.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
+  }
+
+  const { error: verifyError } = await supabase.auth.verifyOtp({
+    email: normalizedEmail,
+    token: normalizedOtp,
+    type: "email",
+  });
+
+  if (verifyError) {
+    throw new Error("Invalid or expired OTP. Please request a new OTP.");
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: normalizedPassword,
+  });
+
+  if (updateError) {
+    throw updateError;
+  }
+
+  await supabase.auth.signOut();
+}
+
 export async function changeAdminPassword(currentPassword, nextPassword) {
   if (!hasSupabase()) {
     throw new Error("Supabase is required to change password.");
