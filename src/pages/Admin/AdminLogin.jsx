@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Button from "../../components/ui/Button/Button";
-import { adminAllowedEmail, getMissingSupabaseEnvVars } from "../../services/supabaseClient";
+import { adminAllowedEmail, getMissingSupabaseEnvVars, hasSupabase } from "../../services/supabaseClient";
 import { getCurrentAdminSession, signInAdmin } from "../../services/adminService";
 
 function AdminLogin() {
@@ -17,6 +17,7 @@ function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const missingEnvVars = getMissingSupabaseEnvVars();
+  const supabaseConfigured = hasSupabase();
 
   useEffect(() => {
     let active = true;
@@ -88,7 +89,7 @@ function AdminLogin() {
             </div>
           </div>
 
-          {location.state?.reason === "missing-supabase" ? (
+          {!supabaseConfigured && location.state?.reason === "missing-supabase" ? (
             <p className="admin-auth__error">
               Supabase is not configured yet. Missing env vars: {missingEnvVars.length ? missingEnvVars.join(", ") : "VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY"}.
             </p>
