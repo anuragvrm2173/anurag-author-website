@@ -1,10 +1,10 @@
 import "./Admin.css";
 
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import Button from "../../components/ui/Button/Button";
-import { deleteAdminBook, fetchAdminBooks, generateSlug, getDefaultBookForm, upsertAdminBook, uploadAdminMediaFile } from "../../services/adminService";
+import { deleteAdminBook, fetchAdminBooks, generateSlug, getDefaultBookForm, restoreAdminBook, upsertAdminBook, uploadAdminMediaFile } from "../../services/adminService";
 
 function buildBookForm(book) {
   if (!book) {
@@ -197,15 +197,50 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
 function AdminBooks() {
   const navigate = useNavigate();
   const { bookId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isCreating = window.location.pathname.endsWith("/new");
   const [books, setBooks] = useState([]);
   const [error, setError] = useState("");
+  const [showArchived, setShowArchived] = useState(searchParams.get("archived") === "1");
+  const activeStatus = searchParams.get("status") || "all";
+
+  async function loadBooks(includeArchived = showArchived) {
+    const nextBooks = await fetchAdminBooks({ includeArchived });
+    setBooks(nextBooks);
+  }
 
   useEffect(() => {
-    fetchAdminBooks().then(setBooks).catch((nextError) => setError(nextError.message));
-  }, []);
+    let active = true;
+
+    fetchAdminBooks({ includeArchived: showArchived })
+      .then((nextBooks) => {
+        if (active) {
+          setBooks(nextBooks);
+        }
+      })
+      .catch((nextError) => {
+        if (active) {
+          setError(nextError.message);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [showArchived]);
 
   const selectedBook = useMemo(() => books.find((item) => item.id === bookId || item.slug === bookId) || null, [bookId, books]);
+  const filteredBooks = useMemo(() => {
+    if (activeStatus === "all") {
+      return books;
+    }
+
+    if (activeStatus === "draft") {
+      return books.filter((book) => ["draft", "coming soon"].includes(String(book.status || "").toLowerCase()));
+    }
+
+    return books.filter((book) => String(book.status || "").toLowerCase() === activeStatus.replace(/_/g, " "));
+  }, [activeStatus, books]);
   const initialForm = useMemo(() => buildBookForm(selectedBook), [selectedBook]);
   const formKey = isCreating ? "book-new" : selectedBook?.id || bookId || "book-default";
 
@@ -217,10 +252,71 @@ function AdminBooks() {
           <h1 className="admin-page__title">Manage books and editions</h1>
           <p className="admin-page__description">Create, update, and archive titles without editing source files.</p>
         </div>
-        <Link to="/admin/books/new" className="admin-link-button">Create Book</Link>
+        <div className="admin-page__actions">
+          <div className="admin-filter-group" role="tablist" aria-label="Book status filters">
+            {[
+              ["all", "All"],
+              ["draft", "Draft + Coming Soon"],
+              ["published", "Published"],
+              ["archived", "Archived"],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={`admin-filter-chip ${activeStatus === value ? "admin-filter-chip--active" : ""}`.trim()}
+                onClick={() => {
+                  const nextShowArchived = value === "archived";
+                  setShowArchived(nextShowArchived);
+                  setSearchParams((current) => {
+                    const nextParams = new URLSearchParams(current);
+                    if (value === "all") {
+                      nextParams.delete("status");
+                    } else {
+                      nextParams.set("status", value);
+                    }
+
+                    if (nextShowArchived) {
+                      nextParams.set("archived", "1");
+                    } else {
+                      nextParams.delete("archived");
+                    }
+
+                    return nextParams;
+                  });
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <label className="admin-toggle">
+            <input
+              type="checkbox"
+              checked={showArchived}
+              onChange={(event) => {
+                const nextChecked = event.target.checked;
+                setShowArchived(nextChecked);
+                setSearchParams((current) => {
+                  const nextParams = new URLSearchParams(current);
+                  if (nextChecked) {
+                    nextParams.set("archived", "1");
+                  } else {
+                    nextParams.delete("archived");
+                  }
+                  return nextParams;
+                });
+              }}
+            />
+            <span>Show archived</span>
+          </label>
+          <Link to="/admin/books/new" className="admin-link-button">Create Book</Link>
+        </div>
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
+      {books.length > 0 && filteredBooks.length === 0 ? (
+        <div className="admin-empty">No books match the current filter. Try a different status or turn off archived mode.</div>
+      ) : null}
 
       <div className="admin-grid">
         <div className="admin-table">
@@ -234,7 +330,7 @@ function AdminBooks() {
               </tr>
             </thead>
             <tbody>
-              {books.map((book) => (
+              {filteredBooks.map((book) => (
                 <tr key={book.id}>
                   <td>
                     <strong>{book.title}</strong>
@@ -245,23 +341,36 @@ function AdminBooks() {
                   <td>
                     <div className="admin-table__actions">
                       <Link to={`/admin/books/${book.id}`} className="admin-link-button">Edit</Link>
-                      <button
-                        type="button"
-                        className="admin-inline-button admin-inline-button--danger"
-                        onClick={async () => {
-                          if (!window.confirm(`Delete ${book.title}?`)) {
-                            return;
-                          }
+                      {book.deletedAt ? (
+                        <button
+                          type="button"
+                          className="admin-inline-button"
+                          onClick={async () => {
+                            await restoreAdminBook(book.id);
+                            await loadBooks(showArchived);
+                          }}
+                        >
+                          Restore
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="admin-inline-button admin-inline-button--danger"
+                          onClick={async () => {
+                            if (!window.confirm(`Delete ${book.title}?`)) {
+                              return;
+                            }
 
-                          await deleteAdminBook(book.id);
-                          setBooks((current) => current.filter((item) => item.id !== book.id));
-                          if (bookId === book.id) {
-                            navigate("/admin/books");
-                          }
-                        }}
-                      >
-                        Delete
-                      </button>
+                            await deleteAdminBook(book.id);
+                            await loadBooks(showArchived);
+                            if (bookId === book.id) {
+                              navigate("/admin/books");
+                            }
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -276,7 +385,7 @@ function AdminBooks() {
           selectedBook={selectedBook}
           onError={setError}
           onSaved={async () => {
-            setBooks(await fetchAdminBooks());
+            await loadBooks(showArchived);
           }}
           onReset={() => navigate("/admin/books")}
         />

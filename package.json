@@ -9,6 +9,8 @@
     "seed:content": "node scripts/generate-content-seed.mjs",
     "build": "npm run generate:seo && vite build",
     "lint": "eslint .",
+    "deploy": "npx vercel --prod",
+    "deploy:preview": "npx vercel",
     "preview": "vite preview",
     "optimize:images": "node scripts/optimize-images.mjs"
   },

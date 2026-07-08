@@ -1,11 +1,11 @@
 import "./Admin.css";
 
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import RichTextEditor from "../../components/forms/RichTextEditor/RichTextEditor";
 import Button from "../../components/ui/Button/Button";
-import { deleteAdminBlogPost, fetchAdminBlogPosts, generateSlug, getDefaultBlogForm, upsertAdminBlogPost } from "../../services/adminService";
+import { deleteAdminBlogPost, fetchAdminBlogPosts, generateSlug, getDefaultBlogForm, restoreAdminBlogPost, upsertAdminBlogPost } from "../../services/adminService";
 
 function buildBlogForm(post) {
   if (!post) {
@@ -135,16 +135,47 @@ function BlogEditorForm({ initialForm, selectedPost, onSaved, onError, onReset }
 function AdminBlog() {
   const navigate = useNavigate();
   const { postId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isCreating = window.location.pathname.endsWith("/new");
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
   const [revisionDraft, setRevisionDraft] = useState(null);
+  const [showArchived, setShowArchived] = useState(searchParams.get("archived") === "1");
+  const activeStatus = searchParams.get("status") || "all";
+
+  async function loadPosts(includeArchived = showArchived) {
+    const nextPosts = await fetchAdminBlogPosts({ includeArchived });
+    setPosts(nextPosts);
+  }
 
   useEffect(() => {
-    fetchAdminBlogPosts().then(setPosts).catch((nextError) => setError(nextError.message));
-  }, []);
+    let active = true;
+
+    fetchAdminBlogPosts({ includeArchived: showArchived })
+      .then((nextPosts) => {
+        if (active) {
+          setPosts(nextPosts);
+        }
+      })
+      .catch((nextError) => {
+        if (active) {
+          setError(nextError.message);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [showArchived]);
 
   const selectedPost = useMemo(() => posts.find((item) => item.id === postId || item.slug === postId) || null, [postId, posts]);
+  const filteredPosts = useMemo(() => {
+    if (activeStatus === "all") {
+      return posts;
+    }
+
+    return posts.filter((post) => String(post.status || "").toLowerCase() === activeStatus.replace(/_/g, " "));
+  }, [activeStatus, posts]);
   const activeRevisionDraft = useMemo(() => {
     if (!revisionDraft || !selectedPost || revisionDraft.sourceId !== selectedPost.id) {
       return null;
@@ -171,10 +202,71 @@ function AdminBlog() {
           <h1 className="admin-page__title">Publish without code changes</h1>
           <p className="admin-page__description">Manage article metadata, content, SEO, and related books from one editor.</p>
         </div>
-        <Link to="/admin/blog/new" className="admin-link-button">Create Post</Link>
+        <div className="admin-page__actions">
+          <div className="admin-filter-group" role="tablist" aria-label="Blog status filters">
+            {[
+              ["all", "All"],
+              ["draft", "Draft"],
+              ["published", "Published"],
+              ["archived", "Archived"],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={`admin-filter-chip ${activeStatus === value ? "admin-filter-chip--active" : ""}`.trim()}
+                onClick={() => {
+                  const nextShowArchived = value === "archived";
+                  setShowArchived(nextShowArchived);
+                  setSearchParams((current) => {
+                    const nextParams = new URLSearchParams(current);
+                    if (value === "all") {
+                      nextParams.delete("status");
+                    } else {
+                      nextParams.set("status", value);
+                    }
+
+                    if (nextShowArchived) {
+                      nextParams.set("archived", "1");
+                    } else {
+                      nextParams.delete("archived");
+                    }
+
+                    return nextParams;
+                  });
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <label className="admin-toggle">
+            <input
+              type="checkbox"
+              checked={showArchived}
+              onChange={(event) => {
+                const nextChecked = event.target.checked;
+                setShowArchived(nextChecked);
+                setSearchParams((current) => {
+                  const nextParams = new URLSearchParams(current);
+                  if (nextChecked) {
+                    nextParams.set("archived", "1");
+                  } else {
+                    nextParams.delete("archived");
+                  }
+                  return nextParams;
+                });
+              }}
+            />
+            <span>Show archived</span>
+          </label>
+          <Link to="/admin/blog/new" className="admin-link-button">Create Post</Link>
+        </div>
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
+      {posts.length > 0 && filteredPosts.length === 0 ? (
+        <div className="admin-empty">No posts match the current filter. Try a different status or turn off archived mode.</div>
+      ) : null}
 
       <div className="admin-grid">
         <div className="admin-table">
@@ -189,7 +281,7 @@ function AdminBlog() {
               </tr>
             </thead>
             <tbody>
-              {posts.map((post) => (
+              {filteredPosts.map((post) => (
                 <tr key={post.id}>
                   <td>
                     <strong>{post.title}</strong>
@@ -201,23 +293,36 @@ function AdminBlog() {
                   <td>
                     <div className="admin-table__actions">
                       <Link to={`/admin/blog/${post.id}`} className="admin-link-button">Edit</Link>
-                      <button
-                        type="button"
-                        className="admin-inline-button admin-inline-button--danger"
-                        onClick={async () => {
-                          if (!window.confirm(`Delete ${post.title}?`)) {
-                            return;
-                          }
+                      {post.deletedAt ? (
+                        <button
+                          type="button"
+                          className="admin-inline-button"
+                          onClick={async () => {
+                            await restoreAdminBlogPost(post.id);
+                            await loadPosts(showArchived);
+                          }}
+                        >
+                          Restore
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="admin-inline-button admin-inline-button--danger"
+                          onClick={async () => {
+                            if (!window.confirm(`Delete ${post.title}?`)) {
+                              return;
+                            }
 
-                          await deleteAdminBlogPost(post.id);
-                          setPosts((current) => current.filter((item) => item.id !== post.id));
-                          if (postId === post.id) {
-                            navigate("/admin/blog");
-                          }
-                        }}
-                      >
-                        Delete
-                      </button>
+                            await deleteAdminBlogPost(post.id);
+                            await loadPosts(showArchived);
+                            if (postId === post.id) {
+                              navigate("/admin/blog");
+                            }
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -233,7 +338,7 @@ function AdminBlog() {
           onError={setError}
           onSaved={async () => {
             setRevisionDraft(null);
-            setPosts(await fetchAdminBlogPosts());
+            await loadPosts(showArchived);
           }}
           onReset={() => navigate("/admin/blog")}
         />

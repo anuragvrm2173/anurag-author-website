@@ -154,6 +154,15 @@ Recommended deployment flow:
 ```bash
 npm install
 npm run build
+npm run deploy
 ```
+
+If you want a preview deploy instead of production, use:
+
+```bash
+npm run deploy:preview
+```
+
+These scripts use `npx vercel`, so they work even when the Vercel CLI is not installed globally.
 
 Then add the same environment variables in the Vercel project settings before deploying.

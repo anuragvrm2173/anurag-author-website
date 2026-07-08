@@ -1,6 +1,7 @@
 import "./Admin.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { deleteAdminReview, fetchAdminReviews, updateAdminReview } from "../../services/adminService";
 
@@ -18,12 +19,26 @@ function getNextReviewStatus(status) {
 }
 
 function AdminReviews() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState("");
+  const activeStatus = searchParams.get("status") || "all";
 
   useEffect(() => {
     fetchAdminReviews().then(setReviews).catch((nextError) => setError(nextError.message));
   }, []);
+
+  const filteredReviews = useMemo(() => {
+    if (activeStatus === "all") {
+      return reviews;
+    }
+
+    if (activeStatus === "pending") {
+      return reviews.filter((review) => ["submitted", "pending"].includes(review.status));
+    }
+
+    return reviews.filter((review) => review.status === activeStatus);
+  }, [activeStatus, reviews]);
 
   return (
     <section className="admin-page">
@@ -33,11 +48,41 @@ function AdminReviews() {
           <h1 className="admin-page__title">Moderate reader feedback</h1>
           <p className="admin-page__description">Approve, reject, feature, edit, or remove incoming reviews.</p>
         </div>
+        <div className="admin-filter-group" role="tablist" aria-label="Review status filters">
+          {[
+            ["all", "All"],
+            ["pending", "Pending Queue"],
+            ["approved", "Approved"],
+            ["published", "Published"],
+            ["rejected", "Rejected"],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={`admin-filter-chip ${activeStatus === value ? "admin-filter-chip--active" : ""}`.trim()}
+              onClick={() => {
+                setSearchParams((current) => {
+                  const nextParams = new URLSearchParams(current);
+                  if (value === "all") {
+                    nextParams.delete("status");
+                  } else {
+                    nextParams.set("status", value);
+                  }
+                  return nextParams;
+                });
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
+      {reviews.length > 0 && filteredReviews.length === 0 ? <div className="admin-empty">No reviews match the current filter.</div> : null}
 
-      <div className="admin-table">
+      {filteredReviews.length > 0 ? (
+        <div className="admin-table">
         <table>
           <thead>
             <tr>
@@ -49,7 +94,7 @@ function AdminReviews() {
             </tr>
           </thead>
           <tbody>
-            {reviews.map((review) => (
+            {filteredReviews.map((review) => (
               <tr key={review.id}>
                 <td>
                   <strong>{review.reviewerName}</strong>
@@ -90,7 +135,8 @@ function AdminReviews() {
             ))}
           </tbody>
         </table>
-      </div>
+        </div>
+      ) : null}
     </section>
   );
 }

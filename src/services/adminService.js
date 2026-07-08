@@ -335,16 +335,22 @@ export function subscribeToAdminAuth(callback) {
 export async function fetchAdminDashboardStats() {
   if (!hasSupabase()) {
     const draftBooks = books.filter((book) => ["Coming Soon", "Draft"].includes(book.status)).length;
+    const publishedBooks = books.filter((book) => book.status === "Published").length;
     const latestBlogTitle = blogPosts[0]?.title || null;
     return {
       books: books.length,
       blogPosts: blogPosts.length,
       draftBooks,
+      publishedBooks,
+      archivedBooks: 0,
       draftPosts: 0,
+      publishedPosts: blogPosts.length,
+      archivedPosts: 0,
       pendingReviews: localReviews.filter((review) => ["submitted", "pending"].includes(review.status)).length,
       publishedReviews: localReviews.filter((review) => ["approved", "published"].includes(review.status)).length,
       newsletterSubscribers: 0,
       messages: 0,
+      unreadMessages: 0,
       latestBlogTitle,
       recentActivity: [
         { id: "local-books", label: `${books.length} local books available`, timestamp: new Date().toISOString() },
@@ -354,37 +360,52 @@ export async function fetchAdminDashboardStats() {
     };
   }
 
-  const [booksResult, draftBooksResult, blogResult, draftPostsResult, latestBlogResult, reviewsResult, newsletterResult, messagesResult, settingsResult] = await Promise.all([
+  const [booksResult, draftBooksResult, publishedBooksResult, archivedBooksResult, blogResult, draftPostsResult, publishedPostsResult, archivedPostsResult, latestBlogResult, reviewsResult, newsletterResult, messagesResult, unreadMessagesResult, settingsResult] = await Promise.all([
     supabase.from("books").select("id", { count: "exact", head: true }).is("deleted_at", null),
     supabase.from("books").select("id", { count: "exact", head: true }).is("deleted_at", null).in("status", ["draft", "coming_soon"]),
+    supabase.from("books").select("id", { count: "exact", head: true }).is("deleted_at", null).eq("status", "published"),
+    supabase.from("books").select("id", { count: "exact", head: true }).not("deleted_at", "is", null),
     supabase.from("blog_posts").select("id", { count: "exact", head: true }).is("deleted_at", null),
     supabase.from("blog_posts").select("id", { count: "exact", head: true }).is("deleted_at", null).eq("status", "draft"),
+    supabase.from("blog_posts").select("id", { count: "exact", head: true }).is("deleted_at", null).eq("status", "published"),
+    supabase.from("blog_posts").select("id", { count: "exact", head: true }).not("deleted_at", "is", null),
     supabase.from("blog_posts").select("title, updated_at").is("deleted_at", null).order("updated_at", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("reviews").select("status"),
     supabase.from("newsletter_subscribers").select("id", { count: "exact", head: true }).eq("status", "active").is("deleted_at", null),
     supabase.from("messages").select("id", { count: "exact", head: true }).neq("status", "archived").is("deleted_at", null),
+    supabase.from("messages").select("id", { count: "exact", head: true }).is("deleted_at", null).neq("status", "read").neq("status", "archived"),
     supabase.from("site_settings").select("updated_at").order("updated_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
   if (booksResult.error) throw booksResult.error;
   if (draftBooksResult.error) throw draftBooksResult.error;
+  if (publishedBooksResult.error) throw publishedBooksResult.error;
+  if (archivedBooksResult.error) throw archivedBooksResult.error;
   if (blogResult.error) throw blogResult.error;
   if (draftPostsResult.error) throw draftPostsResult.error;
+  if (publishedPostsResult.error) throw publishedPostsResult.error;
+  if (archivedPostsResult.error) throw archivedPostsResult.error;
   if (reviewsResult.error) throw reviewsResult.error;
   if (newsletterResult.error) throw newsletterResult.error;
   if (messagesResult.error) throw messagesResult.error;
+  if (unreadMessagesResult.error) throw unreadMessagesResult.error;
 
   const reviewRows = reviewsResult.data || [];
 
   return {
     books: booksResult.count || 0,
     draftBooks: draftBooksResult.count || 0,
+    publishedBooks: publishedBooksResult.count || 0,
+    archivedBooks: archivedBooksResult.count || 0,
     blogPosts: blogResult.count || 0,
     draftPosts: draftPostsResult.count || 0,
+    publishedPosts: publishedPostsResult.count || 0,
+    archivedPosts: archivedPostsResult.count || 0,
     pendingReviews: reviewRows.filter((review) => ["submitted", "pending"].includes(review.status)).length,
     publishedReviews: reviewRows.filter((review) => review.status === "published").length,
     newsletterSubscribers: newsletterResult.count || 0,
     messages: messagesResult.count || 0,
+    unreadMessages: unreadMessagesResult.count || 0,
     latestBlogTitle: latestBlogResult.data?.title || null,
     recentActivity: [
       latestBlogResult.data?.title ? { id: "latest-blog", label: `Latest blog edited: ${latestBlogResult.data.title}`, timestamp: latestBlogResult.data.updated_at } : null,
@@ -394,12 +415,20 @@ export async function fetchAdminDashboardStats() {
   };
 }
 
-export async function fetchAdminBooks() {
+export async function fetchAdminBooks(options = {}) {
+  const { includeArchived = false } = options;
+
   if (!hasSupabase()) {
     return books.map((book, index) => ({ ...book, displayOrder: book.displayOrder ?? index }));
   }
 
-  const { data, error } = await supabase.from("books").select("*").is("deleted_at", null).order("display_order", { ascending: true }).order("updated_at", { ascending: false });
+  let query = supabase.from("books").select("*");
+
+  if (!includeArchived) {
+    query = query.is("deleted_at", null);
+  }
+
+  const { data, error } = await query.order("display_order", { ascending: true }).order("updated_at", { ascending: false });
   if (error) throw error;
   return (data || []).map(normalizeBookRow);
 }
@@ -423,12 +452,29 @@ export async function deleteAdminBook(bookId) {
   if (error) throw error;
 }
 
-export async function fetchAdminBlogPosts() {
+export async function restoreAdminBook(bookId) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is required to restore books.");
+  }
+
+  const { error } = await supabase.from("books").update({ deleted_at: null, status: "draft", updated_at: new Date().toISOString() }).eq("id", bookId);
+  if (error) throw error;
+}
+
+export async function fetchAdminBlogPosts(options = {}) {
+  const { includeArchived = false } = options;
+
   if (!hasSupabase()) {
     return blogPosts.map((post, index) => ({ ...post, slug: post.slug || post.id, displayOrder: index, bodyHtml: createLegacyHtml(post), status: post.status || "published" }));
   }
 
-  const { data, error } = await supabase.from("blog_posts").select("*").is("deleted_at", null).order("display_order", { ascending: true }).order("updated_at", { ascending: false });
+  let query = supabase.from("blog_posts").select("*");
+
+  if (!includeArchived) {
+    query = query.is("deleted_at", null);
+  }
+
+  const { data, error } = await query.order("display_order", { ascending: true }).order("updated_at", { ascending: false });
   if (error) throw error;
   return (data || []).map(normalizeBlogRow);
 }
@@ -470,6 +516,15 @@ export async function deleteAdminBlogPost(postId) {
   }
 
   const { error } = await supabase.from("blog_posts").update({ deleted_at: new Date().toISOString(), status: "archived", updated_at: new Date().toISOString() }).eq("id", postId);
+  if (error) throw error;
+}
+
+export async function restoreAdminBlogPost(postId) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is required to restore blog posts.");
+  }
+
+  const { error } = await supabase.from("blog_posts").update({ deleted_at: null, status: "draft", updated_at: new Date().toISOString() }).eq("id", postId);
   if (error) throw error;
 }
 
