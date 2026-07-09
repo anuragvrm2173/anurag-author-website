@@ -70,11 +70,7 @@ function normalizeRetailers(activeEdition) {
     };
   });
 
-  if (fromStructured.length > 0) {
-    return fromStructured;
-  }
-
-  return Object.entries(activeEdition.purchaseLinks || {})
+  const fromLinks = Object.entries(activeEdition.purchaseLinks || {})
     .filter(([key, value]) => !FORMAT_KEYS.has(key) && Boolean(value))
     .map(([key, value]) => {
       const safeUrl = sanitizeExternalUrl(value);
@@ -87,6 +83,29 @@ function normalizeRetailers(activeEdition) {
       statusLabel: null,
       };
     });
+
+  // Merge both sources so one incomplete structure doesn't hide valid links.
+  const merged = [...fromStructured];
+  const structuredByKey = new Map(fromStructured.map((item) => [item.key, item]));
+
+  fromLinks.forEach((item) => {
+    const existing = structuredByKey.get(item.key);
+    if (!existing) {
+      merged.push(item);
+      return;
+    }
+
+    if ((!existing.url || existing.available === false) && item.url) {
+      structuredByKey.set(item.key, {
+        ...existing,
+        available: true,
+        url: item.url,
+        statusLabel: null,
+      });
+    }
+  });
+
+  return merged.map((item) => structuredByKey.get(item.key) || item);
 }
 
 function formatCurrencyPrice(pricing) {

@@ -317,15 +317,25 @@ function AdminBooks() {
 
   // Extract links from an edition — handles both purchaseLinks and retailers formats
   function extractEditionLinks(ed) {
-    if (ed.purchaseLinks && Object.keys(ed.purchaseLinks).length > 0) return ed.purchaseLinks;
-    if (ed.retailers) {
-      const links = {};
-      Object.entries(ed.retailers).forEach(([key, r]) => {
-        if (r.available !== false && r.url) links[r.name || key] = r.url;
-      });
-      return links;
-    }
-    return {};
+    const links = {};
+
+    Object.entries(ed.purchaseLinks || {}).forEach(([key, url]) => {
+      if (typeof url === "string" && /^https?:\/\//i.test(url.trim())) {
+        links[key] = url.trim();
+      }
+    });
+
+    Object.entries(ed.retailers || {}).forEach(([key, r]) => {
+      const url = typeof r === "string" ? r : (r?.url || r?.href || "");
+      if ((typeof r === "string" || r?.available !== false) && typeof url === "string" && /^https?:\/\//i.test(url.trim())) {
+        const label = (typeof r === "object" && r?.name) ? r.name : key;
+        if (!links[label]) {
+          links[label] = url.trim();
+        }
+      }
+    });
+
+    return links;
   }
 
   // Flatten each book's editions into separate rows
