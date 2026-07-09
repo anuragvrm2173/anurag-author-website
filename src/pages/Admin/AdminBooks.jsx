@@ -50,6 +50,23 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
   const [saving, setSaving] = useState(false);
   const [slugTouched, setSlugTouched] = useState(Boolean(initialForm.slug));
 
+  // Parse purchase links JSON into editable rows
+  const [purchaseRows, setPurchaseRows] = useState(() => {
+    try {
+      const parsed = JSON.parse(initialForm.purchaseLinksJson || "{}");
+      return Object.entries(parsed).length > 0
+        ? Object.entries(parsed).map(([key, url]) => ({ key, url }))
+        : [{ key: "amazon", url: "" }];
+    } catch { return [{ key: "amazon", url: "" }]; }
+  });
+
+  // Keep form.purchaseLinksJson in sync whenever purchaseRows changes
+  useEffect(() => {
+    const obj = {};
+    purchaseRows.forEach(({ key, url }) => { if (key && url) obj[key] = url; });
+    setForm((current) => ({ ...current, purchaseLinksJson: JSON.stringify(obj, null, 2) }));
+  }, [purchaseRows]);
+
   function updateEditionCover(editionKey, coverKey, publicUrl) {
     const editions = JSON.parse(form.editionsJson || "{}");
     const nextEditions = {
@@ -115,7 +132,6 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
           ["whoThisBookIsFor", "Who This Book Is For", true],
           ["favoriteQuotes", "Favorite Quotes", true],
           ["formatsJson", "Formats JSON", true],
-          ["purchaseLinksJson", "Purchase Links JSON", true],
           ["seoJson", "SEO JSON", true],
           ["editionsJson", "Editions JSON", true],
         ].map(([key, label, isFull]) => (
@@ -149,6 +165,39 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
             <option value="coming_soon">Coming Soon</option>
             <option value="draft">Draft</option>
           </select>
+        </div>
+
+        <div className="admin-form__field admin-form__field--full">
+          <label style={{ fontWeight: "600", display: "block", marginBottom: "0.75rem" }}>Buy Now Links</label>
+          <div style={{ display: "grid", gap: "0.5rem" }}>
+            {purchaseRows.map((row, i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "160px 1fr auto", gap: "0.5rem", alignItems: "center" }}>
+                <input
+                  value={row.key}
+                  onChange={(e) => setPurchaseRows((current) => current.map((r, j) => j === i ? { ...r, key: e.target.value } : r))}
+                  placeholder="amazon / flipkart / goodreads…"
+                  style={{ padding: "0.45rem 0.6rem", border: "1px solid #ccc", borderRadius: "0.5rem", fontFamily: "inherit" }}
+                />
+                <input
+                  type="url"
+                  value={row.url}
+                  onChange={(e) => setPurchaseRows((current) => current.map((r, j) => j === i ? { ...r, url: e.target.value } : r))}
+                  placeholder="https://..."
+                  style={{ padding: "0.45rem 0.6rem", border: "1px solid #ccc", borderRadius: "0.5rem", fontFamily: "inherit" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setPurchaseRows((current) => current.filter((_, j) => j !== i))}
+                  style={{ padding: "0.45rem 0.75rem", borderRadius: "0.5rem", background: "#fee2e2", color: "#b91c1c", border: "none", cursor: "pointer", fontWeight: "700" }}
+                >✕</button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPurchaseRows((current) => [...current, { key: "", url: "" }])}
+              style={{ justifySelf: "start", padding: "0.45rem 1rem", borderRadius: "0.5rem", background: "var(--color-primary)", color: "white", border: "none", cursor: "pointer", fontWeight: "600", marginTop: "0.25rem" }}
+            >+ Add Link</button>
+          </div>
         </div>
       </div>
 

@@ -7,6 +7,98 @@ import RichTextEditor from "../../components/forms/RichTextEditor/RichTextEditor
 import Button from "../../components/ui/Button/Button";
 import { deleteAdminBlogPost, fetchAdminBlogPosts, generateSlug, getDefaultBlogForm, restoreAdminBlogPost, upsertAdminBlogPost } from "../../services/adminService";
 
+const BLOG_CATEGORIES = ["Behind the Book", "Writing Life", "Reader Letters", "Personal", "Announcements", "Thoughts"];
+
+function BlogQuickForm({ onAdded, onError }) {
+  const [form, setForm] = useState({
+    title: "", excerpt: "", category: "", publishedAt: new Date().toISOString().slice(0, 10),
+    status: "draft", featured: false, relatedBookId: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    import("../../data/books").then((m) => setBooks(m.default || []));
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.title) { onError("Title is required"); return; }
+    setSaving(true);
+    try {
+      const slug = generateSlug(form.title);
+      await upsertAdminBlogPost({
+        id: slug, slug, title: form.title, excerpt: form.excerpt,
+        category: form.category, publishedAt: form.publishedAt,
+        status: form.status, featured: form.featured,
+        relatedBookIds: form.relatedBookId ? form.relatedBookId : "",
+        displayOrder: 0, readingTime: "", bodyHtml: "",
+        contentSectionsJson: "[]", visualJson: "{}", seoTitle: "", seoDescription: "",
+      });
+      setForm({ title: "", excerpt: "", category: "", publishedAt: new Date().toISOString().slice(0, 10), status: "draft", featured: false, relatedBookId: "" });
+      onAdded();
+      onError("");
+    } catch (err) {
+      onError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputStyle = { width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem", fontFamily: "inherit" };
+  const labelStyle = { fontWeight: "600", display: "block", marginBottom: "0.4rem", fontSize: "0.9rem" };
+
+  return (
+    <div className="admin-card" style={{ marginBottom: "2rem" }}>
+      <p className="admin-card__label">Quick Create Post</p>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "1rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div style={{ gridColumn: "span 2" }}>
+            <label style={labelStyle}>Title *</label>
+            <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} style={inputStyle} placeholder="Post title..." />
+          </div>
+          <div>
+            <label style={labelStyle}>Category</label>
+            <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} style={inputStyle}>
+              <option value="">Select category</option>
+              {BLOG_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Publish Date</label>
+            <input type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} style={inputStyle} />
+          </div>
+          <div style={{ gridColumn: "span 2" }}>
+            <label style={labelStyle}>Excerpt</label>
+            <textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} style={{ ...inputStyle, minHeight: "80px" }} placeholder="Short description..." />
+          </div>
+          <div>
+            <label style={labelStyle}>Related Book</label>
+            <select value={form.relatedBookId} onChange={(e) => setForm({ ...form, relatedBookId: e.target.value })} style={inputStyle}>
+              <option value="">None</option>
+              {books.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Status</label>
+            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} style={inputStyle}>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <input type="checkbox" id="quick-blog-featured" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
+            <label htmlFor="quick-blog-featured" style={{ fontWeight: "600" }}>Featured</label>
+          </div>
+        </div>
+        <button type="submit" disabled={saving} style={{ padding: "0.75rem 1.5rem", borderRadius: "0.5rem", background: "var(--color-primary)", color: "white", border: "none", cursor: "pointer", fontWeight: "600", justifySelf: "start" }}>
+          {saving ? "Creating..." : "Create Post"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 function buildBlogForm(post) {
   if (!post) {
     return getDefaultBlogForm();
@@ -324,6 +416,12 @@ function AdminBlog() {
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
+
+      <BlogQuickForm
+        onAdded={async () => { await loadPosts(showArchived); }}
+        onError={setError}
+      />
+
       {posts.length > 0 && filteredPosts.length === 0 ? (
         <div className="admin-empty">No posts match the current filter. Try a different status or turn off archived mode.</div>
       ) : null}

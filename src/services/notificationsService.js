@@ -1,9 +1,26 @@
 const ADMIN_EMAIL = "vanuragverma2173@gmail.com";
-const ADMIN_NOTIFICATION_ENDPOINT = "https://formsubmit.co/ajax/" + ADMIN_EMAIL;
+const EDGE_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT || null;
+const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/" + ADMIN_EMAIL;
 
 async function sendAdminNotification({ subject, name, email, message }) {
+  // Prefer the Supabase Edge Function if configured
+  if (EDGE_ENDPOINT) {
+    try {
+      const response = await fetch(EDGE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject, name, email, message }),
+        keepalive: true,
+      });
+      if (response.ok) return true;
+    } catch {
+      // fall through to formsubmit
+    }
+  }
+
+  // Fallback: formsubmit.co (requires one-time email activation)
   try {
-    const response = await fetch(ADMIN_NOTIFICATION_ENDPOINT, {
+    const response = await fetch(FORMSUBMIT_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -14,6 +31,8 @@ async function sendAdminNotification({ subject, name, email, message }) {
         email: email || "no-reply@website.local",
         message,
         _subject: subject,
+        _replyto: email || ADMIN_EMAIL,
+        _template: "basic",
       }),
       keepalive: true,
     });
