@@ -11,6 +11,7 @@ function normalizeReview(row) {
     reviewerRole: row.reviewer_role || "Reader",
     quote: row.quote,
     source: row.source || null,
+    sourceUrl: row.source_url || null,
     rating: row.rating || 0,
     featured: Boolean(row.featured),
     status: row.status || "published",
@@ -26,7 +27,7 @@ export async function fetchApprovedReviews() {
   try {
     const { data, error } = await supabase
       .from("reviews")
-      .select("id, book_id, reviewer_name, reviewer_role, quote, source, rating, featured, status, created_at")
+      .select("id, book_id, reviewer_name, reviewer_role, quote, source, source_url, rating, featured, status, created_at")
       .eq("status", "published")
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
