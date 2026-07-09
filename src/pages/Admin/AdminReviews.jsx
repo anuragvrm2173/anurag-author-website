@@ -265,14 +265,14 @@ function AdminReviews() {
               });
               setReviews((current) => current.map((item) => item.id === editingReview.id ? {
                 ...item,
-                reviewer_name: formData.get("reviewerName"),
-                reviewer_email: formData.get("reviewerEmail"),
-                reviewer_role: formData.get("reviewerRole"),
-                book_id: formData.get("bookId"),
+                reviewerName: formData.get("reviewerName"),
+                reviewerEmail: formData.get("reviewerEmail"),
+                reviewerRole: formData.get("reviewerRole"),
+                bookId: formData.get("bookId"),
                 quote: formData.get("quote"),
                 rating: Number(formData.get("rating")),
                 source: formData.get("source"),
-                source_url: formData.get("sourceUrl"),
+                sourceUrl: formData.get("sourceUrl"),
               } : item));
               setEditingReviewId(null);
               setError("");
@@ -363,7 +363,16 @@ function AdminReviews() {
                   <div>{review.reviewerEmail || review.reviewerRole}</div>
                 </td>
                 <td data-label="Book">{review.bookId}</td>
-                <td data-label="Quote">{review.quote}</td>
+                <td data-label="Quote">
+                  {review.quote}
+                  {review.sourceUrl && (
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-primary)", fontWeight: "600", fontSize: "0.85rem" }}>
+                        🔗 View Source
+                      </a>
+                    </div>
+                  )}
+                </td>
                 <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${review.status}`}>{review.status}</span></td>
                 <td data-label="Actions">
                   <div className="admin-table__actions">
@@ -374,6 +383,12 @@ function AdminReviews() {
                         await updateAdminReview(review.id, { status: nextStatus });
                         setReviews((current) => current.map((item) => item.id === review.id ? { ...item, status: nextStatus } : item));
                       }}>{REVIEW_FLOW[review.status]}</button>
+                    ) : null}
+                    {review.status === "rejected" ? (
+                      <button type="button" className="admin-inline-button" onClick={async () => {
+                        await updateAdminReview(review.id, { status: "approved" });
+                        setReviews((current) => current.map((item) => item.id === review.id ? { ...item, status: "approved" } : item));
+                      }}>Approve</button>
                     ) : null}
                     {review.status !== "rejected" ? (
                       <button type="button" className="admin-inline-button" onClick={async () => {
