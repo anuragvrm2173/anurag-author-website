@@ -2,6 +2,51 @@
 
 A premium editorial React application for books, essays, and reader connection.
 
+## 📚 Documentation
+
+Additional project documentation:
+
+- **CHANGELOG.md** - Release history and notable changes.
+- **OPERATIONS.md** - Deployment, Supabase setup, environment variables, backups, security, and production operations.
+- **CONTRIBUTING.md** - Development workflow, coding standards, branching strategy, and pull request guidelines.
+
+Before making production changes, review **OPERATIONS.md**.
+
+For development conventions, see **CONTRIBUTING.md**.
+
+## Project Structure
+
+```text
+src/
+ ├── components/
+ ├── pages/
+ ├── sections/
+ ├── services/
+ ├── hooks/
+ ├── context/
+ ├── layouts/
+ ├── routes/
+ ├── data/
+ ├── utils/
+ └── assets/
+```
+
+## Architecture Overview
+
+```text
+Public Website
+  │
+  ▼
+Runtime Services
+  │
+ ┌──────┴──────┐
+ │             │
+Supabase   JS Fallback
+  │
+  ▼
+Admin CMS
+```
+
 ## Core Routes
 - `/`
 - `/about`
@@ -95,6 +140,21 @@ npm run dev
 npm run build
 ```
 
+## Available Scripts
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run lint
+npm run preview
+npm run generate:seo
+npm run seed:content
+npm run optimize:images
+npm run deploy
+npm run deploy:preview
+```
+
 ## Seed Content
 Generate SQL to seed the current JS books, blog content, site config, and social links into Supabase:
 
@@ -182,3 +242,22 @@ npm run deploy:preview
 These scripts use `npx vercel`, so they work even when the Vercel CLI is not installed globally.
 
 Then add the same environment variables in the Vercel project settings before deploying.
+
+## Project Status
+
+Current Release: **v1.0.0**
+
+Status:
+- Public Website: Complete
+- Admin CMS: Complete
+- SEO: Complete
+- Security Hardening: Complete
+- Mobile Optimization: Complete
+
+Remaining work:
+- Configure production environment variables
+- Configure Supabase production project
+- Configure Google Analytics
+- Configure Microsoft Clarity
+- Verify Google Search Console
+- Verify Bing Webmaster Tools
