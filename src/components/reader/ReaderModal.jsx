@@ -83,7 +83,9 @@ function ReaderModal({ open, children, onClose }) {
       <div
         ref={modalRef}
         className="reader-modal"
-        role="presentation"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Reader preview dialog"
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
       >

@@ -1,0 +1,20 @@
+.captcha-challenge {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.captcha-challenge__widget {
+  min-height: 70px;
+}
+
+.captcha-challenge__help {
+  margin: 0;
+  font-size: 0.86rem;
+  color: rgba(43, 43, 43, 0.78);
+}
+
+.captcha-challenge__error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #8b1e1e;
+}

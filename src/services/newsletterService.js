@@ -1,4 +1,5 @@
 import { hasSupabase, supabase } from "./supabaseClient";
+import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
 
 const PROVIDER = (import.meta.env.VITE_NEWSLETTER_PROVIDER || "").toLowerCase();
 const PROXY_ENDPOINT = import.meta.env.VITE_NEWSLETTER_PROXY_ENDPOINT;
@@ -36,13 +37,20 @@ async function sendAdminNewsletterCopy(email, source, deliveryChannel) {
   return true;
 }
 
-async function subscribeThroughProxy(email, source) {
+async function subscribeThroughProxy(email, source, captchaToken = "") {
   const response = await fetch(PROXY_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, source, provider: PROVIDER || "none", subscribedAt: new Date().toISOString() }),
+    body: JSON.stringify({
+      email,
+      source,
+      provider: PROVIDER || "none",
+      subscribedAt: new Date().toISOString(),
+      turnstileToken: captchaToken,
+      "cf-turnstile-response": captchaToken,
+    }),
   });
 
   if (!response.ok) {
@@ -50,7 +58,7 @@ async function subscribeThroughProxy(email, source) {
   }
 }
 
-async function subscribeConvertKit(email, source) {
+async function subscribeConvertKit(email, source, captchaToken = "") {
   const endpoint = import.meta.env.VITE_CONVERTKIT_ENDPOINT;
   const apiKey = import.meta.env.VITE_CONVERTKIT_API_KEY;
   const formId = import.meta.env.VITE_CONVERTKIT_FORM_ID;
@@ -62,7 +70,14 @@ async function subscribeConvertKit(email, source) {
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ api_key: apiKey, email, form_id: formId, fields: { source } }),
+    body: JSON.stringify({
+      api_key: apiKey,
+      email,
+      form_id: formId,
+      fields: { source, turnstile_token: captchaToken },
+      turnstileToken: captchaToken,
+      "cf-turnstile-response": captchaToken,
+    }),
   });
 
   if (!response.ok) {
@@ -70,7 +85,7 @@ async function subscribeConvertKit(email, source) {
   }
 }
 
-async function subscribeMailerLite(email, source) {
+async function subscribeMailerLite(email, source, captchaToken = "") {
   const endpoint = import.meta.env.VITE_MAILERLITE_ENDPOINT;
   const apiKey = import.meta.env.VITE_MAILERLITE_API_KEY;
 
@@ -84,7 +99,16 @@ async function subscribeMailerLite(email, source) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({ email, fields: { source, signup_date: new Date().toISOString() } }),
+    body: JSON.stringify({
+      email,
+      fields: {
+        source,
+        signup_date: new Date().toISOString(),
+        turnstile_token: captchaToken,
+      },
+      turnstileToken: captchaToken,
+      "cf-turnstile-response": captchaToken,
+    }),
   });
 
   if (!response.ok) {
@@ -92,7 +116,7 @@ async function subscribeMailerLite(email, source) {
   }
 }
 
-async function subscribeBrevo(email, source) {
+async function subscribeBrevo(email, source, captchaToken = "") {
   const endpoint = import.meta.env.VITE_BREVO_ENDPOINT;
   const apiKey = import.meta.env.VITE_BREVO_API_KEY;
   const listId = Number(import.meta.env.VITE_BREVO_LIST_ID || 0);
@@ -112,6 +136,8 @@ async function subscribeBrevo(email, source) {
       listIds: [listId],
       attributes: { SOURCE: source, SIGNUP_DATE: new Date().toISOString() },
       updateEnabled: true,
+      turnstileToken: captchaToken,
+      "cf-turnstile-response": captchaToken,
     }),
   });
 
@@ -148,33 +174,36 @@ async function storeSignupInSupabase(email, source) {
   }
 }
 
-async function syncWithExternalProvider(email, source) {
+async function syncWithExternalProvider(email, source, captchaToken = "") {
   if (PROXY_ENDPOINT) {
-    await subscribeThroughProxy(email, source);
+    await subscribeThroughProxy(email, source, captchaToken);
     return true;
   }
 
   if (PROVIDER === "convertkit") {
-    await subscribeConvertKit(email, source);
+    await subscribeConvertKit(email, source, captchaToken);
     return true;
   }
 
   if (PROVIDER === "mailerlite") {
-    await subscribeMailerLite(email, source);
+    await subscribeMailerLite(email, source, captchaToken);
     return true;
   }
 
   if (PROVIDER === "brevo") {
-    await subscribeBrevo(email, source);
+    await subscribeBrevo(email, source, captchaToken);
     return true;
   }
 
   return false;
 }
 
-export async function subscribeToNewsletter(email, source) {
+export async function subscribeToNewsletter(email, source, options = {}) {
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const normalizedSource = String(source || "Website").trim();
+  const captchaToken = normalizeCaptchaToken(options?.captchaToken);
+
+  assertCaptchaToken(captchaToken);
 
   if (!normalizedEmail) {
     throw new Error("Please enter your email address.");
@@ -191,7 +220,7 @@ export async function subscribeToNewsletter(email, source) {
     }
 
     try {
-      const synced = await syncWithExternalProvider(normalizedEmail, normalizedSource);
+      const synced = await syncWithExternalProvider(normalizedEmail, normalizedSource, captchaToken);
       if (synced) {
         deliveryChannel = deliveryChannel === "none" ? "provider" : `${deliveryChannel}+provider`;
       }
@@ -202,7 +231,7 @@ export async function subscribeToNewsletter(email, source) {
 
   if (deliveryChannel === "none") {
     try {
-      const synced = await syncWithExternalProvider(normalizedEmail, normalizedSource);
+      const synced = await syncWithExternalProvider(normalizedEmail, normalizedSource, captchaToken);
       if (synced) {
         deliveryChannel = "provider";
       }

@@ -1,12 +1,17 @@
 import { useState } from "react";
 
 import { submitContactMessage } from "../../../services/contactService";
+import { isCaptchaEnabled } from "../../../services/captchaService";
+import CaptchaChallenge from "../../common/CaptchaChallenge/CaptchaChallenge";
 import Button from "../../ui/Button/Button";
 import "./ContactForm.css";
 
 function ContactForm() {
   const [status, setStatus] = useState("idle");
   const [statusMessage, setStatusMessage] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+  const [captchaResetCounter, setCaptchaResetCounter] = useState(0);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -21,10 +26,19 @@ function ContactForm() {
       message: formData.get("message"),
     };
 
+    if (isCaptchaEnabled() && !captchaToken) {
+      setStatus("error");
+      setCaptchaError("Please complete the security check before sending your message.");
+      return;
+    }
+
     try {
-      const result = await submitContactMessage(payload);
+      const result = await submitContactMessage(payload, { captchaToken });
       formElement.reset();
       setStatus("success");
+      setCaptchaError("");
+      setCaptchaToken("");
+      setCaptchaResetCounter((current) => current + 1);
       if (result.delivered) {
         setStatusMessage("Your message was sent successfully. Thank you for reaching out.");
       } else {
@@ -52,6 +66,17 @@ function ContactForm() {
         <label htmlFor="contact-message">Message</label>
         <textarea id="contact-message" name="message" rows="6" required />
       </div>
+
+      <CaptchaChallenge
+        onTokenChange={(token) => {
+          setCaptchaToken(token);
+          if (token) {
+            setCaptchaError("");
+          }
+        }}
+        resetCounter={captchaResetCounter}
+        errorMessage={captchaError}
+      />
 
       <Button type="submit">{status === "loading" ? "Sending..." : "Send Message"}</Button>
 

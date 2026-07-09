@@ -2,13 +2,18 @@ import "./Newsletter.css";
 
 import { useState } from "react";
 
+import CaptchaChallenge from "../../components/common/CaptchaChallenge/CaptchaChallenge";
 import Button from "../../components/ui/Button/Button";
 import Container from "../../components/ui/Container/Container";
+import { isCaptchaEnabled } from "../../services/captchaService";
 import { subscribeToNewsletter } from "../../services/newsletterService";
 
 function Newsletter({ source = "Homepage" }) {
   const [status, setStatus] = useState("idle");
   const [statusMessage, setStatusMessage] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+  const [captchaResetCounter, setCaptchaResetCounter] = useState(0);
   const isLoading = status === "loading";
 
   const handleSubmit = async (event) => {
@@ -20,12 +25,22 @@ function Newsletter({ source = "Homepage" }) {
       return;
     }
 
+    if (isCaptchaEnabled() && !captchaToken) {
+      setStatus("error");
+      setStatusMessage("Please complete the security check before subscribing.");
+      setCaptchaError("Please complete the security check before subscribing.");
+      return;
+    }
+
     setStatus("loading");
     setStatusMessage("");
+    setCaptchaError("");
     try {
-      const result = await subscribeToNewsletter(email, source);
+      const result = await subscribeToNewsletter(email, source, { captchaToken });
       formElement.reset();
       setStatus("success");
+      setCaptchaToken("");
+      setCaptchaResetCounter((current) => current + 1);
       if (result.delivered) {
         setStatusMessage("You are subscribed successfully. Welcome.");
       } else {
@@ -58,6 +73,17 @@ function Newsletter({ source = "Homepage" }) {
             <input id="newsletter-email" name="email" type="email" placeholder="Email address" required disabled={isLoading} aria-describedby={status === "error" ? "newsletter-status" : undefined} />
             <Button type="submit" disabled={isLoading}>{isLoading ? "Joining..." : "Join my readers"}</Button>
           </form>
+
+          <CaptchaChallenge
+            onTokenChange={(token) => {
+              setCaptchaToken(token);
+              if (token) {
+                setCaptchaError("");
+              }
+            }}
+            resetCounter={captchaResetCounter}
+            errorMessage={captchaError}
+          />
 
           {status === "success" ? (
             <p className="newsletter__status newsletter__status--success" role="status">

@@ -1,4 +1,5 @@
 import { hasSupabase, supabase } from "./supabaseClient";
+import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
 const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT || CONTACT_ENDPOINT;
@@ -72,7 +73,7 @@ async function submitToSupabase(payload) {
   }
 }
 
-async function submitToEndpoint(payload, subject = "Contact Form Submission") {
+async function submitToEndpoint(payload, subject = "Contact Form Submission", captchaToken = "") {
   if (!CONTACT_ENDPOINT) {
     throw new Error("Contact endpoint is not configured");
   }
@@ -86,6 +87,8 @@ async function submitToEndpoint(payload, subject = "Contact Form Submission") {
     body: JSON.stringify({
       ...payload,
       _subject: subject,
+      turnstileToken: captchaToken,
+      "cf-turnstile-response": captchaToken,
     }),
   });
 
@@ -96,6 +99,9 @@ async function submitToEndpoint(payload, subject = "Contact Form Submission") {
 
 export async function submitContactMessage(payload, options = {}) {
   const subject = String(options?.subject || "Contact Form Submission").trim() || "Contact Form Submission";
+  const captchaToken = normalizeCaptchaToken(options?.captchaToken);
+
+  assertCaptchaToken(captchaToken);
 
   const normalizedPayload = {
     name: String(payload?.name || "").trim(),
@@ -120,7 +126,7 @@ export async function submitContactMessage(payload, options = {}) {
 
   if (deliveryChannel === "none") {
     try {
-      await submitToEndpoint(normalizedPayload, subject);
+      await submitToEndpoint(normalizedPayload, subject, captchaToken);
       deliveryChannel = "endpoint";
     } catch {
       // Continue to local fallback when endpoint is temporarily unavailable.
@@ -171,5 +177,6 @@ export async function submitBuyNowLead(payload) {
 
   return submitContactMessage(leadPayload, {
     subject: "New Buy Now Lead (Website)",
+    captchaToken: payload?.captchaToken,
   });
 }

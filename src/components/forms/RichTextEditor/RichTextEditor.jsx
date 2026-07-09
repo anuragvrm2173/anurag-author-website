@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import Link from "@tiptap/extension-link";
 import StarterKit from "@tiptap/starter-kit";
+import { sanitizeExternalUrl } from "../../../utils/urlSafety";
 
 function RichTextEditor({ label, value, onChange, helperText }) {
   const editor = useEditor({
@@ -55,7 +56,14 @@ function RichTextEditor({ label, value, onChange, helperText }) {
       return;
     }
 
-    const href = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmedHref) ? trimmedHref : `https://${trimmedHref}`;
+    const candidateHref = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmedHref) ? trimmedHref : `https://${trimmedHref}`;
+    const href = sanitizeExternalUrl(candidateHref);
+
+    if (!href) {
+      window.alert("Please enter a valid URL starting with https://, mailto:, or tel:.");
+      return;
+    }
+
     editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
   }
 

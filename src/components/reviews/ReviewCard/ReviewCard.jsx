@@ -1,4 +1,5 @@
 import "./ReviewCard.css";
+import { sanitizeExternalUrl } from "../../../utils/urlSafety";
 
 function renderStars(rating = 0) {
   if (!rating) {
@@ -9,6 +10,8 @@ function renderStars(rating = 0) {
 }
 
 function ReviewCard({ review, showVerifiedBadge = true }) {
+  const safeSourceUrl = sanitizeExternalUrl(review.sourceUrl);
+
   return (
     <article className="review-card" aria-label={`Review by ${review.reviewerName}`}>
       {showVerifiedBadge ? <p className="review-card__verified">Verified Reader</p> : null}
@@ -21,12 +24,12 @@ function ReviewCard({ review, showVerifiedBadge = true }) {
       {review.source ? (
         <p className="review-card__source">
           Source:{" "}
-          {review.sourceUrl ? (
+          {safeSourceUrl ? (
             <a
               className="review-card__source-link"
-              href={review.sourceUrl}
+              href={safeSourceUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               {review.source}
             </a>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { notifyBuyLinkClick } from "../../services/notificationsService";
+import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 const READER_OPEN_DELAY = 400;
 
@@ -104,6 +105,7 @@ function BookReader({ sample, onClose, buyLink }) {
 
   const currentPage = pages[pageIndex];
   const isLastPage = pageIndex === pages.length - 1;
+  const safeBuyLink = sanitizeExternalUrl(buyLink);
   const pageBlocks = currentPage?.blocks || currentPage?.content?.map((text) => ({ type: "paragraph", text })) || [];
 
   const handleTouchStart = (event) => {
@@ -160,18 +162,18 @@ function BookReader({ sample, onClose, buyLink }) {
             <div className="reader-page__body">
               {pageBlocks.map((block, index) => renderPageBlock(block, index))}
             </div>
-            {isLastPage && buyLink ? (
+            {isLastPage && safeBuyLink ? (
               <a
-                href={buyLink}
+                href={safeBuyLink}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="reader-buy-cta"
                 onClick={() => {
                   notifyBuyLinkClick({
                     bookTitle: sample?.title,
                     editionLabel: sample?.language || sample?.previewLabel,
                     retailer: "Primary Buy Link",
-                    url: buyLink,
+                    url: safeBuyLink,
                     source: "reader-cta",
                   });
                 }}

@@ -1,11 +1,16 @@
 import { useMemo, useState } from "react";
 
+import CaptchaChallenge from "../../common/CaptchaChallenge/CaptchaChallenge";
+import { isCaptchaEnabled } from "../../../services/captchaService";
 import Button from "../../ui/Button/Button";
 import { submitPendingReview } from "../../../services/reviewsService";
 import "./ReviewForm.css";
 
 function ReviewForm({ books, defaultBookId, source = "reviews-page", onSubmitted }) {
   const [status, setStatus] = useState("idle");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+  const [captchaResetCounter, setCaptchaResetCounter] = useState(0);
   const [form, setForm] = useState({
     reviewerName: "",
     reviewerEmail: "",
@@ -25,14 +30,25 @@ function ReviewForm({ books, defaultBookId, source = "reviews-page", onSubmitted
     event.preventDefault();
     setStatus("loading");
 
+    if (isCaptchaEnabled() && !captchaToken) {
+      setStatus("error");
+      setCaptchaError("Please complete the security check before submitting your review.");
+      return;
+    }
+
     try {
       await submitPendingReview({
         ...form,
         reviewerName: form.reviewerName.trim() || "Anonymous Reader",
         reviewerEmail: form.reviewerEmail.trim() || "no-email@example.com",
         source,
+      }, {
+        captchaToken,
       });
       setStatus("success");
+      setCaptchaError("");
+      setCaptchaToken("");
+      setCaptchaResetCounter((current) => current + 1);
       setForm((current) => ({ ...current, quote: "" }));
       if (onSubmitted) {
         onSubmitted();
@@ -84,6 +100,17 @@ function ReviewForm({ books, defaultBookId, source = "reviews-page", onSubmitted
         Review
         <textarea value={form.quote} onChange={handleChange("quote")} rows={5} required />
       </label>
+
+      <CaptchaChallenge
+        onTokenChange={(token) => {
+          setCaptchaToken(token);
+          if (token) {
+            setCaptchaError("");
+          }
+        }}
+        resetCounter={captchaResetCounter}
+        errorMessage={captchaError}
+      />
 
       <Button type="submit">{status === "loading" ? "Submitting..." : "Submit Review"}</Button>
 

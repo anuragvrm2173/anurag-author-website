@@ -1,7 +1,10 @@
 import { useState } from "react";
 
+import CaptchaChallenge from "../common/CaptchaChallenge/CaptchaChallenge";
+import { isCaptchaEnabled } from "../../services/captchaService";
 import { submitBuyNowLead } from "../../services/contactService";
 import { notifyBuyLinkClick } from "../../services/notificationsService";
+import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 const STORE_LOGOS = {
   amazon: "/store-logos/amazon.svg",
@@ -43,21 +46,24 @@ function getPrimaryFormat(formats = {}) {
 function normalizeRetailers(activeEdition) {
   const fromStructured = Object.entries(activeEdition.retailers || {}).map(([key, value]) => {
     if (typeof value === "string") {
+      const safeUrl = sanitizeExternalUrl(value);
       return {
         key,
         name: toTitleCase(key),
-        available: true,
-        url: value,
+        available: Boolean(safeUrl),
+        url: safeUrl,
         actionLabel: `Buy from ${toTitleCase(key)}`,
         statusLabel: null,
       };
     }
 
+    const safeUrl = sanitizeExternalUrl(value?.url || value?.href || null);
+
     return {
       key,
       name: value?.name || toTitleCase(key),
-      available: value?.available !== false,
-      url: value?.url || value?.href || null,
+      available: value?.available !== false && Boolean(safeUrl),
+      url: safeUrl,
       actionLabel: value?.actionLabel || value?.label || `Buy from ${value?.name || toTitleCase(key)}`,
       statusLabel: value?.statusLabel || value?.label || "Coming Soon",
     };
@@ -69,14 +75,17 @@ function normalizeRetailers(activeEdition) {
 
   return Object.entries(activeEdition.purchaseLinks || {})
     .filter(([key, value]) => !FORMAT_KEYS.has(key) && Boolean(value))
-    .map(([key, value]) => ({
+    .map(([key, value]) => {
+      const safeUrl = sanitizeExternalUrl(value);
+      return {
       key,
       name: toTitleCase(key),
-      available: true,
-      url: value,
+      available: Boolean(safeUrl),
+      url: safeUrl,
       actionLabel: `Buy from ${toTitleCase(key)}`,
       statusLabel: null,
-    }));
+      };
+    });
 }
 
 function formatCurrencyPrice(pricing) {
@@ -109,6 +118,9 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
   const [selectedRetailer, setSelectedRetailer] = useState(null);
   const [readerName, setReaderName] = useState("");
   const [readerEmail, setReaderEmail] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+  const [captchaResetCounter, setCaptchaResetCounter] = useState(0);
   const [leadError, setLeadError] = useState("");
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const isPublished = bookStatus === "Published";
@@ -179,6 +191,9 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     setSelectedRetailer(null);
     setReaderName("");
     setReaderEmail("");
+    setCaptchaToken("");
+    setCaptchaError("");
+    setCaptchaResetCounter((current) => current + 1);
     setLeadError("");
     setLeadSubmitting(false);
   };
@@ -307,8 +322,16 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                   return;
                 }
 
+                if (isCaptchaEnabled() && !captchaToken) {
+                  setCaptchaError(isHindi
+                    ? "कृपया सुरक्षा जांच पूरी करें।"
+                    : "Please complete the security check before continuing.");
+                  return;
+                }
+
                 setLeadSubmitting(true);
                 setLeadError("");
+                setCaptchaError("");
 
                 try {
                   await submitBuyNowLead({
@@ -318,6 +341,7 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                     editionLabel: activeEdition?.label || activeEdition?.formatLabel || "Unknown",
                     retailerName: selectedRetailer.name,
                     buyUrl: selectedRetailer.url,
+                    captchaToken,
                   });
 
                   proceedToRetailer(selectedRetailer.url);
@@ -350,6 +374,17 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                 className="purchase-panel__lead-input"
                 value={readerEmail}
                 onChange={(event) => setReaderEmail(event.target.value)}
+              />
+
+              <CaptchaChallenge
+                onTokenChange={(token) => {
+                  setCaptchaToken(token);
+                  if (token) {
+                    setCaptchaError("");
+                  }
+                }}
+                resetCounter={captchaResetCounter}
+                errorMessage={captchaError}
               />
 
               {leadError ? <p className="purchase-panel__lead-error">{leadError}</p> : null}

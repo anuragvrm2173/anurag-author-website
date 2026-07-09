@@ -1,6 +1,7 @@
 import { reviews as localReviews } from "../data/reviews";
 import { notifyReviewSubmission } from "./notificationsService";
 import { hasSupabase, supabase } from "./supabaseClient";
+import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
 
 function normalizeReview(row) {
   return {
@@ -40,7 +41,9 @@ export async function fetchApprovedReviews() {
   }
 }
 
-export async function submitPendingReview(payload) {
+export async function submitPendingReview(payload, options = {}) {
+  assertCaptchaToken(normalizeCaptchaToken(options?.captchaToken));
+
   const row = {
     book_id: payload.bookId,
     reviewer_name: payload.reviewerName,

@@ -2,6 +2,7 @@ import "./Footer.css";
 
 import { Link } from "react-router-dom";
 import useSiteSettings from "../../../hooks/useSiteSettings";
+import { sanitizeExternalUrl } from "../../../utils/urlSafety";
 
 const pages = [
   { label: "Books", path: "/library" },
@@ -13,7 +14,13 @@ const pages = [
 
 function Footer() {
   const { socialLinks } = useSiteSettings();
-  const social = socialLinks.filter((item) => item.active !== false);
+  const social = socialLinks
+    .filter((item) => item.active !== false)
+    .map((item) => ({
+      ...item,
+      safeUrl: sanitizeExternalUrl(item.url),
+    }))
+    .filter((item) => Boolean(item.safeUrl));
 
   return (
     <footer className="footer">
@@ -35,7 +42,7 @@ function Footer() {
             <ul className="footer__list" aria-label="Social links">
               {social.map((item) => (
                 <li key={item.id}>
-                  <a href={item.url} target={item.external ? "_blank" : undefined} rel={item.external ? "noreferrer noopener" : undefined}>{item.name}</a>
+                  <a href={item.safeUrl} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}>{item.name}</a>
                 </li>
               ))}
             </ul>

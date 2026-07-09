@@ -9,10 +9,17 @@ import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
 import authorImage from "../../assets/images/author/author.jpg";
 import useSiteSettings from "../../hooks/useSiteSettings";
+import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 function Contact() {
   const { siteConfig, socialLinks } = useSiteSettings();
-  const contactChannels = socialLinks.filter((link) => link.active !== false);
+  const contactChannels = socialLinks
+    .filter((link) => link.active !== false)
+    .map((link) => ({
+      ...link,
+      safeUrl: sanitizeExternalUrl(link.url),
+    }))
+    .filter((link) => Boolean(link.safeUrl));
   const inquiries = ["Media", "Collaborations", "Speaking", "General Questions"];
   const channelMeta = {
     instagram: {
@@ -116,9 +123,9 @@ function Contact() {
                     <li key={channel.id} className="contact-page__channel-item">
                       <a
                         className="contact-page__channel-link"
-                        href={channel.url}
+                        href={channel.safeUrl}
                         target={channel.external ? "_blank" : undefined}
-                        rel={channel.external ? "noreferrer noopener" : undefined}
+                        rel={channel.external ? "noopener noreferrer" : undefined}
                         aria-label={`${channel.name} link`}
                       >
                         <span className="contact-page__channel-icon" aria-hidden="true">
@@ -129,7 +136,7 @@ function Contact() {
                         </span>
                         <span className="contact-page__channel-copy">
                           <span className="contact-page__channel-name">{channel.name}</span>
-                          <span className="contact-page__channel-handle">{channelMeta[channel.id]?.label || channel.url}</span>
+                          <span className="contact-page__channel-handle">{channelMeta[channel.id]?.label || channel.safeUrl}</span>
                         </span>
                       </a>
                     </li>

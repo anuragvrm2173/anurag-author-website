@@ -42,6 +42,8 @@ function Search() {
     }
   });
   const inputRef = useRef(null);
+  const paletteCardRef = useRef(null);
+  const previousActiveElementRef = useRef(null);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -63,6 +65,51 @@ function Search() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (!isPaletteOpen) {
+      previousActiveElementRef.current?.focus?.();
+      return;
+    }
+
+    previousActiveElementRef.current = document.activeElement;
+    const card = paletteCardRef.current;
+    const firstButton = card?.querySelector("button");
+    firstButton?.focus();
+
+    const handlePaletteKeyDown = (event) => {
+      if (!isPaletteOpen || event.key !== "Tab") {
+        return;
+      }
+
+      const focusable = card
+        ? Array.from(card.querySelectorAll("button:not([disabled]), [href], input:not([disabled])"))
+        : [];
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusable[0];
+      const lastElement = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      }
+
+      if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handlePaletteKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handlePaletteKeyDown);
+    };
+  }, [isPaletteOpen]);
 
   useEffect(() => {
     if (!normalizedQuery) {
@@ -127,7 +174,7 @@ function Search() {
       <main className="search-page">
         {isPaletteOpen ? (
           <div className="search-page__palette" role="dialog" aria-modal="true" aria-label="Quick search" onClick={() => setIsPaletteOpen(false)}>
-            <div className="search-page__palette-card" onClick={(event) => event.stopPropagation()}>
+            <div className="search-page__palette-card" ref={paletteCardRef} onClick={(event) => event.stopPropagation()}>
               <button
                 type="button"
                 className="search-page__palette-action"

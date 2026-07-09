@@ -437,7 +437,7 @@ function BookDetails() {
                 className="book-details__share-link"
                 href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${pageUrl}`)}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="Share on WhatsApp"
               >
                 <span aria-hidden="true">○</span>
@@ -448,7 +448,7 @@ function BookDetails() {
                 className="book-details__share-link"
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="Share on X"
               >
                 <span aria-hidden="true">○</span>
@@ -459,7 +459,7 @@ function BookDetails() {
                 className="book-details__share-link"
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="Share on Facebook"
               >
                 <span aria-hidden="true">○</span>
