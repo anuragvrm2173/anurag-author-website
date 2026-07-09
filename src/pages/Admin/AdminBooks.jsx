@@ -315,6 +315,19 @@ function AdminBooks() {
   const initialForm = useMemo(() => buildBookForm(selectedBook), [selectedBook]);
   const formKey = isCreating ? "book-new" : selectedBook?.id || bookId || "book-default";
 
+  // Extract links from an edition — handles both purchaseLinks and retailers formats
+  function extractEditionLinks(ed) {
+    if (ed.purchaseLinks && Object.keys(ed.purchaseLinks).length > 0) return ed.purchaseLinks;
+    if (ed.retailers) {
+      const links = {};
+      Object.entries(ed.retailers).forEach(([key, r]) => {
+        if (r.available !== false && r.url) links[r.name || key] = r.url;
+      });
+      return links;
+    }
+    return {};
+  }
+
   // Flatten each book's editions into separate rows
   const editionRows = useMemo(() => {
     const rows = [];
@@ -328,7 +341,7 @@ function AdminBooks() {
             ...book,
             _editionKey: key,
             _editionLabel: ed.label || key,
-            _editionLinks: ed.purchaseLinks || {},
+            _editionLinks: extractEditionLinks(ed),
             _languageCode: ed.languageCode || key,
           });
         });
@@ -425,11 +438,10 @@ function AdminBooks() {
               </tr>
             </thead>
             <tbody>
-              {editionRows.map((row) => {
+              {editionRows.flatMap((row) => {
                 const rowKey = row._editionKey ? `${row.id}-${row._editionKey}` : row.id;
                 const isManaging = managingLinksFor?.bookId === row.id && managingLinksFor?.editionKey === row._editionKey;
-                return (
-                  <>
+                const result = [
                     <tr key={rowKey}>
                       <td data-label="Title / Edition">
                         <strong>{row.title}</strong>
@@ -479,7 +491,8 @@ function AdminBooks() {
                         </div>
                       </td>
                     </tr>
-                    {isManaging && (
+                ];
+                if (isManaging) result.push(
                       <tr key={`${rowKey}-links`}>
                         <td colSpan={4} style={{ background: "#f9f3e6", padding: "1rem", borderTop: "2px solid var(--color-primary)" }}>
                           <p style={{ fontWeight: "700", marginBottom: "0.75rem" }}>
@@ -525,9 +538,8 @@ function AdminBooks() {
                           </div>
                         </td>
                       </tr>
-                    )}
-                  </>
                 );
+                return result;
               })}
             </tbody>
           </table>
