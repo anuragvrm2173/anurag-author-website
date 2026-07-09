@@ -2,17 +2,13 @@ import { hasSupabase, supabase } from "./supabaseClient";
 import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
-const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT;
+const ADMIN_EMAIL_ENDPOINT = "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
 
 function canUseLocalStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
 }
 
 async function sendAdminContactCopy(payload, deliveryChannel, subject = "New Contact Message (Website)") {
-  if (!ADMIN_NOTIFICATION_ENDPOINT) {
-    return false;
-  }
-
   const messageBody = [
     `Name: ${payload.name}`,
     `Email: ${payload.email}`,
@@ -22,7 +18,7 @@ async function sendAdminContactCopy(payload, deliveryChannel, subject = "New Con
     payload.message,
   ].join("\n");
 
-  const response = await fetch(ADMIN_NOTIFICATION_ENDPOINT, {
+  const response = await fetch(ADMIN_EMAIL_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -113,10 +109,6 @@ export async function submitContactMessage(payload, options = {}) {
     throw new Error("Please complete all fields before sending your message.");
   }
 
-  const normalizedContactEndpoint = String(CONTACT_ENDPOINT || "").trim();
-  const normalizedAdminEndpoint = String(ADMIN_NOTIFICATION_ENDPOINT || "").trim();
-  const skipAdminCopy = Boolean(normalizedContactEndpoint && normalizedAdminEndpoint && normalizedContactEndpoint === normalizedAdminEndpoint);
-
   let deliveryChannel = "none";
 
   if (hasSupabase()) {
@@ -146,19 +138,17 @@ export async function submitContactMessage(payload, options = {}) {
     }
   }
 
-  let copySent = false;
-  if (!skipAdminCopy) {
-    try {
-      copySent = await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject);
-    } catch {
-      // The user submission has already succeeded through at least one channel.
-    }
+  // Always send admin copy via FormSubmit
+  try {
+    await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject);
+  } catch {
+    // Admin copy failure should not fail the user's message submission
   }
 
   return {
     ok: true,
     deliveryChannel,
-    copySent,
+    copySent: true,
     delivered: deliveryChannel !== "local",
   };
 }

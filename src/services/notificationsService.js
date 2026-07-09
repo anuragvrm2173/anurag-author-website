@@ -1,10 +1,7 @@
-const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT;
+const ADMIN_EMAIL = "vanuragverma2173@gmail.com";
+const ADMIN_NOTIFICATION_ENDPOINT = "https://formsubmit.co/ajax/" + ADMIN_EMAIL;
 
 async function sendAdminNotification({ subject, name, email, message }) {
-  if (!ADMIN_NOTIFICATION_ENDPOINT) {
-    return false;
-  }
-
   try {
     const response = await fetch(ADMIN_NOTIFICATION_ENDPOINT, {
       method: "POST",

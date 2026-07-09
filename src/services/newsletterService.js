@@ -3,19 +3,13 @@ import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
 
 const PROVIDER = (import.meta.env.VITE_NEWSLETTER_PROVIDER || "").toLowerCase();
 const PROXY_ENDPOINT = import.meta.env.VITE_NEWSLETTER_PROXY_ENDPOINT;
-const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT
-  || import.meta.env.VITE_CONTACT_FORM_ENDPOINT
-  || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
+const ADMIN_NOTIFICATION_ENDPOINT = "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
 
 function canUseLocalStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
 }
 
 async function sendAdminNewsletterCopy(email, source, deliveryChannel) {
-  if (!ADMIN_NOTIFICATION_ENDPOINT) {
-    return false;
-  }
-
   const response = await fetch(ADMIN_NOTIFICATION_ENDPOINT, {
     method: "POST",
     headers: {
