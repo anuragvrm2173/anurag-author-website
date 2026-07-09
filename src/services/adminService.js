@@ -201,6 +201,7 @@ function normalizeReviewRow(row) {
     quote: row.quote,
     rating: row.rating,
     source: row.source,
+    sourceUrl: row.source_url,
     featured: Boolean(row.featured),
     status: row.status,
     createdAt: row.created_at,

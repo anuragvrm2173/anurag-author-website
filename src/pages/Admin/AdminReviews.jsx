@@ -283,21 +283,21 @@ function AdminReviews() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
                 <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Reviewer Name *</label>
-                <input name="reviewerName" defaultValue={editingReview.reviewer_name} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+                <input name="reviewerName" defaultValue={editingReview.reviewerName} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
               </div>
               <div>
                 <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Email</label>
-                <input type="email" name="reviewerEmail" defaultValue={editingReview.reviewer_email} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+                <input type="email" name="reviewerEmail" defaultValue={editingReview.reviewerEmail} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
                 <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Role</label>
-                <input name="reviewerRole" defaultValue={editingReview.reviewer_role} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+                <input name="reviewerRole" defaultValue={editingReview.reviewerRole} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
               </div>
               <div>
                 <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Book *</label>
-                <select name="bookId" defaultValue={editingReview.book_id} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
+                <select name="bookId" defaultValue={editingReview.bookId} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
                   {books.map((book) => (
                     <option key={book.id} value={book.id}>{book.title}</option>
                   ))}
@@ -326,7 +326,7 @@ function AdminReviews() {
               </div>
               <div>
                 <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Source URL</label>
-                <input type="url" name="sourceUrl" defaultValue={editingReview.source_url || ""} placeholder="https://..." style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+                <input type="url" name="sourceUrl" defaultValue={editingReview.sourceUrl || ""} placeholder="https://..." style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: "1rem" }}>
