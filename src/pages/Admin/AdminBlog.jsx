@@ -162,6 +162,7 @@ function AdminBlog() {
   const [revisionDraft, setRevisionDraft] = useState(null);
   const [showArchived, setShowArchived] = useState(searchParams.get("archived") === "1");
   const activeStatus = searchParams.get("status") || "all";
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
 
   async function loadPosts(includeArchived = showArchived) {
     const nextPosts = await fetchAdminBlogPosts({ includeArchived });

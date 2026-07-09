@@ -346,6 +346,22 @@
   height: 1rem;
 }
 
+.admin-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.admin-sort select {
+  min-height: 2.4rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 255, 255, 0.82);
+}
+
 .admin-password-field {
   position: relative;
 }

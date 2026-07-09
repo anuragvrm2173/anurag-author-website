@@ -23,22 +23,40 @@ function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState("");
   const activeStatus = searchParams.get("status") || "all";
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
 
   useEffect(() => {
     fetchAdminReviews().then(setReviews).catch((nextError) => setError(nextError.message));
   }, []);
 
   const filteredReviews = useMemo(() => {
+    let filtered = reviews;
     if (activeStatus === "all") {
-      return reviews;
+      filtered = reviews;
+    } else if (activeStatus === "pending") {
+      filtered = reviews.filter((review) => ["submitted", "pending"].includes(review.status));
+    } else {
+      filtered = reviews.filter((review) => review.status === activeStatus);
     }
 
-    if (activeStatus === "pending") {
-      return reviews.filter((review) => ["submitted", "pending"].includes(review.status));
+    const sorted = [...filtered];
+    if (sortBy === "highest-rated") {
+      sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (sortBy === "oldest") {
+      sorted.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return aTime - bTime;
+      });
+    } else {
+      sorted.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
     }
-
-    return reviews.filter((review) => review.status === activeStatus);
-  }, [activeStatus, reviews]);
+    return sorted;
+  }, [activeStatus, reviews, sortBy]);
 
   return (
     <section className="admin-page">
@@ -76,6 +94,21 @@ function AdminReviews() {
             </button>
           ))}
         </div>
+        <label className="admin-sort" htmlFor="admin-reviews-sort">
+          <span>Sort by</span>
+          <select id="admin-reviews-sort" value={sortBy} onChange={(event) => {
+            setSortBy(event.target.value);
+            setSearchParams((current) => {
+              const nextParams = new URLSearchParams(current);
+              nextParams.set("sort", event.target.value);
+              return nextParams;
+            });
+          }}>
+            <option value="newest">Newest</option>
+            <option value="highest-rated">Highest Rated</option>
+            <option value="oldest">Oldest</option>
+          </select>
+        </label>
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}

@@ -29,6 +29,31 @@
   padding: 0.5rem 0 2.5rem;
 }
 
+.blog-page__header-with-sort {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.blog-page__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.blog-page__sort select {
+  min-height: 2.4rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 255, 255, 0.82);
+}
+
 .blog-page__categories {
   padding: 0.5rem 0 5rem;
 }

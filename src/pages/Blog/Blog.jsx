@@ -1,6 +1,7 @@
 import "./Blog.css";
 
 import { HelmetProvider } from "react-helmet-async";
+import { useMemo, useState } from "react";
 
 import BlogGrid from "../../components/blog/BlogGrid/BlogGrid";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
@@ -12,7 +13,31 @@ import usePublicContent from "../../hooks/usePublicContent";
 function Blog() {
   const { blogPosts } = usePublicContent({ includeBooks: false, includeBlogPosts: true });
   const { siteConfig } = useSiteSettings();
-  const [featuredArticle, ...latestArticles] = blogPosts;
+  const [sortBy, setSortBy] = useState("newest");
+  
+  const sortedPosts = useMemo(() => {
+    const sorted = [...blogPosts];
+    if (sortBy === "oldest") {
+      sorted.sort((a, b) => {
+        const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+        const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+        return aTime - bTime;
+      });
+    } else if (sortBy === "title-asc") {
+      sorted.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
+    } else if (sortBy === "title-desc") {
+      sorted.sort((a, b) => String(b.title || "").localeCompare(String(a.title || "")));
+    } else {
+      sorted.sort((a, b) => {
+        const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+        const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+        return bTime - aTime;
+      });
+    }
+    return sorted;
+  }, [blogPosts, sortBy]);
+  
+  const [featuredArticle, ...latestArticles] = sortedPosts;
   const categoryMap = blogPosts.reduce((acc, post) => {
     if (!acc[post.category]) {
       acc[post.category] = [];
@@ -59,7 +84,18 @@ function Blog() {
 
         <section className="blog-page__list" aria-labelledby="blog-latest-title">
           <Container>
-            <h2 id="blog-latest-title" className="blog-page__section-title">Latest Articles</h2>
+            <div className="blog-page__header-with-sort">
+              <h2 id="blog-latest-title" className="blog-page__section-title">Latest Articles</h2>
+              <label className="blog-page__sort" htmlFor="blog-sort">
+                <span>Sort</span>
+                <select id="blog-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="title-asc">Title A-Z</option>
+                  <option value="title-desc">Title Z-A</option>
+                </select>
+              </label>
+            </div>
             <BlogGrid posts={latestArticles} />
           </Container>
         </section>
