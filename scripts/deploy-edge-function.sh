@@ -55,7 +55,7 @@ echo ""
 echo "⏳ Deploying Edge Function..."
 
 # Deploy function
-supabase functions deploy admin-notify --project-id "$PROJECT_ID"
+supabase functions deploy admin-notify --project-ref "$PROJECT_ID"
 
 echo ""
 echo "✅ Edge Function deployed!"
@@ -63,7 +63,7 @@ echo ""
 echo "⏳ Setting environment secrets..."
 
 # Build secrets command
-SECRETS_CMD="supabase secrets set --project-id $PROJECT_ID RESEND_API_KEY='$RESEND_API_KEY' ADMIN_NOTIFY_TO_EMAIL='$ADMIN_EMAIL'"
+SECRETS_CMD="supabase secrets set --project-ref $PROJECT_ID RESEND_API_KEY='$RESEND_API_KEY' ADMIN_NOTIFY_TO_EMAIL='$ADMIN_EMAIL'"
 
 if [ -n "$ADMIN_ORIGINS" ]; then
     SECRETS_CMD="$SECRETS_CMD ADMIN_NOTIFY_ALLOWED_ORIGINS='$ADMIN_ORIGINS'"
