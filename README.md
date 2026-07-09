@@ -219,6 +219,11 @@ Variables (must match `.env.example`):
 - `VITE_GA_MEASUREMENT_ID`
 - `VITE_CLARITY_PROJECT_ID`
 
+Recommended for reliable production email notifications:
+
+- Set `VITE_ADMIN_NOTIFICATION_ENDPOINT` to your Supabase Edge Function URL, for example: `https://<project-ref>.functions.supabase.co/admin-notify`
+- Configure function secrets in Supabase: `RESEND_API_KEY`, `ADMIN_NOTIFY_TO_EMAIL`, and `ADMIN_NOTIFY_ALLOWED_ORIGINS`
+
 ## Deployment
 The project is prepared for Vercel with:
 - SPA rewrites in `vercel.json`

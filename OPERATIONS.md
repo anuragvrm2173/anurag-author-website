@@ -55,6 +55,33 @@ Optional but recommended depending on integrations:
 - Analytics and verification values
 - Social profile values
 
+### Email notifications via Supabase Edge Function
+
+For reliable first-party email notifications (recommended):
+
+1. **Deploy the Edge Function:**
+   ```bash
+   supabase functions deploy admin-notify --project-id <your-project-id>
+   ```
+
+2. **Set Edge Function secrets in Supabase dashboard:**
+   ```bash
+   supabase secrets set \
+     RESEND_API_KEY="sk_live_..." \
+     ADMIN_NOTIFY_TO_EMAIL="admin@example.com" \
+     ADMIN_NOTIFY_ALLOWED_ORIGINS="https://anuragverma-author.vercel.app"
+   ```
+
+3. **Get the function URL** from Supabase Functions dashboard and set in Vercel:
+   - `VITE_ADMIN_NOTIFICATION_ENDPOINT=https://<project-ref>.supabase.co/functions/v1/admin-notify`
+
+4. **Redeploy production:**
+   ```bash
+   npm run deploy
+   ```
+
+If `VITE_ADMIN_NOTIFICATION_ENDPOINT` is not set, contact/review/buy-now forms will use `VITE_CONTACT_FORM_ENDPOINT` fallback (less reliable).
+
 ## 4. Backup Procedure
 
 ### Database backup
@@ -103,6 +130,22 @@ Rotate on a scheduled cadence and after any incident:
 - Contact/admin notification endpoint credentials
 - Vercel project tokens used in CI/CD
 - Turnstile site/secret pair (secret is backend only)
+
+### Supabase Edge Function secrets rotation
+
+For `admin-notify` function, these secrets are managed in Supabase project settings (not in .env):
+
+- `RESEND_API_KEY` (required for email delivery)
+- `ADMIN_NOTIFY_TO_EMAIL` (required, target inbox)
+- `ADMIN_NOTIFY_FROM_EMAIL` (optional, defaults to Resend onboarding sender)
+- `ADMIN_NOTIFY_ALLOWED_ORIGINS` (comma-separated origins allowed, e.g., `https://anuragverma-author.vercel.app`)
+- `TURNSTILE_SECRET_KEY` (optional, enables Turnstile verification if set)
+
+To rotate secrets:
+
+1. Update values in Supabase project settings
+2. Verify `VITE_ADMIN_NOTIFICATION_ENDPOINT` is still correct in Vercel
+3. Redeploy Vercel production: `npm run deploy`
 
 After rotation:
 

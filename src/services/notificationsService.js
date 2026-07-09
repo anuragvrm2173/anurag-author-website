@@ -1,6 +1,4 @@
-const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT
-  || import.meta.env.VITE_CONTACT_FORM_ENDPOINT
-  || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
+const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT;
 
 async function sendAdminNotification({ subject, name, email, message }) {
   if (!ADMIN_NOTIFICATION_ENDPOINT) {

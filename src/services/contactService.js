@@ -2,7 +2,7 @@ import { hasSupabase, supabase } from "./supabaseClient";
 import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
-const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT || CONTACT_ENDPOINT;
+const ADMIN_NOTIFICATION_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT;
 
 function canUseLocalStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
@@ -113,6 +113,10 @@ export async function submitContactMessage(payload, options = {}) {
     throw new Error("Please complete all fields before sending your message.");
   }
 
+  const normalizedContactEndpoint = String(CONTACT_ENDPOINT || "").trim();
+  const normalizedAdminEndpoint = String(ADMIN_NOTIFICATION_ENDPOINT || "").trim();
+  const skipAdminCopy = Boolean(normalizedContactEndpoint && normalizedAdminEndpoint && normalizedContactEndpoint === normalizedAdminEndpoint);
+
   let deliveryChannel = "none";
 
   if (hasSupabase()) {
@@ -143,10 +147,12 @@ export async function submitContactMessage(payload, options = {}) {
   }
 
   let copySent = false;
-  try {
-    copySent = await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject);
-  } catch {
-    // The user submission has already succeeded through at least one channel.
+  if (!skipAdminCopy) {
+    try {
+      copySent = await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject);
+    } catch {
+      // The user submission has already succeeded through at least one channel.
+    }
   }
 
   return {
