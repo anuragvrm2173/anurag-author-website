@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import Button from "../../components/ui/Button/Button";
-import { deleteAdminBook, fetchAdminBooks, generateSlug, getDefaultBookForm, restoreAdminBook, upsertAdminBook, uploadAdminMediaFile } from "../../services/adminService";
+import { deleteAdminBook, fetchAdminBooks, generateSlug, getDefaultBookForm, restoreAdminBook, upsertAdminBook, updateAdminBookEditionLinks, uploadAdminMediaFile } from "../../services/adminService";
 
 function buildBookForm(book) {
   if (!book) {
@@ -271,6 +271,9 @@ function AdminBooks() {
   const [error, setError] = useState("");
   const [showArchived, setShowArchived] = useState(searchParams.get("archived") === "1");
   const activeStatus = searchParams.get("status") || "all";
+  const [managingLinksFor, setManagingLinksFor] = useState(null); // { bookId, editionKey }
+  const [linkEdits, setLinkEdits] = useState([]); // [{ key, url }]
+  const [linkSaving, setLinkSaving] = useState(false);
 
   async function loadBooks(includeArchived = showArchived) {
     const nextBooks = await fetchAdminBooks({ includeArchived });
@@ -311,6 +314,30 @@ function AdminBooks() {
   }, [activeStatus, books]);
   const initialForm = useMemo(() => buildBookForm(selectedBook), [selectedBook]);
   const formKey = isCreating ? "book-new" : selectedBook?.id || bookId || "book-default";
+
+  // Flatten each book's editions into separate rows
+  const editionRows = useMemo(() => {
+    const rows = [];
+    filteredBooks.forEach((book) => {
+      const editions = book.editions || {};
+      const editionKeys = Object.keys(editions);
+      if (editionKeys.length > 0) {
+        editionKeys.forEach((key) => {
+          const ed = editions[key];
+          rows.push({
+            ...book,
+            _editionKey: key,
+            _editionLabel: ed.label || key,
+            _editionLinks: ed.purchaseLinks || {},
+            _languageCode: ed.languageCode || key,
+          });
+        });
+      } else {
+        rows.push({ ...book, _editionKey: null, _editionLabel: null, _editionLinks: book.purchaseLinks || {}, _languageCode: null });
+      }
+    });
+    return rows;
+  }, [filteredBooks]);
 
   return (
     <section className="admin-page">
@@ -391,58 +418,117 @@ function AdminBooks() {
           <table>
             <thead>
               <tr>
-                <th>Title</th>
+                <th>Title / Edition</th>
                 <th>Status</th>
-                <th>Language</th>
+                <th>Buy Links</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredBooks.map((book) => (
-                <tr key={book.id}>
-                  <td data-label="Title">
-                    <strong>{book.title}</strong>
-                    <div>{book.subtitle}</div>
-                  </td>
-                  <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${String(book.status || "draft").toLowerCase().replace(/\s+/g, "_")}`}>{book.status}</span></td>
-                  <td data-label="Language">{book.language || "—"}</td>
-                  <td data-label="Actions">
-                    <div className="admin-table__actions">
-                      <Link to={`/admin/books/${book.id}`} className="admin-link-button">Edit</Link>
-                      {book.deletedAt ? (
-                        <button
-                          type="button"
-                          className="admin-inline-button"
-                          onClick={async () => {
-                            await restoreAdminBook(book.id);
-                            await loadBooks(showArchived);
-                          }}
-                        >
-                          Restore
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="admin-inline-button admin-inline-button--danger"
-                          onClick={async () => {
-                            if (!window.confirm(`Delete ${book.title}?`)) {
-                              return;
-                            }
-
-                            await deleteAdminBook(book.id);
-                            await loadBooks(showArchived);
-                            if (bookId === book.id) {
-                              navigate("/admin/books");
-                            }
-                          }}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {editionRows.map((row) => {
+                const rowKey = row._editionKey ? `${row.id}-${row._editionKey}` : row.id;
+                const isManaging = managingLinksFor?.bookId === row.id && managingLinksFor?.editionKey === row._editionKey;
+                return (
+                  <>
+                    <tr key={rowKey}>
+                      <td data-label="Title / Edition">
+                        <strong>{row.title}</strong>
+                        {row._editionLabel && (
+                          <span style={{ marginLeft: "0.5rem", padding: "0.15rem 0.5rem", borderRadius: "999px", background: row._languageCode === "hi" ? "#fef3c7" : "#dbeafe", color: row._languageCode === "hi" ? "#92400e" : "#1e40af", fontSize: "0.78rem", fontWeight: "600" }}>
+                            {row._editionLabel}
+                          </span>
+                        )}
+                      </td>
+                      <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${String(row.status || "draft").toLowerCase().replace(/\s+/g, "_")}`}>{row.status}</span></td>
+                      <td data-label="Buy Links">
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                          {Object.entries(row._editionLinks).length > 0
+                            ? Object.entries(row._editionLinks).map(([label, url]) => (
+                                <a key={label} href={url} target="_blank" rel="noopener noreferrer"
+                                  style={{ padding: "0.2rem 0.6rem", borderRadius: "0.4rem", background: "var(--color-primary)", color: "white", fontSize: "0.8rem", fontWeight: "600", textDecoration: "none" }}>
+                                  {label} ↗
+                                </a>
+                              ))
+                            : <span style={{ color: "#999", fontSize: "0.85rem" }}>No links</span>
+                          }
+                        </div>
+                      </td>
+                      <td data-label="Actions">
+                        <div className="admin-table__actions">
+                          <Link to={`/admin/books/${row.id}`} className="admin-link-button">Edit Book</Link>
+                          <button type="button" className="admin-inline-button"
+                            onClick={() => {
+                              if (isManaging) { setManagingLinksFor(null); return; }
+                              setManagingLinksFor({ bookId: row.id, editionKey: row._editionKey });
+                              const current = Object.entries(row._editionLinks);
+                              setLinkEdits(current.length > 0 ? current.map(([k, v]) => ({ key: k, url: v })) : [{ key: "", url: "" }]);
+                            }}>
+                            {isManaging ? "Close Links" : "Manage Links"}
+                          </button>
+                          {row.deletedAt ? (
+                            <button type="button" className="admin-inline-button" onClick={async () => { await restoreAdminBook(row.id); await loadBooks(showArchived); }}>Restore</button>
+                          ) : (
+                            <button type="button" className="admin-inline-button admin-inline-button--danger"
+                              onClick={async () => {
+                                if (!window.confirm(`Delete ${row.title}?`)) return;
+                                await deleteAdminBook(row.id);
+                                await loadBooks(showArchived);
+                                if (bookId === row.id) navigate("/admin/books");
+                              }}>Delete</button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {isManaging && (
+                      <tr key={`${rowKey}-links`}>
+                        <td colSpan={4} style={{ background: "#f9f3e6", padding: "1rem", borderTop: "2px solid var(--color-primary)" }}>
+                          <p style={{ fontWeight: "700", marginBottom: "0.75rem" }}>
+                            Buy Links — {row.title} {row._editionLabel ? `(${row._editionLabel})` : ""}
+                          </p>
+                          <div style={{ display: "grid", gap: "0.5rem" }}>
+                            {linkEdits.map((lnk, i) => (
+                              <div key={i} style={{ display: "grid", gridTemplateColumns: "160px 1fr auto", gap: "0.5rem", alignItems: "center" }}>
+                                <input value={lnk.key} placeholder="amazon / flipkart…"
+                                  onChange={(e) => setLinkEdits((cur) => cur.map((l, j) => j === i ? { ...l, key: e.target.value } : l))}
+                                  style={{ padding: "0.45rem 0.6rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+                                <input type="url" value={lnk.url} placeholder="https://..."
+                                  onChange={(e) => setLinkEdits((cur) => cur.map((l, j) => j === i ? { ...l, url: e.target.value } : l))}
+                                  style={{ padding: "0.45rem 0.6rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+                                <button type="button"
+                                  onClick={() => setLinkEdits((cur) => cur.filter((_, j) => j !== i))}
+                                  style={{ padding: "0.45rem 0.7rem", borderRadius: "0.5rem", background: "#fee2e2", color: "#b91c1c", border: "none", cursor: "pointer", fontWeight: "700" }}>✕</button>
+                              </div>
+                            ))}
+                          </div>
+                          <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.75rem" }}>
+                            <button type="button"
+                              onClick={() => setLinkEdits((cur) => [...cur, { key: "", url: "" }])}
+                              style={{ padding: "0.45rem 1rem", borderRadius: "0.5rem", background: "#e0f2fe", color: "#0369a1", border: "none", cursor: "pointer", fontWeight: "600" }}>+ Add Link</button>
+                            <button type="button" disabled={linkSaving}
+                              onClick={async () => {
+                                setLinkSaving(true);
+                                try {
+                                  const newLinks = {};
+                                  linkEdits.forEach(({ key, url }) => { if (key && url) newLinks[key] = url; });
+                                  await updateAdminBookEditionLinks(row.id, row._editionKey, newLinks);
+                                  await loadBooks(showArchived);
+                                  setManagingLinksFor(null);
+                                  setError("");
+                                } catch (err) { setError(err.message); }
+                                finally { setLinkSaving(false); }
+                              }}
+                              style={{ padding: "0.45rem 1.25rem", borderRadius: "0.5rem", background: "var(--color-primary)", color: "white", border: "none", cursor: "pointer", fontWeight: "600" }}>
+                              {linkSaving ? "Saving…" : "Save Links"}
+                            </button>
+                            <button type="button" onClick={() => setManagingLinksFor(null)}
+                              style={{ padding: "0.45rem 1rem", borderRadius: "0.5rem", background: "#e5e7eb", color: "#374151", border: "none", cursor: "pointer", fontWeight: "600" }}>Cancel</button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
             </tbody>
           </table>
         </div>

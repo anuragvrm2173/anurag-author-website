@@ -703,6 +703,24 @@ export async function upsertAdminBook(form) {
   if (error) throw error;
 }
 
+export async function updateAdminBookEditionLinks(bookId, editionKey, newLinks) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is required to update books.");
+  }
+
+  if (editionKey) {
+    const { data: existing, error: fetchError } = await supabase.from("books").select("editions").eq("id", bookId).single();
+    if (fetchError) throw fetchError;
+    const editions = { ...(existing?.editions || {}) };
+    editions[editionKey] = { ...(editions[editionKey] || {}), purchaseLinks: newLinks };
+    const { error } = await supabase.from("books").update({ editions, updated_at: new Date().toISOString() }).eq("id", bookId);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase.from("books").update({ purchase_links: newLinks, updated_at: new Date().toISOString() }).eq("id", bookId);
+    if (error) throw error;
+  }
+}
+
 export async function deleteAdminBook(bookId) {
   if (!hasSupabase()) {
     throw new Error("Supabase is required to delete books.");
