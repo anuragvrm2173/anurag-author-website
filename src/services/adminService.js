@@ -374,12 +374,12 @@ export async function requestAdminPasswordOtp(email, options = {}) {
   } catch (error) {
     const message = normalizeAuthErrorMessage(error, "");
     if (/rate\s*limit|security purposes|too many/i.test(message)) {
-      throw new Error("Too many OTP requests. Please wait 60 seconds and try again.");
+      throw new Error("Too many OTP requests. Please wait 60 seconds and try again.", { cause: error });
     }
     if (message) {
-      throw new Error(message);
+      throw new Error(message, { cause: error });
     }
-    throw new Error("Unable to send OTP. Check Supabase SMTP config and Auth URL allow list, then try again.");
+    throw new Error("Unable to send OTP. Check Supabase SMTP config and Auth URL allow list, then try again.", { cause: error });
   }
 }
 
@@ -392,7 +392,7 @@ export async function verifyAdminOtpAndResetPassword(email, otp, nextPassword) {
   const normalizedOtp = String(otp || "")
     .trim()
     .replace(/\s+/g, "")
-    .replace(/^['\"]+|['\"]+$/g, "");
+    .replace(/^['"]+|['"]+$/g, "");
   const normalizedPassword = String(nextPassword || "").trim();
 
   if (!normalizedEmail) {

@@ -108,7 +108,15 @@ function AdminMedia() {
   }
 
   useEffect(() => {
-    loadMedia().catch((nextError) => setError(nextError.message));
+    const timer = window.setTimeout(() => {
+      loadMedia().catch((nextError) => {
+        setError(nextError.message);
+      });
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, []);
 
   const localFiles = useMemo(() => Object.entries(LOCAL_MEDIA_MODULES).map(([modulePath, fileUrl]) => {
@@ -177,16 +185,6 @@ function AdminMedia() {
     return sortedFiles.slice(start, start + pageSize);
   }, [clampedPage, pageSize, sortedFiles]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [query, sourceFilter, typeFilter, sortKey, sortDirection, pageSize]);
-
-  useEffect(() => {
-    if (page > pageCount) {
-      setPage(pageCount);
-    }
-  }, [page, pageCount]);
-
   async function handleCopyUrl(file) {
     if (!file.publicUrl) {
       return;
@@ -248,32 +246,50 @@ function AdminMedia() {
             type="search"
             placeholder="Search by file name or path"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setPage(1);
+            }}
           />
-          <select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}>
+          <select value={sourceFilter} onChange={(event) => {
+            setSourceFilter(event.target.value);
+            setPage(1);
+          }}>
             <option value="all">All sources</option>
             <option value="supabase">Supabase</option>
             <option value="public">Public</option>
             <option value="src/assets">Src assets</option>
           </select>
-          <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
+          <select value={typeFilter} onChange={(event) => {
+            setTypeFilter(event.target.value);
+            setPage(1);
+          }}>
             <option value="all">All types</option>
             <option value="image">Images</option>
             <option value="video">Videos</option>
             <option value="document">Documents</option>
             <option value="other">Other</option>
           </select>
-          <select value={sortKey} onChange={(event) => setSortKey(event.target.value)}>
+          <select value={sortKey} onChange={(event) => {
+            setSortKey(event.target.value);
+            setPage(1);
+          }}>
             <option value="name">Sort by Name</option>
             <option value="updated">Sort by Updated</option>
             <option value="size">Sort by Size</option>
             <option value="source">Sort by Source</option>
           </select>
-          <select value={sortDirection} onChange={(event) => setSortDirection(event.target.value)}>
+          <select value={sortDirection} onChange={(event) => {
+            setSortDirection(event.target.value);
+            setPage(1);
+          }}>
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
-          <select value={String(pageSize)} onChange={(event) => setPageSize(Number(event.target.value))}>
+          <select value={String(pageSize)} onChange={(event) => {
+            setPageSize(Number(event.target.value));
+            setPage(1);
+          }}>
             <option value="10">10 / page</option>
             <option value="25">25 / page</option>
             <option value="50">50 / page</option>
@@ -339,7 +355,7 @@ function AdminMedia() {
               type="button"
               className="admin-inline-button"
               disabled={clampedPage <= 1}
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              onClick={() => setPage((current) => Math.max(1, Math.min(current, pageCount) - 1))}
             >
               Previous
             </button>
@@ -348,7 +364,7 @@ function AdminMedia() {
               type="button"
               className="admin-inline-button"
               disabled={clampedPage >= pageCount}
-              onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+              onClick={() => setPage((current) => Math.min(pageCount, Math.min(current, pageCount) + 1))}
             >
               Next
             </button>

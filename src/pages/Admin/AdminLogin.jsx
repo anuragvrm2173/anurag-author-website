@@ -57,10 +57,13 @@ function normalizeUiErrorMessage(error, fallback) {
 function AdminLogin() {
   const navigate = useNavigate();
   const location = useLocation();
+  const searchParams = new URLSearchParams(location.search || "");
+  const hashParams = new URLSearchParams((location.hash || "").replace(/^#/, ""));
+  const isRecoveryLinkMode = searchParams.get("type") === "recovery" || hashParams.get("type") === "recovery";
   const [email, setEmail] = useState(adminAllowedEmail);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(isRecoveryLinkMode);
   const [resetEmail, setResetEmail] = useState(adminAllowedEmail);
   const [resetOtp, setResetOtp] = useState("");
   const [resetPassword, setResetPassword] = useState("");
@@ -69,16 +72,16 @@ function AdminLogin() {
   const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
-  const [otpSecondsLeft, setOtpSecondsLeft] = useState(0);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMessage, setResetMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const missingEnvVars = getMissingSupabaseEnvVars();
   const supabaseConfigured = hasSupabase();
-  const searchParams = new URLSearchParams(location.search || "");
-  const hashParams = new URLSearchParams((location.hash || "").replace(/^#/, ""));
-  const isRecoveryLinkMode = searchParams.get("type") === "recovery" || hashParams.get("type") === "recovery";
+  const [clockTick, setClockTick] = useState(() => Date.now());
+  const otpSecondsLeft = otpCooldownUntil
+    ? Math.max(0, Math.ceil((otpCooldownUntil - clockTick) / 1000))
+    : 0;
 
   useEffect(() => {
     let active = true;
@@ -94,27 +97,14 @@ function AdminLogin() {
   }, [isRecoveryLinkMode, location.state?.from, navigate]);
 
   useEffect(() => {
-    if (isRecoveryLinkMode) {
-      setShowForgotPassword(true);
-    }
-  }, [isRecoveryLinkMode]);
-
-  useEffect(() => {
     if (!otpCooldownUntil) {
-      setOtpSecondsLeft(0);
       return undefined;
     }
 
-    const tick = () => {
-      const remaining = Math.max(0, Math.ceil((otpCooldownUntil - Date.now()) / 1000));
-      setOtpSecondsLeft(remaining);
-      if (remaining <= 0) {
-        setOtpCooldownUntil(0);
-      }
-    };
+    const timer = window.setInterval(() => {
+      setClockTick(Date.now());
+    }, 1000);
 
-    tick();
-    const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
   }, [otpCooldownUntil]);
 
