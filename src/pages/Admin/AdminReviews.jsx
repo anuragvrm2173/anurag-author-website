@@ -3,7 +3,7 @@ import "./Admin.css";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { deleteAdminReview, fetchAdminReviews, updateAdminReview } from "../../services/adminService";
+import { deleteAdminReview, fetchAdminReviews, updateAdminReview, insertAdminReview } from "../../services/adminService";
 
 const REVIEW_FLOW = {
   submitted: "Move to Pending",
@@ -21,6 +21,7 @@ function getNextReviewStatus(status) {
 function ReviewQuickForm({ onAdded, onError }) {
   const [form, setForm] = useState({
     reviewerName: "",
+    reviewerEmail: "",
     reviewerRole: "Reader",
     bookId: "",
     quote: "",
@@ -46,12 +47,10 @@ function ReviewQuickForm({ onAdded, onError }) {
 
     setSaving(true);
     try {
-      const id = `review-${Date.now()}`;
-      const now = new Date().toISOString();
-      await updateAdminReview(id, {
-        id,
+      await insertAdminReview({
         book_id: form.bookId,
         reviewer_name: form.reviewerName,
+        reviewer_email: form.reviewerEmail || "unknown@example.com",
         reviewer_role: form.reviewerRole,
         quote: form.quote,
         rating: form.rating,
@@ -59,10 +58,10 @@ function ReviewQuickForm({ onAdded, onError }) {
         source_url: form.sourceUrl || null,
         status: form.status,
         featured: form.featured,
-        created_at: now,
       });
       setForm({
         reviewerName: "",
+        reviewerEmail: "",
         reviewerRole: "Reader",
         bookId: "",
         quote: "",
@@ -91,25 +90,21 @@ function ReviewQuickForm({ onAdded, onError }) {
             <input value={form.reviewerName} onChange={(e) => setForm({ ...form, reviewerName: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
           </div>
           <div>
-            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Role</label>
-            <input value={form.reviewerRole} onChange={(e) => setForm({ ...form, reviewerRole: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Email</label>
+            <input type="email" value={form.reviewerEmail} onChange={(e) => setForm({ ...form, reviewerEmail: e.target.value })} placeholder="reviewer@example.com" style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Role</label>
+            <input value={form.reviewerRole} onChange={(e) => setForm({ ...form, reviewerRole: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+          </div>
           <div>
             <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Book *</label>
             <select value={form.bookId} onChange={(e) => setForm({ ...form, bookId: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
               <option value="">Select a book</option>
               {books.map((book) => (
                 <option key={book.id} value={book.id}>{book.title}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Rating (1-5)</label>
-            <select value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
-              {[5, 4, 3, 2, 1].map((n) => (
-                <option key={n} value={n}>{n} ★</option>
               ))}
             </select>
           </div>
@@ -157,9 +152,12 @@ function AdminReviews() {
   const [error, setError] = useState("");
   const activeStatus = searchParams.get("status") || "all";
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [books, setBooks] = useState([]);
 
   useEffect(() => {
     fetchAdminReviews().then(setReviews).catch((nextError) => setError(nextError.message));
+    import("../../data/books").then((m) => setBooks(m.default || []));
   }, []);
 
   const filteredReviews = useMemo(() => {
@@ -190,6 +188,8 @@ function AdminReviews() {
     }
     return sorted;
   }, [activeStatus, reviews, sortBy]);
+
+  const editingReview = editingReviewId ? reviews.find((r) => r.id === editingReviewId) : null;
 
   return (
     <section className="admin-page">
@@ -246,6 +246,97 @@ function AdminReviews() {
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
 
+      {editingReview ? (
+        <div className="admin-card" style={{ marginBottom: "2rem", display: "grid", gap: "1rem", background: "#f9f3e6", border: "2px solid var(--color-primary)" }}>
+          <p className="admin-card__label">Edit Review</p>
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+              await updateAdminReview(editingReview.id, {
+                reviewer_name: formData.get("reviewerName"),
+                reviewer_email: formData.get("reviewerEmail"),
+                reviewer_role: formData.get("reviewerRole"),
+                book_id: formData.get("bookId"),
+                quote: formData.get("quote"),
+                rating: Number(formData.get("rating")),
+                source: formData.get("source"),
+                source_url: formData.get("sourceUrl"),
+              });
+              setReviews((current) => current.map((item) => item.id === editingReview.id ? {
+                ...item,
+                reviewer_name: formData.get("reviewerName"),
+                reviewer_email: formData.get("reviewerEmail"),
+                reviewer_role: formData.get("reviewerRole"),
+                book_id: formData.get("bookId"),
+                quote: formData.get("quote"),
+                rating: Number(formData.get("rating")),
+                source: formData.get("source"),
+                source_url: formData.get("sourceUrl"),
+              } : item));
+              setEditingReviewId(null);
+              setError("");
+            } catch (err) {
+              setError(err.message);
+            }
+          }} style={{ display: "grid", gap: "1rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div>
+                <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Reviewer Name *</label>
+                <input name="reviewerName" defaultValue={editingReview.reviewer_name} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+              </div>
+              <div>
+                <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Email</label>
+                <input type="email" name="reviewerEmail" defaultValue={editingReview.reviewer_email} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div>
+                <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Role</label>
+                <input name="reviewerRole" defaultValue={editingReview.reviewer_role} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+              </div>
+              <div>
+                <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Book *</label>
+                <select name="bookId" defaultValue={editingReview.book_id} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
+                  {books.map((book) => (
+                    <option key={book.id} value={book.id}>{book.title}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div>
+                <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Rating (1-5)</label>
+                <select name="rating" defaultValue={editingReview.rating} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
+                  {[5, 4, 3, 2, 1].map((n) => (
+                    <option key={n} value={n}>{n} ★</option>
+                  ))}
+                </select>
+              </div>
+              <div />
+            </div>
+            <div>
+              <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Review Quote *</label>
+              <textarea name="quote" defaultValue={editingReview.quote} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem", minHeight: "100px", fontFamily: "inherit" }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div>
+                <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Source</label>
+                <input name="source" defaultValue={editingReview.source} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+              </div>
+              <div>
+                <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Source URL</label>
+                <input type="url" name="sourceUrl" defaultValue={editingReview.source_url || ""} placeholder="https://..." style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button type="submit" style={{ padding: "0.75rem 1.5rem", borderRadius: "0.5rem", background: "var(--color-primary)", color: "white", border: "none", cursor: "pointer", fontWeight: "600" }}>Save Changes</button>
+              <button type="button" onClick={() => setEditingReviewId(null)} style={{ padding: "0.75rem 1.5rem", borderRadius: "0.5rem", background: "#ccc", color: "black", border: "none", cursor: "pointer", fontWeight: "600" }}>Cancel</button>
+            </div>
+          </form>
+        </div>
+      ) : null}
+
       <ReviewQuickForm onAdded={() => {
         fetchAdminReviews().then(setReviews).catch((nextError) => setError(nextError.message));
       }} onError={setError} />
@@ -276,6 +367,7 @@ function AdminReviews() {
                 <td data-label="Status"><span className={`admin-status-pill admin-status-pill--${review.status}`}>{review.status}</span></td>
                 <td data-label="Actions">
                   <div className="admin-table__actions">
+                    <button type="button" className="admin-inline-button" onClick={() => setEditingReviewId(review.id)}>Edit</button>
                     {getNextReviewStatus(review.status) ? (
                       <button type="button" className="admin-inline-button" onClick={async () => {
                         const nextStatus = getNextReviewStatus(review.status);

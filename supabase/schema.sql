@@ -8,6 +8,7 @@ create table if not exists public.reviews (
   quote text not null,
   rating int not null check (rating between 1 and 5),
   source text,
+  source_url text,
   featured boolean not null default false,
   status text not null default 'submitted' check (status in ('submitted', 'pending', 'approved', 'published', 'rejected')),
   created_at timestamptz not null default now(),
@@ -17,6 +18,7 @@ create table if not exists public.reviews (
 );
 
 alter table public.reviews add column if not exists deleted_at timestamptz;
+alter table public.reviews add column if not exists source_url text;
 alter table public.reviews drop constraint if exists reviews_status_check;
 alter table public.reviews add constraint reviews_status_check check (status in ('submitted', 'pending', 'approved', 'published', 'rejected'));
 

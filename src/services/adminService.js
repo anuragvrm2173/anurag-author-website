@@ -811,6 +811,21 @@ export async function updateAdminReview(reviewId, updates) {
   if (error) throw error;
 }
 
+export async function insertAdminReview(reviewData) {
+  if (!hasSupabase()) {
+    throw new Error("Supabase is required to create reviews.");
+  }
+
+  const payload = { ...reviewData };
+  if (payload.status && payload.status !== "pending") {
+    payload.moderated_at = new Date().toISOString();
+  }
+
+  const { data, error } = await supabase.from("reviews").insert([payload]).select();
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteAdminReview(reviewId) {
   if (!hasSupabase()) {
     throw new Error("Supabase is required to delete reviews.");
