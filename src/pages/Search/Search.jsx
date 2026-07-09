@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import SectionHeader from "../../components/common/SectionHeader/SectionHeader";
 import SEO from "../../components/seo/SEO";
 import Container from "../../components/ui/Container/Container";
+import useDialogA11y from "../../hooks/useDialogA11y";
 import useSiteSettings from "../../hooks/useSiteSettings";
 import { getBlogPostPath, getBlogSearchText } from "../../data/blog";
 import usePublicContent from "../../hooks/usePublicContent";
@@ -43,7 +44,6 @@ function Search() {
   });
   const inputRef = useRef(null);
   const paletteCardRef = useRef(null);
-  const previousActiveElementRef = useRef(null);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -66,50 +66,12 @@ function Search() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  useEffect(() => {
-    if (!isPaletteOpen) {
-      previousActiveElementRef.current?.focus?.();
-      return;
-    }
-
-    previousActiveElementRef.current = document.activeElement;
-    const card = paletteCardRef.current;
-    const firstButton = card?.querySelector("button");
-    firstButton?.focus();
-
-    const handlePaletteKeyDown = (event) => {
-      if (!isPaletteOpen || event.key !== "Tab") {
-        return;
-      }
-
-      const focusable = card
-        ? Array.from(card.querySelectorAll("button:not([disabled]), [href], input:not([disabled])"))
-        : [];
-
-      if (focusable.length === 0) {
-        event.preventDefault();
-        return;
-      }
-
-      const firstElement = focusable[0];
-      const lastElement = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === firstElement) {
-        event.preventDefault();
-        lastElement.focus();
-      }
-
-      if (!event.shiftKey && document.activeElement === lastElement) {
-        event.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    window.addEventListener("keydown", handlePaletteKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handlePaletteKeyDown);
-    };
-  }, [isPaletteOpen]);
+  useDialogA11y({
+    open: isPaletteOpen,
+    dialogRef: paletteCardRef,
+    onClose: () => setIsPaletteOpen(false),
+    lockBodyScroll: true,
+  });
 
   useEffect(() => {
     if (!normalizedQuery) {
@@ -173,8 +135,19 @@ function Search() {
 
       <main className="search-page">
         {isPaletteOpen ? (
-          <div className="search-page__palette" role="dialog" aria-modal="true" aria-label="Quick search" onClick={() => setIsPaletteOpen(false)}>
-            <div className="search-page__palette-card" ref={paletteCardRef} onClick={(event) => event.stopPropagation()}>
+          <div className="search-page__palette" onClick={() => setIsPaletteOpen(false)}>
+            <div
+              className="search-page__palette-card"
+              ref={paletteCardRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="search-palette-title"
+              aria-describedby="search-palette-description"
+              tabIndex={-1}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h2 id="search-palette-title" className="visually-hidden">Quick search</h2>
+              <p id="search-palette-description" className="visually-hidden">Choose a quick action and focus moves to the search input.</p>
               <button
                 type="button"
                 className="search-page__palette-action"

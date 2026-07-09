@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { fetchAdminMessages, updateAdminMessage } from "../../services/adminService";
+import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 function getMessageType(message) {
   const text = String(message?.message || "");
@@ -42,7 +43,7 @@ function createReplyLink(message) {
     getDisplayMessageBody(message),
   ].join("\n"));
 
-  return `mailto:${recipient}?subject=${subject}&body=${body}`;
+  return sanitizeExternalUrl(`mailto:${recipient}?subject=${subject}&body=${body}`);
 }
 
 function AdminMessages() {

@@ -129,7 +129,7 @@ function BookReader({ sample, onClose, buyLink }) {
   };
 
   return (
-    <div className="reader-overlay" role="dialog" aria-modal="true" aria-label="Book preview reader">
+    <div className="reader-overlay">
       <div className="reader-shell">
         <div className="reader-toolbar">
           <button type="button" className="reader-close" onClick={onClose}>

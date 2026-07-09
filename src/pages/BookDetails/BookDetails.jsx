@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { FaFacebookF, FaLink, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
@@ -13,7 +13,9 @@ import ReviewForm from "../../components/forms/ReviewForm/ReviewForm";
 import BookReader from "../../components/reader/BookReader";
 import ReaderModal from "../../components/reader/ReaderModal";
 import Container from "../../components/ui/Container/Container";
+import useDialogA11y from "../../hooks/useDialogA11y";
 import useSiteSettings from "../../hooks/useSiteSettings";
+import { sanitizeExternalUrl } from "../../utils/urlSafety";
 import { sampleMap } from "../../data/samples";
 import { getReviewsByBookId } from "../../data/reviews";
 import usePublicContent from "../../hooks/usePublicContent";
@@ -57,7 +59,9 @@ function BookDetails() {
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isCoverZoomed, setIsCoverZoomed] = useState(false);
+  const coverModalRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const coverTriggerRef = useRef(null);
   const { reviews, refresh } = useApprovedReviews();
   const { books, blogPosts, loading } = usePublicContent({ includeBooks: true, includeBlogPosts: true });
   const { siteConfig } = useSiteSettings();
@@ -88,23 +92,19 @@ function BookDetails() {
     [requestedEditionKey, editionEntries]
   );
 
-  useEffect(() => {
-    if (!isCoverOpen) {
-      return undefined;
-    }
+  const closeCoverModal = () => {
+    setIsCoverOpen(false);
+    setIsCoverZoomed(false);
+  };
 
-    closeButtonRef.current?.focus();
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setIsCoverOpen(false);
-        setIsCoverZoomed(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isCoverOpen]);
+  useDialogA11y({
+    open: isCoverOpen,
+    dialogRef: coverModalRef,
+    onClose: closeCoverModal,
+    initialFocusRef: closeButtonRef,
+    restoreFocusRef: coverTriggerRef,
+    lockBodyScroll: true,
+  });
 
   if (!book && loading) {
     return (
@@ -376,6 +376,9 @@ function BookDetails() {
   const toBeAnnouncedLabel = isHindi ? "घोषित किया जाना है" : "To Be Announced";
   const pageUrl = `${siteConfig.url}/library/${book.id}${effectiveEditionKey ? `?edition=${effectiveEditionKey}` : ""}`;
   const shareText = `${book.title} by Anurag Verma`;
+  const whatsappShareUrl = sanitizeExternalUrl(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${pageUrl}`)}`);
+  const xShareUrl = sanitizeExternalUrl(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`);
+  const facebookShareUrl = sanitizeExternalUrl(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`);
 
   return (
     <HelmetProvider>
@@ -410,7 +413,10 @@ function BookDetails() {
           <BookHero
             book={book}
             activeEdition={activeEdition}
-            onCoverPreviewOpen={() => setIsCoverOpen(true)}
+            onCoverPreviewOpen={() => {
+              coverTriggerRef.current = document.activeElement;
+              setIsCoverOpen(true);
+            }}
             isHindi={isHindi}
             labels={labels}
             displaySubtitle={displaySubtitle}
@@ -433,39 +439,45 @@ function BookDetails() {
 
             <div className="book-details__share" aria-label="Share this book">
               <p className="book-details__share-label">Share this Book</p>
-              <a
-                className="book-details__share-link"
-                href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${pageUrl}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Share on WhatsApp"
-              >
-                <span aria-hidden="true">○</span>
-                <FaWhatsapp />
-                <span>WhatsApp</span>
-              </a>
-              <a
-                className="book-details__share-link"
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Share on X"
-              >
-                <span aria-hidden="true">○</span>
-                <FaXTwitter />
-                <span>X</span>
-              </a>
-              <a
-                className="book-details__share-link"
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Share on Facebook"
-              >
-                <span aria-hidden="true">○</span>
-                <FaFacebookF />
-                <span>Facebook</span>
-              </a>
+              {whatsappShareUrl ? (
+                <a
+                  className="book-details__share-link"
+                  href={whatsappShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Share on WhatsApp"
+                >
+                  <span aria-hidden="true">○</span>
+                  <FaWhatsapp />
+                  <span>WhatsApp</span>
+                </a>
+              ) : null}
+              {xShareUrl ? (
+                <a
+                  className="book-details__share-link"
+                  href={xShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Share on X"
+                >
+                  <span aria-hidden="true">○</span>
+                  <FaXTwitter />
+                  <span>X</span>
+                </a>
+              ) : null}
+              {facebookShareUrl ? (
+                <a
+                  className="book-details__share-link"
+                  href={facebookShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Share on Facebook"
+                >
+                  <span aria-hidden="true">○</span>
+                  <FaFacebookF />
+                  <span>Facebook</span>
+                </a>
+              ) : null}
               <button
                 type="button"
                 className="book-details__share-link"
@@ -603,21 +615,18 @@ function BookDetails() {
           className="book-cover-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="Book cover preview"
-          onClick={() => {
-            setIsCoverOpen(false);
-            setIsCoverZoomed(false);
-          }}
+          aria-labelledby="book-cover-modal-title"
+          aria-describedby="book-cover-modal-description"
+          onClick={closeCoverModal}
         >
-          <div className="book-cover-modal__inner" onClick={(event) => event.stopPropagation()}>
+          <div ref={coverModalRef} className="book-cover-modal__inner" tabIndex={-1} onClick={(event) => event.stopPropagation()}>
+            <h2 id="book-cover-modal-title" className="visually-hidden">Book cover preview</h2>
+            <p id="book-cover-modal-description" className="visually-hidden">Use the close button or Escape to close. Press Enter or Space on the cover to toggle zoom.</p>
             <button
               type="button"
               className="book-cover-modal__close"
               ref={closeButtonRef}
-              onClick={() => {
-                setIsCoverOpen(false);
-                setIsCoverZoomed(false);
-              }}
+              onClick={closeCoverModal}
               aria-label="Close cover preview"
             >
               Close

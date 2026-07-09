@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import Button from "../../components/ui/Button/Button";
 import { listAdminMediaFiles, uploadAdminMediaFile } from "../../services/adminService";
+import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 const LOCAL_MEDIA_MODULES = import.meta.glob([
   "../../assets/**/*.{png,jpg,jpeg,webp,avif,gif,svg,mp4,webm,pdf}",
@@ -146,10 +147,17 @@ function AdminMedia() {
     return [...localFiles, ...storageFiles];
   }, [files, localFiles]);
 
+  const normalizedFiles = useMemo(() => {
+    return combinedFiles.map((file) => ({
+      ...file,
+      safePublicUrl: sanitizeExternalUrl(file.publicUrl),
+    }));
+  }, [combinedFiles]);
+
   const filteredFiles = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return combinedFiles.filter((file) => {
+    return normalizedFiles.filter((file) => {
       if (sourceFilter !== "all" && file.source !== sourceFilter) {
         return false;
       }
@@ -166,7 +174,7 @@ function AdminMedia() {
       const haystack = `${file.name} ${file.path} ${file.source}`.toLowerCase();
       return haystack.includes(normalizedQuery);
     });
-  }, [combinedFiles, query, sourceFilter, typeFilter]);
+  }, [normalizedFiles, query, sourceFilter, typeFilter]);
 
   const sortedFiles = useMemo(() => {
     const sorted = [...filteredFiles].sort((left, right) => compareByKey(left, right, sortKey));
@@ -186,12 +194,12 @@ function AdminMedia() {
   }, [clampedPage, pageSize, sortedFiles]);
 
   async function handleCopyUrl(file) {
-    if (!file.publicUrl) {
+    if (!file.safePublicUrl) {
       return;
     }
 
     try {
-      await navigator.clipboard.writeText(file.publicUrl);
+      await navigator.clipboard.writeText(file.safePublicUrl);
       setCopiedId(file.id);
       window.setTimeout(() => {
         setCopiedId((current) => (current === file.id ? "" : current));
@@ -323,9 +331,9 @@ function AdminMedia() {
                 <tr key={file.id}>
                   <td data-label="Source">{file.source}</td>
                   <td data-label="Preview">
-                    {isImage(file) && file.publicUrl ? (
-                      <a href={file.publicUrl} target="_blank" rel="noopener noreferrer">
-                        <img className="admin-media-thumb" src={file.publicUrl} alt={file.name} loading="lazy" />
+                    {isImage(file) && file.safePublicUrl ? (
+                      <a href={file.safePublicUrl} target="_blank" rel="noopener noreferrer">
+                        <img className="admin-media-thumb" src={file.safePublicUrl} alt={file.name} loading="lazy" />
                       </a>
                     ) : (
                       <span>—</span>
@@ -335,10 +343,10 @@ function AdminMedia() {
                   <td data-label="Path">{file.path}</td>
                   <td data-label="Updated">{file.updated_at ? new Date(file.updated_at).toLocaleString() : "—"}</td>
                   <td data-label="Size">{formatSize(file.size)}</td>
-                  <td data-label="Public URL">{file.publicUrl ? <a href={file.publicUrl} target="_blank" rel="noopener noreferrer">Open</a> : "—"}</td>
+                  <td data-label="Public URL">{file.safePublicUrl ? <a href={file.safePublicUrl} target="_blank" rel="noopener noreferrer">Open</a> : "—"}</td>
                   <td data-label="Actions">
                     <div className="admin-table__actions">
-                      <button type="button" className="admin-inline-button" disabled={!file.publicUrl} onClick={() => {
+                      <button type="button" className="admin-inline-button" disabled={!file.safePublicUrl} onClick={() => {
                         handleCopyUrl(file);
                       }}>
                         {copiedId === file.id ? "Copied" : "Copy URL"}

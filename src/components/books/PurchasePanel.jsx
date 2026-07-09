@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import CaptchaChallenge from "../common/CaptchaChallenge/CaptchaChallenge";
 import { isCaptchaEnabled } from "../../services/captchaService";
 import { submitBuyNowLead } from "../../services/contactService";
 import { notifyBuyLinkClick } from "../../services/notificationsService";
+import useDialogA11y from "../../hooks/useDialogA11y";
 import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 const STORE_LOGOS = {
@@ -114,6 +115,9 @@ function RetailerMark({ retailerKey }) {
 }
 
 function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi = false }) {
+  const leadModalRef = useRef(null);
+  const leadNameInputRef = useRef(null);
+  const leadTriggerRef = useRef(null);
   const [leadModalOpen, setLeadModalOpen] = useState(false);
   const [selectedRetailer, setSelectedRetailer] = useState(null);
   const [readerName, setReaderName] = useState("");
@@ -199,10 +203,20 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
   };
 
   const openLeadModal = (retailer) => {
+    leadTriggerRef.current = document.activeElement;
     setSelectedRetailer(retailer);
     setLeadModalOpen(true);
     setLeadError("");
   };
+
+  useDialogA11y({
+    open: leadModalOpen,
+    dialogRef: leadModalRef,
+    onClose: resetLeadModal,
+    initialFocusRef: leadNameInputRef,
+    restoreFocusRef: leadTriggerRef,
+    lockBodyScroll: true,
+  });
 
   const proceedToRetailer = (url) => {
     const nextWindow = window.open(url, "_blank", "noopener,noreferrer");
@@ -298,16 +312,19 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
       {leadModalOpen ? (
         <div className="purchase-panel__lead-backdrop" onClick={resetLeadModal}>
           <div
+            ref={leadModalRef}
             className="purchase-panel__lead-modal"
             role="dialog"
             aria-modal="true"
-            aria-label={isHindi ? "खरीदने से पहले विवरण" : "Details before purchase"}
+            aria-labelledby="purchase-lead-modal-title"
+            aria-describedby="purchase-lead-modal-description"
+            tabIndex={-1}
             onClick={(event) => event.stopPropagation()}
           >
-            <h3 className="purchase-panel__lead-title">
+            <h3 id="purchase-lead-modal-title" className="purchase-panel__lead-title">
               {isHindi ? "आगे बढ़ने से पहले" : "Before You Continue"}
             </h3>
-            <p className="purchase-panel__lead-description">
+            <p id="purchase-lead-modal-description" className="purchase-panel__lead-description">
               {isHindi
                 ? "आप चाहें तो नाम और ईमेल भरें। इसके बाद आप खरीद लिंक पर भेजे जाएंगे।"
                 : "Name and email are optional. You will then be redirected to the buy link."}
@@ -359,6 +376,7 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
               </label>
               <input
                 id="purchase-lead-name"
+                ref={leadNameInputRef}
                 type="text"
                 className="purchase-panel__lead-input"
                 value={readerName}

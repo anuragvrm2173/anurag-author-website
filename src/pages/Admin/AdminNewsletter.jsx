@@ -3,6 +3,7 @@ import "./Admin.css";
 import { useEffect, useState } from "react";
 
 import { deleteAdminNewsletterSubscriber, fetchAdminNewsletterSubscribers } from "../../services/adminService";
+import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 function createSubscriberReplyLink(subscriber) {
   const recipient = String(subscriber.email || "").trim();
@@ -21,7 +22,7 @@ function createSubscriberReplyLink(subscriber) {
     "Anurag Verma",
   ].join("\n"));
 
-  return `mailto:${recipient}?subject=${subject}&body=${body}`;
+  return sanitizeExternalUrl(`mailto:${recipient}?subject=${subject}&body=${body}`);
 }
 
 function AdminNewsletter() {
