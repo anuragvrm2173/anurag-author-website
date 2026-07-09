@@ -18,6 +18,139 @@ function getNextReviewStatus(status) {
   return null;
 }
 
+function ReviewQuickForm({ onAdded, onError }) {
+  const [form, setForm] = useState({
+    reviewerName: "",
+    reviewerRole: "Reader",
+    bookId: "",
+    quote: "",
+    rating: 5,
+    source: "Direct Entry",
+    sourceUrl: "",
+    status: "approved",
+    featured: false,
+  });
+  const [saving, setSaving] = useState(false);
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    import("../../data/books").then((m) => setBooks(m.default || []));
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.reviewerName || !form.bookId || !form.quote) {
+      onError("Reviewer name, book, and quote are required");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const id = `review-${Date.now()}`;
+      const now = new Date().toISOString();
+      await updateAdminReview(id, {
+        id,
+        book_id: form.bookId,
+        reviewer_name: form.reviewerName,
+        reviewer_role: form.reviewerRole,
+        quote: form.quote,
+        rating: form.rating,
+        source: form.source,
+        source_url: form.sourceUrl || null,
+        status: form.status,
+        featured: form.featured,
+        created_at: now,
+      });
+      setForm({
+        reviewerName: "",
+        reviewerRole: "Reader",
+        bookId: "",
+        quote: "",
+        rating: 5,
+        source: "Direct Entry",
+        sourceUrl: "",
+        status: "approved",
+        featured: false,
+      });
+      onAdded();
+      onError("");
+    } catch (err) {
+      onError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="admin-card" style={{ marginBottom: "2rem", display: "grid", gap: "1rem" }}>
+      <p className="admin-card__label">Quick Add Review</p>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "1rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Reviewer Name *</label>
+            <input value={form.reviewerName} onChange={(e) => setForm({ ...form, reviewerName: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+          </div>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Role</label>
+            <input value={form.reviewerRole} onChange={(e) => setForm({ ...form, reviewerRole: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Book *</label>
+            <select value={form.bookId} onChange={(e) => setForm({ ...form, bookId: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
+              <option value="">Select a book</option>
+              {books.map((book) => (
+                <option key={book.id} value={book.id}>{book.title}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Rating (1-5)</label>
+            <select value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
+              {[5, 4, 3, 2, 1].map((n) => (
+                <option key={n} value={n}>{n} ★</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Review Quote *</label>
+          <textarea value={form.quote} onChange={(e) => setForm({ ...form, quote: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem", minHeight: "100px", fontFamily: "inherit" }} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Source</label>
+            <input value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+          </div>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Source URL</label>
+            <input type="url" value={form.sourceUrl} onChange={(e) => setForm({ ...form, sourceUrl: e.target.value })} placeholder="https://..." style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }} />
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div>
+            <label style={{ fontWeight: "600", display: "block", marginBottom: "0.5rem" }}>Status</label>
+            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} style={{ width: "100%", padding: "0.5rem", border: "1px solid #ccc", borderRadius: "0.5rem" }}>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="published">Published</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}>
+            <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} id="rev-featured" />
+            <label htmlFor="rev-featured" style={{ fontWeight: "600", margin: 0 }}>Featured</label>
+          </div>
+        </div>
+        <button type="submit" disabled={saving} style={{ padding: "0.75rem 1.5rem", borderRadius: "0.5rem", background: "var(--color-primary)", color: "white", border: "none", cursor: "pointer", fontWeight: "600" }}>
+          {saving ? "Adding..." : "Add Review"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 function AdminReviews() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [reviews, setReviews] = useState([]);
@@ -112,6 +245,11 @@ function AdminReviews() {
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
+
+      <ReviewQuickForm onAdded={() => {
+        fetchAdminReviews().then(setReviews).catch((nextError) => setError(nextError.message));
+      }} onError={setError} />
+
       {reviews.length > 0 && filteredReviews.length === 0 ? <div className="admin-empty">No reviews match the current filter.</div> : null}
 
       {filteredReviews.length > 0 ? (

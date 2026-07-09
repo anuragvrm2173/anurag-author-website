@@ -163,6 +163,7 @@ function AdminBlog() {
   const [showArchived, setShowArchived] = useState(searchParams.get("archived") === "1");
   const activeStatus = searchParams.get("status") || "all";
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
+  const [displayLimit, setDisplayLimit] = useState(20);
 
   async function loadPosts(includeArchived = showArchived) {
     const nextPosts = await fetchAdminBlogPosts({ includeArchived });
@@ -189,6 +190,10 @@ function AdminBlog() {
     };
   }, [showArchived]);
 
+  useEffect(() => {
+    setDisplayLimit(20);
+  }, [activeStatus, sortBy]);
+
   const selectedPost = useMemo(() => posts.find((item) => item.id === postId || item.slug === postId) || null, [postId, posts]);
   const filteredPosts = useMemo(() => {
     if (activeStatus === "all") {
@@ -197,6 +202,23 @@ function AdminBlog() {
 
     return posts.filter((post) => String(post.status || "").toLowerCase() === activeStatus.replace(/_/g, " "));
   }, [activeStatus, posts]);
+
+  const sortedAndFilteredPosts = useMemo(() => {
+    const postsList = [...filteredPosts];
+    switch (sortBy) {
+      case "oldest":
+        return postsList.sort((a, b) => new Date(a.publishedAt || a.createdAt || 0) - new Date(b.publishedAt || b.createdAt || 0));
+      case "title-asc":
+        return postsList.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+      case "title-desc":
+        return postsList.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
+      case "category":
+        return postsList.sort((a, b) => (a.category || "").localeCompare(b.category || ""));
+      case "newest":
+      default:
+        return postsList.sort((a, b) => new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0));
+    }
+  }, [filteredPosts, sortBy]);
   const activeRevisionDraft = useMemo(() => {
     if (!revisionDraft || !selectedPost || revisionDraft.sourceId !== selectedPost.id) {
       return null;
@@ -260,6 +282,23 @@ function AdminBlog() {
               </button>
             ))}
           </div>
+          <label className="admin-sort" htmlFor="admin-blog-sort">
+            <span>Sort by</span>
+            <select id="admin-blog-sort" value={sortBy} onChange={(event) => {
+              setSortBy(event.target.value);
+              setSearchParams((current) => {
+                const nextParams = new URLSearchParams(current);
+                nextParams.set("sort", event.target.value);
+                return nextParams;
+              });
+            }}>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="title-asc">Title A-Z</option>
+              <option value="title-desc">Title Z-A</option>
+              <option value="category">Category</option>
+            </select>
+          </label>
           <label className="admin-toggle">
             <input
               type="checkbox"
@@ -302,7 +341,7 @@ function AdminBlog() {
               </tr>
             </thead>
             <tbody>
-              {filteredPosts.map((post) => (
+              {sortedAndFilteredPosts.slice(0, displayLimit).map((post) => (
                 <tr key={post.id}>
                   <td data-label="Title">
                     <strong>{post.title}</strong>
@@ -351,6 +390,14 @@ function AdminBlog() {
             </tbody>
           </table>
         </div>
+
+        {displayLimit < sortedAndFilteredPosts.length ? (
+          <div style={{ display: "flex", justifyContent: "center", padding: "1rem" }}>
+            <button onClick={() => setDisplayLimit(displayLimit + 20)} style={{ padding: "0.75rem 1.5rem", background: "var(--color-primary)", color: "white", border: "none", borderRadius: "0.5rem", cursor: "pointer", fontWeight: "600" }}>
+              Load More ({sortedAndFilteredPosts.length - displayLimit} remaining)
+            </button>
+          </div>
+        ) : null}
 
         <BlogEditorForm
           key={formKey}
