@@ -53,6 +53,50 @@ const BLOG_VISUAL_THEMES = {
 
 export const blogPosts = [
 	{
+		id: "every-book-begins-with-an-idea",
+		title: "Every Book Begins With an Idea. Mine Began With a Loss.",
+		excerpt:
+			"The Last Goodbye I Never Got is not just a novel—it is a collection of memories, emotions, and moments that changed my life forever. It was born from love, heartbreak, family, grief, hope, and the quiet realization that some goodbyes are never spoken.",
+		readingTime: "6 min read",
+		publishedAt: "July 2026",
+		category: "Behind the Book",
+		relatedBookIds: ["the-last-goodbye"],
+		contentSections: [
+			{
+				heading: "Where It All Began",
+				paragraphs: [
+					"Every book begins with an idea. Mine began with a loss.",
+					"The Last Goodbye I Never Got is not just a novel—it is a collection of memories, emotions, and moments that changed my life forever. It was born from love, heartbreak, family, grief, hope, and the quiet realization that some goodbyes are never spoken.",
+					"For years, these experiences lived only in my heart. Writing this book became a way to preserve them—not because I wanted to relive the past, but because I wanted to understand it.",
+				],
+			},
+			{
+				heading: "A Story Personal Yet Universal",
+				paragraphs: [
+					"This story is deeply personal, yet I believe its emotions are universal. Almost everyone has loved someone, lost someone, missed opportunities, or carried memories that never truly fade.",
+					"If this book helps even one reader feel less alone, then it has already fulfilled its purpose.",
+					"As a debut author from Sikanderpur, Ballia, Uttar Pradesh, India, I never imagined that my personal journey would one day become a published book. Every page reminds me that even our most painful experiences can become something meaningful when shared with honesty.",
+				],
+			},
+			{
+				heading: "A Note from Goodreads",
+				paragraphs: [
+					"As the author of this book, I wanted to share a story that was lived before it was written.",
+					"The Last Goodbye I Never Got is an autobiographical novel about love, heartbreak, family, loss, healing, and the memories that continue to shape us. Every chapter is inspired by real experiences, making this book deeply personal and emotionally honest.",
+					"My hope is that readers who have experienced love, grief, or the pain of an unfinished goodbye will find comfort and connection within these pages.",
+					"Thank you for giving my debut book a chance. I hope this story stays with you long after you've turned the final page.",
+				],
+			},
+			{
+				heading: "With Gratitude",
+				paragraphs: [
+					"Thank you to everyone who has supported this journey. Your encouragement has made this dream possible.",
+					"I hope that when you finish reading The Last Goodbye I Never Got, you won't just remember my story—you'll remember your own.",
+				],
+			},
+		],
+	},
+	{
 		id: "the-story-behind-the-words",
 		title: "The Story Behind the Words",
 		excerpt:
