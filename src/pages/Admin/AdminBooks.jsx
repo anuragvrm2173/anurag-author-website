@@ -44,6 +44,26 @@ function buildBookForm(book) {
   };
 }
 
+const COVER_THUMBNAIL_STYLE = {
+  width: "52px",
+  height: "78px",
+  objectFit: "cover",
+  borderRadius: "0.35rem",
+  border: "1px solid rgba(0,0,0,0.12)",
+  display: "block",
+};
+
+const COVER_PLACEHOLDER_STYLE = {
+  width: "52px",
+  height: "78px",
+  borderRadius: "0.35rem",
+  border: "1px dashed rgba(0,0,0,0.2)",
+  display: "grid",
+  placeItems: "center",
+  color: "#888",
+  fontSize: "0.7rem",
+};
+
 function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }) {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
@@ -95,7 +115,7 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
           const formToSave = { ...form, purchaseLinksJson: JSON.stringify(purchaseLinksObj, null, 2) };
           await upsertAdminBook(formToSave);
           await onSaved(formToSave);
-          navigate(`/admin/books/${formToSave.id || formToSave.slug || formToSave.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+          navigate(`/admin/books/${formToSave.id || formToSave.slug || generateSlug(formToSave.title)}`);
         } catch (nextError) {
           onError(nextError.message);
         } finally {
@@ -225,10 +245,10 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
                 <img
                   src={currentUrl}
                   alt={label}
-                  style={{ width: "52px", height: "78px", objectFit: "cover", borderRadius: "0.35rem", border: "1px solid rgba(0,0,0,0.12)", display: "block" }}
+                  style={COVER_THUMBNAIL_STYLE}
                 />
               ) : (
-                <div style={{ width: "52px", height: "78px", borderRadius: "0.35rem", border: "1px dashed rgba(0,0,0,0.2)", display: "grid", placeItems: "center", color: "#888", fontSize: "0.7rem" }}>
+                <div style={COVER_PLACEHOLDER_STYLE}>
                   No image
                 </div>
               )}
@@ -484,11 +504,11 @@ function AdminBooks() {
                           <img
                             src={row._coverUrl}
                             alt={`${row.title} cover`}
-                            style={{ width: "52px", height: "78px", objectFit: "cover", borderRadius: "0.35rem", border: "1px solid rgba(0,0,0,0.12)" }}
+                            style={COVER_THUMBNAIL_STYLE}
                             loading="lazy"
                           />
                         ) : (
-                          <div style={{ width: "52px", height: "78px", borderRadius: "0.35rem", border: "1px dashed rgba(0,0,0,0.2)", display: "grid", placeItems: "center", color: "#888", fontSize: "0.7rem" }}>
+                          <div style={COVER_PLACEHOLDER_STYLE}>
                             No Image
                           </div>
                         )}
