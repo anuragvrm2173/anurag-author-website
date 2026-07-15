@@ -2,7 +2,7 @@ const ADMIN_EMAIL = "vanuragverma2173@gmail.com";
 const EDGE_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT || null;
 const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/" + ADMIN_EMAIL;
 
-async function sendAdminNotification({ subject, name, email, message }) {
+export async function sendAdminNotification({ subject, name, email, message }) {
   // Prefer the Supabase Edge Function if configured
   if (EDGE_ENDPOINT) {
     try {

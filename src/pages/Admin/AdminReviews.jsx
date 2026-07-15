@@ -161,13 +161,13 @@ function AdminReviews() {
   }, []);
 
   const filteredReviews = useMemo(() => {
-    let filtered = reviews;
-    if (activeStatus === "all") {
-      filtered = reviews;
-    } else if (activeStatus === "pending") {
+    let filtered;
+    if (activeStatus === "pending") {
       filtered = reviews.filter((review) => ["submitted", "pending"].includes(review.status));
-    } else {
+    } else if (activeStatus !== "all") {
       filtered = reviews.filter((review) => review.status === activeStatus);
+    } else {
+      filtered = reviews;
     }
 
     const sorted = [...filtered];
