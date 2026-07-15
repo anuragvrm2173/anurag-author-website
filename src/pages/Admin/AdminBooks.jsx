@@ -44,6 +44,10 @@ function buildBookForm(book) {
   };
 }
 
+function getBookNavigationPath(form) {
+  return `/admin/books/${form.id || form.slug || generateSlug(form.title)}`;
+}
+
 function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }) {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
@@ -92,7 +96,7 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
           const finalForm = { ...form, purchaseLinksJson: JSON.stringify(obj, null, 2) };
           await upsertAdminBook(finalForm);
           await onSaved(finalForm);
-          navigate(`/admin/books/${finalForm.id || finalForm.slug || finalForm.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+          navigate(getBookNavigationPath(finalForm));
         } catch (nextError) {
           onError(nextError.message);
         } finally {
