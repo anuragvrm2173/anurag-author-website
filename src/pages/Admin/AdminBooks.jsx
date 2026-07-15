@@ -359,7 +359,7 @@ function AdminBooks() {
   const formKey = isCreating ? "book-new" : `${selectedBook?.id || bookId || "book-default"}-v${savedVersion}`;
 
   // Extract links from an edition — handles both purchaseLinks and retailers formats
-  function extractEditionLinks(ed) {
+  function extractEditionLinks(ed, bookPurchaseLinks = {}) {
     const links = {};
 
     Object.entries(ed.purchaseLinks || {}).forEach(([key, url]) => {
@@ -378,6 +378,16 @@ function AdminBooks() {
       }
     });
 
+    // Fall back to the top-level purchase_links column when no edition-level links exist.
+    // The "Buy Now Links" form section saves there, so this ensures the table reflects those saves.
+    if (Object.keys(links).length === 0) {
+      Object.entries(bookPurchaseLinks || {}).forEach(([key, url]) => {
+        if (typeof url === "string" && /^https?:\/\//i.test(url.trim())) {
+          links[key] = url.trim();
+        }
+      });
+    }
+
     return links;
   }
 
@@ -395,7 +405,7 @@ function AdminBooks() {
             ...book,
             _editionKey: key,
             _editionLabel: ed.label || key,
-            _editionLinks: extractEditionLinks(ed),
+            _editionLinks: extractEditionLinks(ed, book.purchaseLinks),
             _languageCode: ed.languageCode || key,
             _coverUrl: cover.frontCover || cover.fullCover || null,
           });

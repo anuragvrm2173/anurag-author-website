@@ -114,6 +114,7 @@ export async function submitContactMessage(payload, options = {}) {
       name: normalizedPayload.name,
       email: normalizedPayload.email,
       message: normalizedPayload.message,
+      captchaToken,
     });
   } catch {
     // Notification failure must not fail the user's message submission
