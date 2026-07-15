@@ -702,7 +702,7 @@ export async function upsertAdminBook(form) {
   const { data, error } = await supabase.from("books").upsert(payload).select("id");
   if (error) throw error;
   if (!data || data.length === 0) {
-    throw new Error("Save failed: your admin account does not have write access. Run bootstrap-admin.sql in Supabase to register this account in admin_users.");
+    throw new Error("Save failed: no rows were updated. Verify your admin account has write access and the record exists.");
   }
 }
 
@@ -719,13 +719,13 @@ export async function updateAdminBookEditionLinks(bookId, editionKey, newLinks) 
     const { data, error } = await supabase.from("books").update({ editions, updated_at: new Date().toISOString() }).eq("id", bookId).select("id");
     if (error) throw error;
     if (!data || data.length === 0) {
-      throw new Error("Save failed: your admin account does not have write access. Run bootstrap-admin.sql in Supabase to register this account in admin_users.");
+      throw new Error("Save failed: no rows were updated. Verify your admin account has write access and the record exists.");
     }
   } else {
     const { data, error } = await supabase.from("books").update({ purchase_links: newLinks, updated_at: new Date().toISOString() }).eq("id", bookId).select("id");
     if (error) throw error;
     if (!data || data.length === 0) {
-      throw new Error("Save failed: your admin account does not have write access. Run bootstrap-admin.sql in Supabase to register this account in admin_users.");
+      throw new Error("Save failed: no rows were updated. Verify your admin account has write access and the record exists.");
     }
   }
 }
