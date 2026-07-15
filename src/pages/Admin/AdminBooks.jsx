@@ -44,6 +44,26 @@ function buildBookForm(book) {
   };
 }
 
+const COVER_THUMBNAIL_STYLE = {
+  width: "52px",
+  height: "78px",
+  objectFit: "cover",
+  borderRadius: "0.35rem",
+  border: "1px solid rgba(0,0,0,0.12)",
+  display: "block",
+};
+
+const COVER_PLACEHOLDER_STYLE = {
+  width: "52px",
+  height: "78px",
+  borderRadius: "0.35rem",
+  border: "1px dashed rgba(0,0,0,0.2)",
+  display: "grid",
+  placeItems: "center",
+  color: "#888",
+  fontSize: "0.7rem",
+};
+
 function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }) {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
@@ -60,27 +80,25 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
     } catch { return [{ key: "amazon", url: "" }]; }
   });
 
-  // Keep form.purchaseLinksJson in sync whenever purchaseRows changes
-  useEffect(() => {
-    const obj = {};
-    purchaseRows.forEach(({ key, url }) => { if (key && url) obj[key] = url; });
-    setForm((current) => ({ ...current, purchaseLinksJson: JSON.stringify(obj, null, 2) }));
-  }, [purchaseRows]);
+  // Keep form.purchaseLinksJson in sync whenever purchaseRows changes is intentionally
+  // removed — purchaseLinksJson is now built from purchaseRows at submit time to avoid
+  // the setState-inside-effect anti-pattern.
 
   function updateEditionCover(editionKey, coverKey, publicUrl) {
-    const editions = JSON.parse(form.editionsJson || "{}");
-    const nextEditions = {
-      ...editions,
-      [editionKey]: {
-        ...(editions[editionKey] || {}),
-        cover: {
-          ...((editions[editionKey] || {}).cover || {}),
-          [coverKey]: publicUrl,
+    setForm((current) => {
+      const editions = JSON.parse(current.editionsJson || "{}");
+      const nextEditions = {
+        ...editions,
+        [editionKey]: {
+          ...(editions[editionKey] || {}),
+          cover: {
+            ...((editions[editionKey] || {}).cover || {}),
+            [coverKey]: publicUrl,
+          },
         },
-      },
-    };
-
-    setForm((current) => ({ ...current, editionsJson: JSON.stringify(nextEditions, null, 2) }));
+      };
+      return { ...current, editionsJson: JSON.stringify(nextEditions, null, 2) };
+    });
   }
 
   return (
@@ -91,9 +109,13 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
         setSaving(true);
         onError("");
         try {
-          await upsertAdminBook(form);
-          await onSaved(form);
-          navigate(`/admin/books/${form.id || form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+          // Build purchaseLinksJson from the current purchaseRows at submit time
+          const purchaseLinksObj = {};
+          purchaseRows.forEach(({ key, url }) => { if (key && url) purchaseLinksObj[key] = url; });
+          const formToSave = { ...form, purchaseLinksJson: JSON.stringify(purchaseLinksObj, null, 2) };
+          await upsertAdminBook(formToSave);
+          await onSaved(formToSave);
+          navigate(`/admin/books/${formToSave.id || formToSave.slug || generateSlug(formToSave.title)}`);
         } catch (nextError) {
           onError(nextError.message);
         } finally {
@@ -209,30 +231,49 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
           ["english", "fullCover", "English Full Cover"],
           ["hindi", "frontCover", "Hindi Front Cover"],
           ["hindi", "fullCover", "Hindi Full Cover"],
-        ].map(([editionKey, coverKey, label]) => (
-          <div key={`${editionKey}-${coverKey}`} className="admin-cover-upload-row">
-            <label>{label}</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (event) => {
-                const file = event.target.files?.[0];
-                if (!file) {
-                  return;
-                }
+        ].map(([editionKey, coverKey, label]) => {
+          let currentUrl = null;
+          try {
+            const parsedEditions = JSON.parse(form.editionsJson || "{}");
+            currentUrl = parsedEditions[editionKey]?.cover?.[coverKey] || null;
+          } catch { /* ignore parse errors */ }
 
-                try {
-                  const uploaded = await uploadAdminMediaFile(file, `covers/${form.id || generateSlug(form.title) || "book"}`);
-                  updateEditionCover(editionKey, coverKey, uploaded.publicUrl);
-                } catch (nextError) {
-                  onError(nextError.message);
-                } finally {
-                  event.target.value = "";
-                }
-              }}
-            />
-          </div>
-        ))}
+          return (
+            <div key={`${editionKey}-${coverKey}`} className="admin-cover-upload-row">
+              <label>{label}</label>
+              {currentUrl ? (
+                <img
+                  src={currentUrl}
+                  alt={label}
+                  style={COVER_THUMBNAIL_STYLE}
+                />
+              ) : (
+                <div style={COVER_PLACEHOLDER_STYLE}>
+                  No image
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) {
+                    return;
+                  }
+
+                  try {
+                    const uploaded = await uploadAdminMediaFile(file, `covers/${form.id || generateSlug(form.title) || "book"}`);
+                    updateEditionCover(editionKey, coverKey, uploaded.publicUrl);
+                  } catch (nextError) {
+                    onError(nextError.message);
+                  } finally {
+                    event.target.value = "";
+                  }
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <div className="admin-form__actions">
@@ -274,6 +315,8 @@ function AdminBooks() {
   const [managingLinksFor, setManagingLinksFor] = useState(null); // { bookId, editionKey }
   const [linkEdits, setLinkEdits] = useState([]); // [{ key, url }]
   const [linkSaving, setLinkSaving] = useState(false);
+  // Incremented after each successful save to force BookEditorForm to remount with fresh DB data
+  const [savedVersion, setSavedVersion] = useState(0);
 
   async function loadBooks(includeArchived = showArchived) {
     const nextBooks = await fetchAdminBooks({ includeArchived });
@@ -313,10 +356,10 @@ function AdminBooks() {
     return books.filter((book) => String(book.status || "").toLowerCase() === activeStatus.replace(/_/g, " "));
   }, [activeStatus, books]);
   const initialForm = useMemo(() => buildBookForm(selectedBook), [selectedBook]);
-  const formKey = isCreating ? "book-new" : selectedBook?.id || bookId || "book-default";
+  const formKey = isCreating ? "book-new" : `${selectedBook?.id || bookId || "book-default"}-v${savedVersion}`;
 
   // Extract links from an edition — handles both purchaseLinks and retailers formats
-  function extractEditionLinks(ed) {
+  function extractEditionLinks(ed, bookPurchaseLinks = {}) {
     const links = {};
 
     Object.entries(ed.purchaseLinks || {}).forEach(([key, url]) => {
@@ -335,6 +378,16 @@ function AdminBooks() {
       }
     });
 
+    // Fall back to the top-level purchase_links column when no edition-level links exist.
+    // The "Buy Now Links" form section saves there, so this ensures the table reflects those saves.
+    if (Object.keys(links).length === 0) {
+      Object.entries(bookPurchaseLinks || {}).forEach(([key, url]) => {
+        if (typeof url === "string" && /^https?:\/\//i.test(url.trim())) {
+          links[key] = url.trim();
+        }
+      });
+    }
+
     return links;
   }
 
@@ -352,7 +405,7 @@ function AdminBooks() {
             ...book,
             _editionKey: key,
             _editionLabel: ed.label || key,
-            _editionLinks: extractEditionLinks(ed),
+            _editionLinks: extractEditionLinks(ed, book.purchaseLinks),
             _languageCode: ed.languageCode || key,
             _coverUrl: cover.frontCover || cover.fullCover || null,
           });
@@ -461,11 +514,11 @@ function AdminBooks() {
                           <img
                             src={row._coverUrl}
                             alt={`${row.title} cover`}
-                            style={{ width: "52px", height: "78px", objectFit: "cover", borderRadius: "0.35rem", border: "1px solid rgba(0,0,0,0.12)" }}
+                            style={COVER_THUMBNAIL_STYLE}
                             loading="lazy"
                           />
                         ) : (
-                          <div style={{ width: "52px", height: "78px", borderRadius: "0.35rem", border: "1px dashed rgba(0,0,0,0.2)", display: "grid", placeItems: "center", color: "#888", fontSize: "0.7rem" }}>
+                          <div style={COVER_PLACEHOLDER_STYLE}>
                             No Image
                           </div>
                         )}
@@ -579,6 +632,7 @@ function AdminBooks() {
           onError={setError}
           onSaved={async () => {
             await loadBooks(showArchived);
+            setSavedVersion((v) => v + 1);
           }}
           onReset={() => navigate("/admin/books")}
         />
