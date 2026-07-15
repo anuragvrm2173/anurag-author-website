@@ -161,7 +161,7 @@ function AdminReviews() {
   }, []);
 
   const filteredReviews = useMemo(() => {
-    let filtered = reviews;
+    let filtered;
     if (activeStatus === "all") {
       filtered = reviews;
     } else if (activeStatus === "pending") {

@@ -1,42 +1,11 @@
 import { hasSupabase, supabase } from "./supabaseClient";
 import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
+import { sendAdminNotification } from "./notificationsService";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
-const ADMIN_EMAIL_ENDPOINT = "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
 
 function canUseLocalStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
-}
-
-async function sendAdminContactCopy(payload, deliveryChannel, subject = "New Contact Message (Website)") {
-  const messageBody = [
-    `Name: ${payload.name}`,
-    `Email: ${payload.email}`,
-    `Delivery: ${deliveryChannel}`,
-    "",
-    "Message:",
-    payload.message,
-  ].join("\n");
-
-  const response = await fetch(ADMIN_EMAIL_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      name: payload.name,
-      email: payload.email,
-      message: messageBody,
-      _subject: subject,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Admin notification failed");
-  }
-
-  return true;
 }
 
 function storeMessageLocally(payload) {
@@ -138,11 +107,23 @@ export async function submitContactMessage(payload, options = {}) {
     }
   }
 
-  // Always send admin copy via FormSubmit
+  // Always send admin notification — tries Edge Function (Resend) first, falls back to FormSubmit
   try {
-    await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject);
+    await sendAdminNotification({
+      subject,
+      name: normalizedPayload.name,
+      email: normalizedPayload.email,
+      message: [
+        `Name: ${normalizedPayload.name}`,
+        `Email: ${normalizedPayload.email}`,
+        `Delivery: ${deliveryChannel}`,
+        "",
+        "Message:",
+        normalizedPayload.message,
+      ].join("\n"),
+    });
   } catch {
-    // Admin copy failure should not fail the user's message submission
+    // Notification failure must not fail the user's message submission
   }
 
   return {

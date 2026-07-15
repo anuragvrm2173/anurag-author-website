@@ -60,27 +60,23 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
     } catch { return [{ key: "amazon", url: "" }]; }
   });
 
-  // Keep form.purchaseLinksJson in sync whenever purchaseRows changes
-  useEffect(() => {
-    const obj = {};
-    purchaseRows.forEach(({ key, url }) => { if (key && url) obj[key] = url; });
-    setForm((current) => ({ ...current, purchaseLinksJson: JSON.stringify(obj, null, 2) }));
-  }, [purchaseRows]);
+  // purchaseLinksJson is derived from purchaseRows at submit time — no effect needed.
 
   function updateEditionCover(editionKey, coverKey, publicUrl) {
-    const editions = JSON.parse(form.editionsJson || "{}");
-    const nextEditions = {
-      ...editions,
-      [editionKey]: {
-        ...(editions[editionKey] || {}),
-        cover: {
-          ...((editions[editionKey] || {}).cover || {}),
-          [coverKey]: publicUrl,
+    setForm((current) => {
+      const editions = JSON.parse(current.editionsJson || "{}");
+      const nextEditions = {
+        ...editions,
+        [editionKey]: {
+          ...(editions[editionKey] || {}),
+          cover: {
+            ...((editions[editionKey] || {}).cover || {}),
+            [coverKey]: publicUrl,
+          },
         },
-      },
-    };
-
-    setForm((current) => ({ ...current, editionsJson: JSON.stringify(nextEditions, null, 2) }));
+      };
+      return { ...current, editionsJson: JSON.stringify(nextEditions, null, 2) };
+    });
   }
 
   return (
@@ -91,9 +87,12 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
         setSaving(true);
         onError("");
         try {
-          await upsertAdminBook(form);
-          await onSaved(form);
-          navigate(`/admin/books/${form.id || form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+          const obj = {};
+          purchaseRows.forEach(({ key, url }) => { if (key && url) obj[key] = url; });
+          const finalForm = { ...form, purchaseLinksJson: JSON.stringify(obj, null, 2) };
+          await upsertAdminBook(finalForm);
+          await onSaved(finalForm);
+          navigate(`/admin/books/${finalForm.id || finalForm.slug || finalForm.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
         } catch (nextError) {
           onError(nextError.message);
         } finally {
