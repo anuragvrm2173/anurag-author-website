@@ -28,9 +28,34 @@ function createSubscriberReplyLink(subscriber) {
 function AdminNewsletter() {
   const [subscribers, setSubscribers] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState("");
 
   useEffect(() => {
-    fetchAdminNewsletterSubscribers().then(setSubscribers).catch((nextError) => setError(nextError.message));
+    let active = true;
+
+    fetchAdminNewsletterSubscribers()
+      .then((nextSubscribers) => {
+        if (!active) {
+          return;
+        }
+        setSubscribers(nextSubscribers);
+      })
+      .catch((nextError) => {
+        if (!active) {
+          return;
+        }
+        setError(nextError.message);
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -76,6 +101,8 @@ function AdminNewsletter() {
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
+      {loading ? <p className="admin-meta-note">Loading subscribers…</p> : null}
+      {!loading && subscribers.length === 0 ? <div className="admin-empty">No subscribers found yet.</div> : null}
 
       <div className="admin-table">
         <table>
@@ -104,10 +131,22 @@ function AdminNewsletter() {
                         Email
                       </a>
                     ) : null}
-                    <button type="button" className="admin-inline-button admin-inline-button--danger" onClick={async () => {
-                      await deleteAdminNewsletterSubscriber(subscriber.id);
-                      setSubscribers((current) => current.map((item) => item.id === subscriber.id ? { ...item, status: "deleted" } : item));
-                    }}>Delete</button>
+                    <button type="button" className="admin-inline-button admin-inline-button--danger" disabled={deletingId === subscriber.id} onClick={async () => {
+                      if (!window.confirm(`Delete subscriber ${subscriber.email}?`)) {
+                        return;
+                      }
+
+                      setDeletingId(subscriber.id);
+                      setError("");
+                      try {
+                        await deleteAdminNewsletterSubscriber(subscriber.id);
+                        setSubscribers((current) => current.map((item) => item.id === subscriber.id ? { ...item, status: "deleted" } : item));
+                      } catch (nextError) {
+                        setError(nextError.message || "Could not delete subscriber.");
+                      } finally {
+                        setDeletingId("");
+                      }
+                    }}>{deletingId === subscriber.id ? "Deleting…" : "Delete"}</button>
                   </div>
                 </td>
               </tr>

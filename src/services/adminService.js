@@ -215,6 +215,12 @@ function assertBooksMutationAffectedRows(data, actionLabel) {
   }
 }
 
+function assertMutationAffectedRows(data, actionLabel) {
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error(`${actionLabel} failed: no rows were affected. Check RLS policies.`);
+  }
+}
+
 export function getDefaultBookForm() {
   return toBookForm();
 }
@@ -896,8 +902,9 @@ export async function updateAdminMessage(messageId, updates) {
     throw new Error("Supabase is required to update messages.");
   }
 
-  const { error } = await supabase.from("messages").update(updates).eq("id", messageId);
+  const { data, error } = await supabase.from("messages").update(updates).eq("id", messageId).select("id");
   if (error) throw error;
+  assertMutationAffectedRows(data, "Update message");
 }
 
 export async function fetchAdminNewsletterSubscribers() {
@@ -922,8 +929,9 @@ export async function deleteAdminNewsletterSubscriber(subscriberId) {
     throw new Error("Supabase is required to manage subscribers.");
   }
 
-  const { error } = await supabase.from("newsletter_subscribers").update({ status: "deleted" }).eq("id", subscriberId);
+  const { data, error } = await supabase.from("newsletter_subscribers").update({ status: "deleted" }).eq("id", subscriberId).select("id");
   if (error) throw error;
+  assertMutationAffectedRows(data, "Delete subscriber");
 }
 
 export async function fetchAdminSettings() {
@@ -964,8 +972,12 @@ export async function upsertAdminSetting(id, value) {
     socialLinks: id === "socialLinks" ? value : existing?.value?.socialLinks || socialLinks,
   };
 
-  const { error } = await supabase.from("site_settings").upsert({ id: "global", value: mergedValue, updated_at: new Date().toISOString() });
+  const { data, error } = await supabase
+    .from("site_settings")
+    .upsert({ id: "global", value: mergedValue, updated_at: new Date().toISOString() })
+    .select("id");
   if (error) throw error;
+  assertMutationAffectedRows(data, "Save settings");
 }
 
 export async function listAdminMediaFiles() {

@@ -50,23 +50,62 @@ function AdminMessages() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [updatingMessageId, setUpdatingMessageId] = useState("");
   const activeStatus = searchParams.get("status") || "all";
 
   useEffect(() => {
-    fetchAdminMessages().then(setMessages).catch((nextError) => setError(nextError.message));
+    let active = true;
+
+    fetchAdminMessages()
+      .then((nextMessages) => {
+        if (!active) {
+          return;
+        }
+        setMessages(nextMessages);
+      })
+      .catch((nextError) => {
+        if (!active) {
+          return;
+        }
+        setError(nextError.message);
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
+
+  async function updateMessageStatus(messageId, status) {
+    setUpdatingMessageId(messageId);
+    setError("");
+    try {
+      await updateAdminMessage(messageId, { status });
+      setMessages((current) => current.map((item) => item.id === messageId ? { ...item, status } : item));
+    } catch (nextError) {
+      setError(nextError.message || "Could not update message status.");
+    } finally {
+      setUpdatingMessageId("");
+    }
+  }
 
   const filteredMessages = useMemo(() => {
     if (activeStatus === "all") {
       return messages;
     }
 
+      {loading ? <p className="admin-meta-note">Loading messages…</p> : null}
     if (activeStatus === "unread") {
-      return messages.filter((message) => message.status !== "read" && message.status !== "archived");
+      {!loading && messages.length === 0 ? <div className="admin-empty">No messages yet. Connect the contact form to the `messages` table to see submissions here.</div> : null}
     }
 
     return messages.filter((message) => message.status === activeStatus);
-  }, [activeStatus, messages]);
+  }, [activeStatus, messages, loading]);
 
   return (
     <section className="admin-page">
@@ -143,22 +182,10 @@ function AdminMessages() {
                           Reply
                         </a>
                       ) : null}
-                      {message.status === "unread" ? <button type="button" className="admin-inline-button" onClick={async () => {
-                        await updateAdminMessage(message.id, { status: "read" });
-                        setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "read" } : item));
-                      }}>Mark Read</button> : null}
-                      {message.status === "read" ? <button type="button" className="admin-inline-button" onClick={async () => {
-                        await updateAdminMessage(message.id, { status: "unread" });
-                        setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "unread" } : item));
-                      }}>Mark Unread</button> : null}
-                      {message.status !== "archived" ? <button type="button" className="admin-inline-button" onClick={async () => {
-                        await updateAdminMessage(message.id, { status: "archived" });
-                        setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "archived" } : item));
-                      }}>Archive</button> : null}
-                      {message.status === "archived" ? <button type="button" className="admin-inline-button" onClick={async () => {
-                        await updateAdminMessage(message.id, { status: "read" });
-                        setMessages((current) => current.map((item) => item.id === message.id ? { ...item, status: "read" } : item));
-                      }}>Restore</button> : null}
+                      {message.status === "unread" ? <button type="button" className="admin-inline-button" disabled={updatingMessageId === message.id} onClick={() => updateMessageStatus(message.id, "read")}>Mark Read</button> : null}
+                      {message.status === "read" ? <button type="button" className="admin-inline-button" disabled={updatingMessageId === message.id} onClick={() => updateMessageStatus(message.id, "unread")}>Mark Unread</button> : null}
+                      {message.status !== "archived" ? <button type="button" className="admin-inline-button" disabled={updatingMessageId === message.id} onClick={() => updateMessageStatus(message.id, "archived")}>Archive</button> : null}
+                      {message.status === "archived" ? <button type="button" className="admin-inline-button" disabled={updatingMessageId === message.id} onClick={() => updateMessageStatus(message.id, "read")}>Restore</button> : null}
                     </div>
                   </td>
                 </tr>

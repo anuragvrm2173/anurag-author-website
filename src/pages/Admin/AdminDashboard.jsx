@@ -7,9 +7,39 @@ import { fetchAdminDashboardStats } from "../../services/adminService";
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchAdminDashboardStats().then(setStats).catch(() => setStats(null));
+    let active = true;
+
+    async function load() {
+      setLoading(true);
+      setError("");
+      try {
+        const nextStats = await fetchAdminDashboardStats();
+        if (!active) {
+          return;
+        }
+        setStats(nextStats);
+      } catch (nextError) {
+        if (!active) {
+          return;
+        }
+        setStats(null);
+        setError(nextError.message || "Could not load dashboard stats.");
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    load();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -36,6 +66,32 @@ function AdminDashboard() {
           </div>
         </div>
       </header>
+
+      {loading ? <p className="admin-meta-note">Loading dashboard stats…</p> : null}
+      {error ? <p className="admin-auth__error">{error}</p> : null}
+
+      {!loading && error ? (
+        <div className="admin-page__actions">
+          <button
+            type="button"
+            className="admin-link-button"
+            onClick={async () => {
+              setLoading(true);
+              setError("");
+              try {
+                const nextStats = await fetchAdminDashboardStats();
+                setStats(nextStats);
+              } catch (nextError) {
+                setError(nextError.message || "Could not refresh dashboard stats.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      ) : null}
 
       {stats ? (
         <section className="admin-section">

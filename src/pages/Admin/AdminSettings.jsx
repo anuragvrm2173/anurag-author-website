@@ -7,7 +7,9 @@ import { changeAdminPassword, fetchAdminSettings, upsertAdminSetting } from "../
 
 function AdminSettings() {
   const [settings, setSettings] = useState({ site: {}, socialLinks: [] });
+  const [socialLinksDraft, setSocialLinksDraft] = useState("[]");
   const [error, setError] = useState("");
+  const [saveMessage, setSaveMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [passwordState, setPasswordState] = useState({ currentPassword: "", nextPassword: "", confirmPassword: "" });
@@ -18,7 +20,12 @@ function AdminSettings() {
   const [passwordMessage, setPasswordMessage] = useState("");
 
   useEffect(() => {
-    fetchAdminSettings().then(setSettings).catch((nextError) => setError(nextError.message));
+    fetchAdminSettings()
+      .then((nextSettings) => {
+        setSettings(nextSettings);
+        setSocialLinksDraft(JSON.stringify(nextSettings.socialLinks || [], null, 2));
+      })
+      .catch((nextError) => setError(nextError.message));
   }, []);
 
   return (
@@ -45,6 +52,7 @@ function AdminSettings() {
       </header>
 
       {error ? <p className="admin-auth__error">{error}</p> : null}
+      {saveMessage ? <p className="admin-meta-note">{saveMessage}</p> : null}
 
       {showPasswordForm ? (
         <form
@@ -164,11 +172,19 @@ function AdminSettings() {
           event.preventDefault();
           setSaving(true);
           setError("");
+          setSaveMessage("");
           try {
+            const parsedSocialLinks = JSON.parse(socialLinksDraft || "[]");
             await upsertAdminSetting("site", settings.site || {});
-            await upsertAdminSetting("socialLinks", settings.socialLinks || []);
+            await upsertAdminSetting("socialLinks", parsedSocialLinks || []);
+            setSettings((current) => ({ ...current, socialLinks: parsedSocialLinks || [] }));
+            setSaveMessage("Settings saved successfully.");
           } catch (nextError) {
-            setError(nextError.message);
+            if (nextError instanceof SyntaxError) {
+              setError("Social links JSON must be valid before saving.");
+            } else {
+              setError(nextError.message);
+            }
           } finally {
             setSaving(false);
           }
@@ -195,12 +211,11 @@ function AdminSettings() {
             <label htmlFor="settings-social-links">Social Links JSON</label>
             <textarea
               id="settings-social-links"
-              value={JSON.stringify(settings.socialLinks || [], null, 2)}
+              value={socialLinksDraft}
               onChange={(event) => {
-                try {
-                  setSettings((current) => ({ ...current, socialLinks: JSON.parse(event.target.value) }));
-                } catch {
-                  setError("Social links must be valid JSON.");
+                setSocialLinksDraft(event.target.value);
+                if (error === "Social links must be valid JSON." || error === "Social links JSON must be valid before saving.") {
+                  setError("");
                 }
               }}
             />
