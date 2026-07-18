@@ -347,18 +347,16 @@ function AdminBooks() {
       if (editionKeys.length > 0) {
         editionKeys.forEach((key) => {
           const ed = editions[key];
-          const cover = ed?.cover || {};
           rows.push({
             ...book,
             _editionKey: key,
             _editionLabel: ed.label || key,
             _editionLinks: extractEditionLinks(ed),
             _languageCode: ed.languageCode || key,
-            _coverUrl: cover.frontCover || cover.fullCover || null,
           });
         });
       } else {
-        rows.push({ ...book, _editionKey: null, _editionLabel: null, _editionLinks: book.purchaseLinks || {}, _languageCode: null, _coverUrl: null });
+        rows.push({ ...book, _editionKey: null, _editionLabel: null, _editionLinks: book.purchaseLinks || {}, _languageCode: null });
       }
     });
     return rows;
@@ -443,7 +441,6 @@ function AdminBooks() {
           <table>
             <thead>
               <tr>
-                <th>Cover</th>
                 <th>Title / Edition</th>
                 <th>Status</th>
                 <th>Buy Links</th>
@@ -456,20 +453,6 @@ function AdminBooks() {
                 const isManaging = managingLinksFor?.bookId === row.id && managingLinksFor?.editionKey === row._editionKey;
                 const result = [
                     <tr key={rowKey}>
-                      <td data-label="Cover">
-                        {row._coverUrl ? (
-                          <img
-                            src={row._coverUrl}
-                            alt={`${row.title} cover`}
-                            style={{ width: "52px", height: "78px", objectFit: "cover", borderRadius: "0.35rem", border: "1px solid rgba(0,0,0,0.12)" }}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div style={{ width: "52px", height: "78px", borderRadius: "0.35rem", border: "1px dashed rgba(0,0,0,0.2)", display: "grid", placeItems: "center", color: "#888", fontSize: "0.7rem" }}>
-                            No Image
-                          </div>
-                        )}
-                      </td>
                       <td data-label="Title / Edition">
                         <strong>{row.title}</strong>
                         {row._editionLabel && (
@@ -521,7 +504,7 @@ function AdminBooks() {
                 ];
                 if (isManaging) result.push(
                       <tr key={`${rowKey}-links`}>
-                        <td colSpan={5} style={{ background: "#f9f3e6", padding: "1rem", borderTop: "2px solid var(--color-primary)" }}>
+                        <td colSpan={4} style={{ background: "#f9f3e6", padding: "1rem", borderTop: "2px solid var(--color-primary)" }}>
                           <p style={{ fontWeight: "700", marginBottom: "0.75rem" }}>
                             Buy Links — {row.title} {row._editionLabel ? `(${row._editionLabel})` : ""}
                           </p>
