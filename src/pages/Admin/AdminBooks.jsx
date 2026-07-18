@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 
 import Button from "../../components/ui/Button/Button";
 import { deleteAdminBook, fetchAdminBooks, generateSlug, getDefaultBookForm, restoreAdminBook, upsertAdminBook, updateAdminBookEditionLinks, uploadAdminMediaFile } from "../../services/adminService";
+import { appendRuntimeTrace, createRuntimeTraceId, withRuntimeTrace } from "../../utils/runtimeTrace";
 
 function buildBookForm(book) {
   if (!book) {
@@ -96,25 +97,35 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
         event.preventDefault();
         setSaving(true);
         onError("");
+        const traceId = createRuntimeTraceId("SaveBook");
         try {
-          const nextPurchaseLinks = {};
-          purchaseRows.forEach(({ key, url }) => {
-            if (key && url) {
-              nextPurchaseLinks[key] = url;
-            }
-          });
-          const nextForm = {
-            ...form,
-            purchaseLinksJson: JSON.stringify(nextPurchaseLinks, null, 2),
-          };
+          await withRuntimeTrace(traceId, async () => {
+            appendRuntimeTrace({ type: "breadcrumb", action: "SaveBook: click", traceId, bookId: form.id || null, slug: form.slug || null });
+            const nextPurchaseLinks = {};
+            purchaseRows.forEach(({ key, url }) => {
+              if (key && url) {
+                nextPurchaseLinks[key] = url;
+              }
+            });
+            appendRuntimeTrace({ type: "breadcrumb", action: "SaveBook: validation passed", traceId, purchaseLinkKeys: Object.keys(nextPurchaseLinks) });
+            const nextForm = {
+              ...form,
+              purchaseLinksJson: JSON.stringify(nextPurchaseLinks, null, 2),
+            };
 
-          await upsertAdminBook(nextForm);
-          await onSaved(nextForm);
-          navigate(`/admin/books/${nextForm.id || nextForm.slug || nextForm.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+            appendRuntimeTrace({ type: "breadcrumb", action: "SaveBook: calling upsertAdminBook", traceId, formId: nextForm.id || null, title: nextForm.title || null });
+            await upsertAdminBook(nextForm);
+            appendRuntimeTrace({ type: "breadcrumb", action: "SaveBook: returned from upsertAdminBook", traceId, formId: nextForm.id || null });
+            await onSaved(nextForm);
+            appendRuntimeTrace({ type: "breadcrumb", action: "SaveBook: reloading books complete", traceId, formId: nextForm.id || null });
+            navigate(`/admin/books/${nextForm.id || nextForm.slug || nextForm.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+          });
         } catch (nextError) {
+          appendRuntimeTrace({ type: "breadcrumb", action: "SaveBook: error", traceId, error: String(nextError?.message || nextError) });
           onError(nextError.message);
         } finally {
           setSaving(false);
+          appendRuntimeTrace({ type: "breadcrumb", action: "SaveBook: finished", traceId });
         }
       }}
     >
@@ -560,15 +571,29 @@ function AdminBooks() {
                             <button type="button" disabled={linkSaving}
                               onClick={async () => {
                                 setLinkSaving(true);
+                                const traceId = createRuntimeTraceId("SaveLinks");
                                 try {
-                                  const newLinks = {};
-                                  linkEdits.forEach(({ key, url }) => { if (key && url) newLinks[key] = url; });
-                                  await updateAdminBookEditionLinks(row.id, row._editionKey, newLinks);
-                                  await loadBooks(showArchived);
-                                  setManagingLinksFor(null);
-                                  setError("");
-                                } catch (err) { setError(err.message); }
-                                finally { setLinkSaving(false); }
+                                  await withRuntimeTrace(traceId, async () => {
+                                    appendRuntimeTrace({ type: "breadcrumb", action: "SaveLinks: click", traceId, bookId: row.id, editionKey: row._editionKey || null });
+                                    const newLinks = {};
+                                    linkEdits.forEach(({ key, url }) => { if (key && url) newLinks[key] = url; });
+                                    appendRuntimeTrace({ type: "breadcrumb", action: "SaveLinks: validation passed", traceId, keys: Object.keys(newLinks), bookId: row.id, editionKey: row._editionKey || null });
+                                    appendRuntimeTrace({ type: "breadcrumb", action: "SaveLinks: calling updateAdminBookEditionLinks", traceId, bookId: row.id, editionKey: row._editionKey || null });
+                                    await updateAdminBookEditionLinks(row.id, row._editionKey, newLinks);
+                                    appendRuntimeTrace({ type: "breadcrumb", action: "SaveLinks: returned from updateAdminBookEditionLinks", traceId, bookId: row.id, editionKey: row._editionKey || null });
+                                    await loadBooks(showArchived);
+                                    appendRuntimeTrace({ type: "breadcrumb", action: "SaveLinks: reloading books complete", traceId, bookId: row.id, editionKey: row._editionKey || null });
+                                    setManagingLinksFor(null);
+                                    setError("");
+                                  });
+                                } catch (err) {
+                                  appendRuntimeTrace({ type: "breadcrumb", action: "SaveLinks: error", traceId, bookId: row.id, editionKey: row._editionKey || null, error: String(err?.message || err) });
+                                  setError(err.message);
+                                }
+                                finally {
+                                  setLinkSaving(false);
+                                  appendRuntimeTrace({ type: "breadcrumb", action: "SaveLinks: finished", traceId, bookId: row.id, editionKey: row._editionKey || null });
+                                }
                               }}
                               style={{ padding: "0.45rem 1.25rem", borderRadius: "0.5rem", background: "var(--color-primary)", color: "white", border: "none", cursor: "pointer", fontWeight: "600" }}>
                               {linkSaving ? "Saving…" : "Save Links"}
