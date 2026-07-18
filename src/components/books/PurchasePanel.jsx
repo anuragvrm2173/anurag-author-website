@@ -9,14 +9,27 @@ import { sanitizeExternalUrl } from "../../utils/urlSafety";
 
 const STORE_LOGOS = {
   amazon: "/store-logos/amazon.svg",
-  notionPress: "/store-logos/notion-press.svg",
+  notionpress: "/store-logos/notion-press.svg",
   pothi: "/store-logos/pothi.svg",
   flipkart: "/store-logos/flipkart.svg",
 };
 
 const FORMAT_KEYS = new Set(["paperback", "kindle", "ebook", "hardcover", "audiobook"]);
 const FORMAT_PRIORITY = ["paperback", "hardcover", "kindle", "ebook", "audiobook"];
-const RETAILER_PRIORITY = ["pothi", "amazon", "notionPress", "flipkart", "kindle"];
+const REQUIRED_RETAILERS = ["pothi", "amazon", "notionpress", "flipkart"];
+
+function normalizeRetailerKey(value = "") {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+
+  if (normalized === "notionpress") {
+    return "notionpress";
+  }
+
+  return normalized;
+}
 
 function toTitleCase(value = "") {
   if (!value) {
@@ -46,10 +59,12 @@ function getPrimaryFormat(formats = {}) {
 
 function normalizeRetailers(activeEdition) {
   const fromStructured = Object.entries(activeEdition.retailers || {}).map(([key, value]) => {
+    const retailerKey = normalizeRetailerKey(key);
+
     if (typeof value === "string") {
       const safeUrl = sanitizeExternalUrl(value);
       return {
-        key,
+        key: retailerKey,
         name: toTitleCase(key),
         available: Boolean(safeUrl),
         url: safeUrl,
@@ -59,39 +74,45 @@ function normalizeRetailers(activeEdition) {
     }
 
     const safeUrl = sanitizeExternalUrl(value?.url || value?.href || null);
+    const displayName = value?.name || toTitleCase(key);
 
     return {
-      key,
-      name: value?.name || toTitleCase(key),
+      key: retailerKey,
+      name: displayName,
       available: value?.available !== false && Boolean(safeUrl),
       url: safeUrl,
-      actionLabel: value?.actionLabel || value?.label || `Buy from ${value?.name || toTitleCase(key)}`,
+      actionLabel: value?.actionLabel || value?.label || `Buy from ${displayName}`,
       statusLabel: value?.statusLabel || value?.label || "Coming Soon",
     };
   });
 
   const fromLinks = Object.entries(activeEdition.purchaseLinks || {})
-    .filter(([key, value]) => !FORMAT_KEYS.has(key) && Boolean(value))
+    .filter(([key, value]) => !FORMAT_KEYS.has(String(key || "").toLowerCase()) && Boolean(value))
     .map(([key, value]) => {
       const safeUrl = sanitizeExternalUrl(value);
+      const retailerKey = normalizeRetailerKey(key);
+
       return {
-      key,
-      name: toTitleCase(key),
-      available: Boolean(safeUrl),
-      url: safeUrl,
-      actionLabel: `Buy from ${toTitleCase(key)}`,
-      statusLabel: null,
+        key: retailerKey,
+        name: toTitleCase(key),
+        available: Boolean(safeUrl),
+        url: safeUrl,
+        actionLabel: `Buy from ${toTitleCase(key)}`,
+        statusLabel: null,
       };
     });
 
   // Merge both sources so one incomplete structure doesn't hide valid links.
-  const merged = [...fromStructured];
-  const structuredByKey = new Map(fromStructured.map((item) => [item.key, item]));
+  const structuredByKey = new Map(fromStructured.filter((item) => item.key).map((item) => [item.key, item]));
 
   fromLinks.forEach((item) => {
+    if (!item.key) {
+      return;
+    }
+
     const existing = structuredByKey.get(item.key);
     if (!existing) {
-      merged.push(item);
+      structuredByKey.set(item.key, item);
       return;
     }
 
@@ -105,7 +126,7 @@ function normalizeRetailers(activeEdition) {
     }
   });
 
-  return merged.map((item) => structuredByKey.get(item.key) || item);
+  return Array.from(structuredByKey.values());
 }
 
 function formatCurrencyPrice(pricing) {
@@ -152,9 +173,12 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     acc[item.key] = item;
     return acc;
   }, {});
-  const displayRetailers = RETAILER_PRIORITY
-    .filter((key) => ["amazon", "notionPress", "pothi", "flipkart"].includes(key))
-    .map((key) => {
+
+  const extraRetailerKeys = retailers
+    .map((item) => item.key)
+    .filter((key) => key && !REQUIRED_RETAILERS.includes(key));
+
+  const displayRetailers = [...REQUIRED_RETAILERS, ...extraRetailerKeys].map((key) => {
       const item = retailerByKey[key];
       if (item) {
         return item;
@@ -203,7 +227,7 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     if (retailer.key === "amazon") {
       return "★★★★★";
     }
-    if (retailer.key === "notionPress") {
+    if (retailer.key === "notionpress") {
       return "Official Store";
     }
     return retailer.actionLabel || (isHindi ? "उपलब्ध" : "Available");

@@ -434,6 +434,17 @@
   gap: 0.45rem;
 }
 
+.admin-cover-upload-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.admin-cover-upload-preview .admin-link-button {
+  padding: 0.45rem 0.75rem;
+}
+
 .admin-cover-upload-row input[type="file"] {
   padding: 0;
   border: 0;

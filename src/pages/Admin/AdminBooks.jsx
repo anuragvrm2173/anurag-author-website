@@ -49,6 +49,14 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
   const [form, setForm] = useState(initialForm);
   const [saving, setSaving] = useState(false);
   const [slugTouched, setSlugTouched] = useState(Boolean(initialForm.slug));
+  const parsedEditions = useMemo(() => {
+    try {
+      const parsed = JSON.parse(form.editionsJson || "{}");
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  }, [form.editionsJson]);
 
   // Parse purchase links JSON into editable rows
   const [purchaseRows, setPurchaseRows] = useState(() => {
@@ -81,6 +89,11 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
     };
 
     setForm((current) => ({ ...current, editionsJson: JSON.stringify(nextEditions, null, 2) }));
+  }
+
+  function getCurrentCoverUrl(editionKey, coverKey) {
+    const url = parsedEditions?.[editionKey]?.cover?.[coverKey];
+    return typeof url === "string" ? url.trim() : "";
   }
 
   return (
@@ -212,6 +225,16 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
         ].map(([editionKey, coverKey, label]) => (
           <div key={`${editionKey}-${coverKey}`} className="admin-cover-upload-row">
             <label>{label}</label>
+            {getCurrentCoverUrl(editionKey, coverKey) ? (
+              <div className="admin-cover-upload-preview">
+                <img src={getCurrentCoverUrl(editionKey, coverKey)} alt={`${label} current`} className="admin-media-thumb" loading="lazy" />
+                <a href={getCurrentCoverUrl(editionKey, coverKey)} target="_blank" rel="noopener noreferrer" className="admin-link-button">
+                  View Current Image
+                </a>
+              </div>
+            ) : (
+              <p className="admin-meta-note">No image set yet.</p>
+            )}
             <input
               type="file"
               accept="image/*"
