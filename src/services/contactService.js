@@ -1,5 +1,6 @@
 import { hasSupabase, supabase } from "./supabaseClient";
 import { assertCaptchaToken, normalizeCaptchaToken } from "./captchaService";
+import { sendAdminNotification } from "./notificationsService";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT || "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
 const ADMIN_EMAIL_ENDPOINT = "https://formsubmit.co/ajax/vanuragverma2173@gmail.com";
@@ -8,7 +9,7 @@ function canUseLocalStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
 }
 
-async function sendAdminContactCopy(payload, deliveryChannel, subject = "New Contact Message (Website)") {
+async function sendAdminContactCopy(payload, deliveryChannel, subject = "New Contact Message (Website)", captchaToken = "") {
   const messageBody = [
     `Name: ${payload.name}`,
     `Email: ${payload.email}`,
@@ -17,6 +18,18 @@ async function sendAdminContactCopy(payload, deliveryChannel, subject = "New Con
     "Message:",
     payload.message,
   ].join("\n");
+
+  const edgeSent = await sendAdminNotification({
+    subject,
+    name: payload.name,
+    email: payload.email,
+    message: messageBody,
+    captchaToken,
+  });
+
+  if (edgeSent) {
+    return true;
+  }
 
   const response = await fetch(ADMIN_EMAIL_ENDPOINT, {
     method: "POST",
@@ -140,7 +153,7 @@ export async function submitContactMessage(payload, options = {}) {
 
   // Always send admin copy via FormSubmit
   try {
-    await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject);
+    await sendAdminContactCopy(normalizedPayload, deliveryChannel, subject, captchaToken);
   } catch {
     // Admin copy failure should not fail the user's message submission
   }

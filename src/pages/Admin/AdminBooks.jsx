@@ -343,10 +343,13 @@ function AdminBooks() {
   const formKey = isCreating ? "book-new" : selectedBook?.id || bookId || "book-default";
 
   // Extract links from an edition — handles both purchaseLinks and retailers formats
-  function extractEditionLinks(ed) {
+  function extractEditionLinks(ed, bookPurchaseLinks = {}) {
     const links = {};
+    const editionPurchaseLinks = Object.keys(ed.purchaseLinks || {}).length > 0
+      ? (ed.purchaseLinks || {})
+      : (bookPurchaseLinks || {});
 
-    Object.entries(ed.purchaseLinks || {}).forEach(([key, url]) => {
+    Object.entries(editionPurchaseLinks).forEach(([key, url]) => {
       if (typeof url === "string" && /^https?:\/\//i.test(url.trim())) {
         links[key] = url.trim();
       }
@@ -378,7 +381,7 @@ function AdminBooks() {
             ...book,
             _editionKey: key,
             _editionLabel: ed.label || key,
-            _editionLinks: extractEditionLinks(ed),
+            _editionLinks: extractEditionLinks(ed, book.purchaseLinks || {}),
             _languageCode: ed.languageCode || key,
           });
         });

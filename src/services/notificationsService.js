@@ -2,14 +2,21 @@ const ADMIN_EMAIL = "vanuragverma2173@gmail.com";
 const EDGE_ENDPOINT = import.meta.env.VITE_ADMIN_NOTIFICATION_ENDPOINT || null;
 const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/" + ADMIN_EMAIL;
 
-async function sendAdminNotification({ subject, name, email, message }) {
+export async function sendAdminNotification({ subject, name, email, message, captchaToken = "" }) {
   // Prefer the Supabase Edge Function if configured
   if (EDGE_ENDPOINT) {
     try {
       const response = await fetch(EDGE_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, name, email, message }),
+        body: JSON.stringify({
+          subject,
+          name,
+          email,
+          message,
+          turnstileToken: captchaToken || "",
+          "cf-turnstile-response": captchaToken || "",
+        }),
         keepalive: true,
       });
       if (response.ok) return true;

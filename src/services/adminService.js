@@ -209,6 +209,12 @@ function normalizeReviewRow(row) {
   };
 }
 
+function assertBooksMutationAffectedRows(data, actionLabel) {
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error(`${actionLabel} failed: no book rows were affected. Check books table RLS policies.`);
+  }
+}
+
 export function getDefaultBookForm() {
   return toBookForm();
 }
@@ -699,8 +705,9 @@ export async function upsertAdminBook(form) {
   }
 
   const payload = fromBookForm(form);
-  const { error } = await supabase.from("books").upsert(payload);
+  const { data, error } = await supabase.from("books").upsert(payload).select("id");
   if (error) throw error;
+  assertBooksMutationAffectedRows(data, "Save book");
 }
 
 export async function updateAdminBookEditionLinks(bookId, editionKey, newLinks) {
@@ -713,11 +720,21 @@ export async function updateAdminBookEditionLinks(bookId, editionKey, newLinks) 
     if (fetchError) throw fetchError;
     const editions = { ...(existing?.editions || {}) };
     editions[editionKey] = { ...(editions[editionKey] || {}), purchaseLinks: newLinks };
-    const { error } = await supabase.from("books").update({ editions, updated_at: new Date().toISOString() }).eq("id", bookId);
+    const { data, error } = await supabase
+      .from("books")
+      .update({ editions, updated_at: new Date().toISOString() })
+      .eq("id", bookId)
+      .select("id");
     if (error) throw error;
+    assertBooksMutationAffectedRows(data, "Update edition links");
   } else {
-    const { error } = await supabase.from("books").update({ purchase_links: newLinks, updated_at: new Date().toISOString() }).eq("id", bookId);
+    const { data, error } = await supabase
+      .from("books")
+      .update({ purchase_links: newLinks, updated_at: new Date().toISOString() })
+      .eq("id", bookId)
+      .select("id");
     if (error) throw error;
+    assertBooksMutationAffectedRows(data, "Update book links");
   }
 }
 
@@ -726,8 +743,13 @@ export async function deleteAdminBook(bookId) {
     throw new Error("Supabase is required to delete books.");
   }
 
-  const { error } = await supabase.from("books").update({ deleted_at: new Date().toISOString(), status: "archived", updated_at: new Date().toISOString() }).eq("id", bookId);
+  const { data, error } = await supabase
+    .from("books")
+    .update({ deleted_at: new Date().toISOString(), status: "archived", updated_at: new Date().toISOString() })
+    .eq("id", bookId)
+    .select("id");
   if (error) throw error;
+  assertBooksMutationAffectedRows(data, "Delete book");
 }
 
 export async function restoreAdminBook(bookId) {
@@ -735,8 +757,13 @@ export async function restoreAdminBook(bookId) {
     throw new Error("Supabase is required to restore books.");
   }
 
-  const { error } = await supabase.from("books").update({ deleted_at: null, status: "draft", updated_at: new Date().toISOString() }).eq("id", bookId);
+  const { data, error } = await supabase
+    .from("books")
+    .update({ deleted_at: null, status: "draft", updated_at: new Date().toISOString() })
+    .eq("id", bookId)
+    .select("id");
   if (error) throw error;
+  assertBooksMutationAffectedRows(data, "Restore book");
 }
 
 export async function fetchAdminBlogPosts(options = {}) {
