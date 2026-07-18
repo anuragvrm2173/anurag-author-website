@@ -196,6 +196,8 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
 
       return String(left.name || "").localeCompare(String(right.name || ""));
     });
+  const hasBuyLinks = displayRetailers.length > 0;
+  const showAvailableMode = isPublished || hasBuyLinks;
   const hasSample = Boolean(activeEdition.sampleId);
   const primaryFormatKey = getPrimaryFormat(activeEdition.formats || {});
   const displayFormat = primaryFormatKey ? toTitleCase(primaryFormatKey) : (activeEdition.formatLabel || (isHindi ? "संस्करण" : "Edition"));
@@ -205,7 +207,7 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     ? { currency: "INR", amount: activeEdition.priceInr }
     : null);
   const displayPrice = formatCurrencyPrice(displayPricing);
-  const availabilityLabel = isPublished
+  const availabilityLabel = showAvailableMode
     ? (isHindi ? "उपलब्ध अब" : "Available Now")
     : (isHindi ? "शीघ्र" : "Coming Soon");
 
@@ -276,11 +278,11 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     <>
       <aside className="purchase-panel">
       <div className="purchase-panel__header">
-        <h2 className="purchase-panel__title">{isPublished ? (isHindi ? "यहां उपलब्ध" : "Available At") : (isHindi ? "उपलब्धता" : "Availability")}</h2>
-        <p className="purchase-panel__status">{isPublished ? availabilityLabel : (isHindi ? "शीघ्र" : "Coming Soon")}</p>
+        <h2 className="purchase-panel__title">{showAvailableMode ? (isHindi ? "यहां उपलब्ध" : "Available At") : (isHindi ? "उपलब्धता" : "Availability")}</h2>
+        <p className="purchase-panel__status">{availabilityLabel}</p>
       </div>
 
-      {isPublished ? (
+      {showAvailableMode ? (
         <>
           <div className="purchase-panel__price-block" aria-label={isHindi ? "संस्करण मूल्य" : "Edition pricing"}>
             <p className="purchase-panel__price-format">{displayFormat}</p>
