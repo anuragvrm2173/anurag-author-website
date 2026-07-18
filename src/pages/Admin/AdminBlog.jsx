@@ -282,10 +282,6 @@ function AdminBlog() {
     };
   }, [showArchived]);
 
-  useEffect(() => {
-    setDisplayLimit(20);
-  }, [activeStatus, sortBy]);
-
   const selectedPost = useMemo(() => posts.find((item) => item.id === postId || item.slug === postId) || null, [postId, posts]);
   const filteredPosts = useMemo(() => {
     if (activeStatus === "all") {
@@ -350,6 +346,7 @@ function AdminBlog() {
                 type="button"
                 className={`admin-filter-chip ${activeStatus === value ? "admin-filter-chip--active" : ""}`.trim()}
                 onClick={() => {
+                  setDisplayLimit(20);
                   const nextShowArchived = value === "archived";
                   setShowArchived(nextShowArchived);
                   setSearchParams((current) => {
@@ -377,6 +374,7 @@ function AdminBlog() {
           <label className="admin-sort" htmlFor="admin-blog-sort">
             <span>Sort by</span>
             <select id="admin-blog-sort" value={sortBy} onChange={(event) => {
+              setDisplayLimit(20);
               setSortBy(event.target.value);
               setSearchParams((current) => {
                 const nextParams = new URLSearchParams(current);

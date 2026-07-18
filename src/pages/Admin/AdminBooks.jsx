@@ -68,13 +68,6 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
     } catch { return [{ key: "amazon", url: "" }]; }
   });
 
-  // Keep form.purchaseLinksJson in sync whenever purchaseRows changes
-  useEffect(() => {
-    const obj = {};
-    purchaseRows.forEach(({ key, url }) => { if (key && url) obj[key] = url; });
-    setForm((current) => ({ ...current, purchaseLinksJson: JSON.stringify(obj, null, 2) }));
-  }, [purchaseRows]);
-
   function updateEditionCover(editionKey, coverKey, publicUrl) {
     const editions = JSON.parse(form.editionsJson || "{}");
     const nextEditions = {
@@ -104,9 +97,20 @@ function BookEditorForm({ initialForm, selectedBook, onSaved, onError, onReset }
         setSaving(true);
         onError("");
         try {
-          await upsertAdminBook(form);
-          await onSaved(form);
-          navigate(`/admin/books/${form.id || form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+          const nextPurchaseLinks = {};
+          purchaseRows.forEach(({ key, url }) => {
+            if (key && url) {
+              nextPurchaseLinks[key] = url;
+            }
+          });
+          const nextForm = {
+            ...form,
+            purchaseLinksJson: JSON.stringify(nextPurchaseLinks, null, 2),
+          };
+
+          await upsertAdminBook(nextForm);
+          await onSaved(nextForm);
+          navigate(`/admin/books/${nextForm.id || nextForm.slug || nextForm.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
         } catch (nextError) {
           onError(nextError.message);
         } finally {

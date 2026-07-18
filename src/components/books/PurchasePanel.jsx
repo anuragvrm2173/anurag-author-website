@@ -178,10 +178,6 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const isPublished = bookStatus === "Published";
   const retailers = normalizeRetailers(activeEdition);
-  const retailerByKey = retailers.reduce((acc, item) => {
-    acc[item.key] = item;
-    return acc;
-  }, {});
   const displayRetailers = retailers
     .filter((item) => item.available && item.url)
     .sort((left, right) => {

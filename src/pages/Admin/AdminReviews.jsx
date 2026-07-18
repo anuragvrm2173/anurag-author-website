@@ -161,14 +161,11 @@ function AdminReviews() {
   }, []);
 
   const filteredReviews = useMemo(() => {
-    let filtered = reviews;
-    if (activeStatus === "all") {
-      filtered = reviews;
-    } else if (activeStatus === "pending") {
-      filtered = reviews.filter((review) => ["submitted", "pending"].includes(review.status));
-    } else {
-      filtered = reviews.filter((review) => review.status === activeStatus);
-    }
+    const filtered = activeStatus === "all"
+      ? reviews
+      : activeStatus === "pending"
+        ? reviews.filter((review) => ["submitted", "pending"].includes(review.status))
+        : reviews.filter((review) => review.status === activeStatus);
 
     const sorted = [...filtered];
     if (sortBy === "highest-rated") {
