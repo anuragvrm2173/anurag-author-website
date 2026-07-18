@@ -16,7 +16,7 @@ const STORE_LOGOS = {
 
 const FORMAT_KEYS = new Set(["paperback", "kindle", "ebook", "hardcover", "audiobook"]);
 const FORMAT_PRIORITY = ["paperback", "hardcover", "kindle", "ebook", "audiobook"];
-const REQUIRED_RETAILERS = ["pothi", "amazon", "notionpress", "flipkart"];
+const RETAILER_PRIORITY = ["pothi", "amazon", "notionpress", "flipkart", "kindle"];
 
 function normalizeRetailerKey(value = "") {
   const normalized = String(value || "")
@@ -126,7 +126,16 @@ function normalizeRetailers(activeEdition) {
     }
   });
 
-  return Array.from(structuredByKey.values());
+  const merged = Array.from(structuredByKey.values());
+  const hasDirectPurchaseLinks = fromLinks.some((item) => item.url);
+
+  // If admin has explicitly configured purchase links, use only those keys.
+  if (hasDirectPurchaseLinks) {
+    const allowedKeys = new Set(fromLinks.map((item) => item.key).filter(Boolean));
+    return merged.filter((item) => allowedKeys.has(item.key));
+  }
+
+  return merged;
 }
 
 function formatCurrencyPrice(pricing) {
@@ -173,24 +182,19 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
     acc[item.key] = item;
     return acc;
   }, {});
+  const displayRetailers = retailers
+    .filter((item) => item.available && item.url)
+    .sort((left, right) => {
+      const leftIndex = RETAILER_PRIORITY.indexOf(left.key);
+      const rightIndex = RETAILER_PRIORITY.indexOf(right.key);
+      const leftRank = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+      const rightRank = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
 
-  const extraRetailerKeys = retailers
-    .map((item) => item.key)
-    .filter((key) => key && !REQUIRED_RETAILERS.includes(key));
-
-  const displayRetailers = [...REQUIRED_RETAILERS, ...extraRetailerKeys].map((key) => {
-      const item = retailerByKey[key];
-      if (item) {
-        return item;
+      if (leftRank !== rightRank) {
+        return leftRank - rightRank;
       }
-      return {
-        key,
-        name: toTitleCase(key),
-        available: false,
-        url: null,
-        actionLabel: `Buy from ${toTitleCase(key)}`,
-        statusLabel: "Coming Soon",
-      };
+
+      return String(left.name || "").localeCompare(String(right.name || ""));
     });
   const hasSample = Boolean(activeEdition.sampleId);
   const primaryFormatKey = getPrimaryFormat(activeEdition.formats || {});
@@ -296,40 +300,39 @@ function PurchasePanel({ bookStatus, book, activeEdition, onPreviewOpen, isHindi
                     <span>{retailer.name}</span>
                   </span>
                   <span className="purchase-panel__retailer-subtext">
-                    {retailer.available && retailer.url ? getRetailerDescriptor(retailer) : "Coming Soon"}
+                    {getRetailerDescriptor(retailer)}
                   </span>
                 </>
               );
-
-              if (retailer.available && retailer.url) {
-                return (
-                  <button
-                    type="button"
-                    key={retailer.key}
-                    className="purchase-panel__button purchase-panel__button--secondary"
-                    aria-label={retailer.actionLabel}
-                    onClick={() => {
-                      notifyBuyLinkClick({
-                        bookTitle: book?.title,
-                        editionLabel: activeEdition?.label || activeEdition?.formatLabel,
-                        retailer: retailer.name,
-                        url: retailer.url,
-                        source: "purchase-panel",
-                      });
-                      openLeadModal(retailer);
-                    }}
-                  >
-                    {content}
-                  </button>
-                );
-              }
-
               return (
-                <div key={retailer.key} className="purchase-panel__button purchase-panel__button--secondary purchase-panel__button--disabled" aria-label={`${retailer.name} coming soon`}>
+                <button
+                  type="button"
+                  key={retailer.key}
+                  className="purchase-panel__button purchase-panel__button--secondary"
+                  aria-label={retailer.actionLabel}
+                  onClick={() => {
+                    notifyBuyLinkClick({
+                      bookTitle: book?.title,
+                      editionLabel: activeEdition?.label || activeEdition?.formatLabel,
+                      retailer: retailer.name,
+                      url: retailer.url,
+                      source: "purchase-panel",
+                    });
+                    openLeadModal(retailer);
+                  }}
+                >
                   {content}
-                </div>
+                </button>
               );
             })}
+            {displayRetailers.length === 0 ? (
+              <div className="purchase-panel__button purchase-panel__button--secondary purchase-panel__button--disabled" aria-label="Buy links coming soon">
+                <span className="purchase-panel__retailer-top-row">
+                  <span>Buy links</span>
+                </span>
+                <span className="purchase-panel__retailer-subtext">Coming Soon</span>
+              </div>
+            ) : null}
           </div>
 
           <div className="purchase-panel__secondary-actions">

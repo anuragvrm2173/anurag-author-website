@@ -41,6 +41,24 @@ function normalizeRetailerKey(value = "") {
 
 function getPrimaryBuyLink(edition) {
   const retailerPriority = RETAILER_PRIORITY.map(normalizeRetailerKey);
+  const purchaseLinks = Object.entries(edition?.purchaseLinks || {})
+    .map(([key, url]) => ({
+      key: normalizeRetailerKey(key),
+      url: typeof url === "string" ? url.trim() : "",
+    }))
+    .filter((item) => item.url && /^https?:\/\//i.test(item.url))
+    .sort((left, right) => {
+      const leftIndex = retailerPriority.indexOf(left.key);
+      const rightIndex = retailerPriority.indexOf(right.key);
+      const leftRank = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+      const rightRank = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
+      return leftRank - rightRank;
+    });
+
+  if (purchaseLinks[0]?.url) {
+    return purchaseLinks[0].url;
+  }
+
   const retailers = Object.entries(edition?.retailers || {})
     .map(([key, value]) => ({
       key: normalizeRetailerKey(key),
@@ -60,21 +78,7 @@ function getPrimaryBuyLink(edition) {
     return retailers[0].url;
   }
 
-  const purchaseLinks = Object.entries(edition?.purchaseLinks || {})
-    .map(([key, url]) => ({
-      key: normalizeRetailerKey(key),
-      url: typeof url === "string" ? url.trim() : "",
-    }))
-    .filter((item) => item.url && /^https?:\/\//i.test(item.url))
-    .sort((left, right) => {
-      const leftIndex = retailerPriority.indexOf(left.key);
-      const rightIndex = retailerPriority.indexOf(right.key);
-      const leftRank = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
-      const rightRank = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
-      return leftRank - rightRank;
-    });
-
-  return purchaseLinks[0]?.url || null;
+  return null;
 }
 
 function BookDetails() {
